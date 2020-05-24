@@ -3,4 +3,12 @@ for stm32f1xx and stm32f4xx
 
 STM32F1xxとSTM32F4xxのプロジェクトおよびライブラリ
 
-※作業中！
+※グラフィックライブラリを追加。
+
+examples/cppGraphicの中にグラフィックライブラリ利用例のプロジェクトを作成。
+
+CoIDEでプロジェクトを開く事。
+
+日本語コードはUTF8Nとしているので、CoIDEのエディタの設定をUTF8Nに変更する事。
+
+以上
