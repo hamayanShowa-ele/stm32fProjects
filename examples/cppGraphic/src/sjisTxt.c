@@ -29,8 +29,6 @@
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-//char sjisTest[] = "à_Œ´";  // 0xE05F,0x8CB4
-
 /*
 http://www.gutenberg.org/files/11/11-h/11-h.htm
 */
