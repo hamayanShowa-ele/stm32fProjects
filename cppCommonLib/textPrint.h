@@ -29,6 +29,9 @@
 #include  <derivertive.h>
 extern "C"
 {
+  #include  <stdarg.h>
+  #include  <stdio.h>
+  #include  <string.h>
   #include  <font8.h>
   #include  <font16.h>
   #include  <font48.h>
@@ -65,6 +68,8 @@ public:
   int  putc( const char *code, int type = TYPE_ASCII_8 );
   void puts( const char *code, int type = TYPE_ASCII_8 );
   void write( const char *code, size_t len, int type = TYPE_ASCII_8 );
+  int  printf( int type, const char *fmt, ... );
+  int  printf( const char *fmt, ... );
 
   uint16_t fontWidth( int type = TYPE_ASCII_8 );
   uint16_t fontHeight( int type = TYPE_ASCII_8 );

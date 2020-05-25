@@ -14,28 +14,33 @@
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
 <part id="1"/>
+<part id="2"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/src/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="13147" selectionTopPixel="7395"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="9483" selectionTopPixel="5270"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="button.cpp" partName="button.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/button.cpp" title="button.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/button.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/button.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="930"/>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.cpp" partName="textPrint.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/textPrint.cpp" title="textPrint.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/textPrint.cpp" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/textPrint.cpp"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10667" selectionTopPixel="6101"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.h" partName="textPrint.h" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/textPrint.h" title="textPrint.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/textPrint.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/textPrint.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2404" selectionTopPixel="1137"/>
 </editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="3">
+<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="1">
 <expanded>
 <element path="/cppGraphic"/>
 <element path="/cppGraphic/cppCommonLib"/>
 </expanded>
 <selection>
-<element path="/cppGraphic/cppCommonLib/button.cpp"/>
+<element path="/cppGraphic/cppCommonLib/textPrint.h"/>
 </selection>
 </viewState>
 </view>
@@ -265,76 +270,17 @@
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/src/main.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/button.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/button.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/textPrint.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/draw.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/images/sw8025.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/src/derivertive.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/draw.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/src/sjisTxt.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/button.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/button.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/textPrint.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/textPrint.h"/>
 </editors>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3066" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position info="not_deleted" x="4282" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3202" y="0"/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="2978" y="0"/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3009" y="0"/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3053" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3053" y="0"/>
-</item>
-<item historyLabel="button.cpp" index="2">
-<position info="not_deleted" x="3066" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="7596" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="7619" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="7654" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="7596" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="7619" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="5660" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="5676" y="0"/>
-</item>
-<item historyLabel="textPrint.cpp" index="3">
-<position info="not_deleted" x="5676" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="0">
-<position/>
-</item>
-<item historyLabel="sw8025.c" index="5">
+<item historyLabel="sw8025.c" index="3">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
@@ -349,13 +295,13 @@
 <item historyLabel="button.h" index="1">
 <position info="not_deleted" x="1703" y="0"/>
 </item>
-<item historyLabel="sw8025.c" index="5">
+<item historyLabel="sw8025.c" index="3">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="button.h" index="1">
 <position info="not_deleted" x="1703" y="0"/>
 </item>
-<item historyLabel="derivertive.h" index="6">
+<item historyLabel="derivertive.h" index="4">
 <position info="not_deleted" x="5330" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
@@ -370,19 +316,19 @@
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13310" y="0"/>
 </item>
-<item historyLabel="derivertive.h" index="6">
+<item historyLabel="derivertive.h" index="4">
 <position info="not_deleted" x="5330" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13310" y="0"/>
 </item>
-<item historyLabel="draw.h" index="4">
+<item historyLabel="draw.h" index="2">
 <position info="not_deleted" x="5567" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13310" y="0"/>
 </item>
-<item historyLabel="draw.cpp" index="7">
+<item historyLabel="draw.cpp" index="5">
 <position info="not_deleted" x="2509" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
@@ -394,19 +340,19 @@
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13310" y="0"/>
 </item>
-<item historyLabel="sjisTxt.h" index="8">
+<item historyLabel="sjisTxt.h" index="6">
 <position/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="11720" y="0"/>
 </item>
-<item historyLabel="sjisTxt.h" index="8">
+<item historyLabel="sjisTxt.h" index="6">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="11515" y="0"/>
 </item>
-<item historyLabel="button.cpp" index="9">
+<item historyLabel="button.cpp" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
 <item historyLabel="main.cpp" index="0">
@@ -418,11 +364,71 @@
 <item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13008" y="0"/>
 </item>
-<item historyLabel="button.cpp" index="9">
+<item historyLabel="button.cpp" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item active="true" historyLabel="main.cpp" index="0">
+<item historyLabel="main.cpp" index="0">
 <position info="not_deleted" x="13008" y="0"/>
+</item>
+<item historyLabel="button.cpp" index="8">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="12992" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10205" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="2408" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10419" y="46"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="2557" y="10"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10419" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10381" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="1193" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10381" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="1193" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10208" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="1193" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="2404" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10731" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="12992" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="9310" y="0"/>
+</item>
+<item historyLabel="textPrint.h" index="10">
+<position info="not_deleted" x="2404" y="0"/>
+</item>
+<item historyLabel="textPrint.cpp" index="9">
+<position info="not_deleted" x="10667" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="9310" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -431,6 +437,33 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.h" tooltip="cppGraphic/cppCommonLib/textPrint.h">
+<persistable path="/cppGraphic/cppCommonLib/textPrint.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.cpp" tooltip="cppGraphic/cppCommonLib/textPrint.cpp">
+<persistable path="/cppGraphic/cppCommonLib/textPrint.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw.h" tooltip="cppGraphic/cppCommonLib/draw.h">
+<persistable path="/cppGraphic/cppCommonLib/draw.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="draw.cpp" tooltip="cppGraphic/cppCommonLib/draw.cpp">
+<persistable path="/cppGraphic/cppCommonLib/draw.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="0900.cpp" tooltip="cppGraphic/src/0900.cpp">
+<persistable path="/cppGraphic/src/0900.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="0900.h" tooltip="cppGraphic/src/0900.h">
+<persistable path="/cppGraphic/src/0900.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.cpp" tooltip="cppGraphic/cppCommonLib/s1d13743.cpp">
+<persistable path="/cppGraphic/cppCommonLib/s1d13743.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.h" tooltip="cppGraphic/cppCommonLib/s1d13743.h">
+<persistable path="/cppGraphic/cppCommonLib/s1d13743.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="sjisTxt.c" tooltip="cppGraphic/src/sjisTxt.c">
+<persistable path="/cppGraphic/src/sjisTxt.c"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="button.cpp" tooltip="cppGraphic/cppCommonLib/button.cpp">
 <persistable path="/cppGraphic/cppCommonLib/button.cpp"/>
 </file>
@@ -443,35 +476,8 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="sw8025.c" tooltip="cppGraphic/images/sw8025.c">
 <persistable path="/cppGraphic/images/sw8025.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.cpp" tooltip="cppGraphic/cppCommonLib/textPrint.cpp">
-<persistable path="/cppGraphic/cppCommonLib/textPrint.cpp"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.h" tooltip="cppGraphic/cppCommonLib/textPrint.h">
-<persistable path="/cppGraphic/cppCommonLib/textPrint.h"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="semihosting.h" tooltip="cppGraphic/semihosting/semihosting.h">
 <persistable path="/cppGraphic/semihosting/semihosting.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="sh_cmd.s" tooltip="cppGraphic/semihosting/sh_cmd.s">
-<persistable path="/cppGraphic/semihosting/sh_cmd.s"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f10x_hd.c" tooltip="cppGraphic/cmsis_boot/startup/startup_stm32f10x_hd.c">
-<persistable path="/cppGraphic/cmsis_boot/startup/startup_stm32f10x_hd.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_it.c" tooltip="cppGraphic/src/stm32f10x_it.c">
-<persistable path="/cppGraphic/src/stm32f10x_it.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.cpp" tooltip="cppGraphic/cppCommonLib/s1d13743.cpp">
-<persistable path="/cppGraphic/cppCommonLib/s1d13743.cpp"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="cppGraphic/myOs/mul_tsk.c">
-<persistable path="/cppGraphic/myOs/mul_tsk.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="button.cpp" tooltip="cppGraphic/cppCommonLib/button.cpp">
-<persistable path="/cppGraphic/cppCommonLib/button.cpp"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="sjisTxt.h" tooltip="cppGraphic/src/sjisTxt.h">
-<persistable path="/cppGraphic/src/sjisTxt.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="cppGraphic/myOs/mul_tsk.c">
 <persistable path="/cppGraphic/myOs/mul_tsk.c"/>

@@ -315,20 +315,11 @@ void lcdDemo02( void )
     struct tm localTime;
     localtime_r( &unixTime, &localTime );
 
-    char buffer[16];
-    sprintf( buffer, "  %02d/%02d",
-//      localTime.tm_year + 1900,
-      localTime.tm_mon + 1,
-      localTime.tm_mday );
     dateTxt.clearScreen();
-    dateTxt.puts( buffer, TYPE_ASCII_48 );
+    dateTxt.printf( TYPE_ASCII_48, "   %02d/%02d", localTime.tm_mon + 1, localTime.tm_mday );
 
-    sprintf( buffer, "%02d:%02d:%02d\r\n",
-      localTime.tm_hour,
-      localTime.tm_min,
-      localTime.tm_sec );
     timeTxt.clearScreen();
-    timeTxt.puts( buffer, TYPE_ASCII_48 );
+    timeTxt.printf( TYPE_ASCII_48, "%02d:%02d:%02d", localTime.tm_hour, localTime.tm_min, localTime.tm_sec );
 
     dly_tsk( 0.9 * 1000UL );
   }
