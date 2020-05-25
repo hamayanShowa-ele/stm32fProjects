@@ -370,4 +370,4 @@ void DMA2_Channel4_5_IRQHandler( void )
   }
 }
 
-}
+}  /* extern "C" */
