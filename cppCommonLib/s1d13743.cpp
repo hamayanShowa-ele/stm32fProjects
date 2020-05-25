@@ -44,6 +44,16 @@ S1D13743::~S1D13743()
 }
 
 /* ----------------------------------------
+    S1D13743 device revision code
+---------------------------------------- */
+uint8_t S1D13743::revision()
+{
+  GLCD_ADDRESS_SET = GLCD_ADR_REVISION_CODE;
+  uint8_t rev = GLCD_DATA_BYTE_ADR;
+  return rev;
+}
+
+/* ----------------------------------------
     begin and end
 ---------------------------------------- */
 /* ----------------------------------------
@@ -121,7 +131,20 @@ int S1D13743::begin()
   GLCD_DATA_BYTE_ADR = LCD_DISP_PIN;    /*DISP is high. Enable the display by setting the DISP pin to High. 0x5C*/
 //  GLCD_DATA_BYTE_ADR = 0x00;    /*DISP is low. Disable the display by setting the DISP pin to High. */
 
+  swivelView( SWIVEL_VIEW_180 );  /* 180 degree rotation */
+
   return 0;
+}
+
+/* ----------------------------------------
+    swivel view.
+---------------------------------------- */
+void S1D13743::swivelView( uint8_t rotation )
+{
+  GLCD_ADDRESS_SET = GLCD_ADR_DISPLAY_MODE;  /* Display Mode Register 0x34 */
+  rotation &= 0x03;
+  rotation |= 0x08;
+  GLCD_DATA_BYTE_ADR = rotation;  /* bit2,1,0=SwivelView 0:normal,1:90,2:180,3:270*/
 }
 
 /* ----------------------------------------

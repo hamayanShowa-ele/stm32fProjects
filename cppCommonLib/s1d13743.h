@@ -98,6 +98,10 @@ extern "C"
 #define  HSYNC_PERIOD   525
 #define  VSYNC_PERIOD   286
 
+#define  SWIVEL_VIEW_000 0
+#define  SWIVEL_VIEW_090 1
+#define  SWIVEL_VIEW_180 2
+#define  SWIVEL_VIEW_270 3
 
 
 #if 0
@@ -123,6 +127,7 @@ public:
   S1D13743();
   ~S1D13743();
 
+  uint8_t revision();
   int begin();
   int vaConfig( uint16_t l = 0, uint16_t u = 0, uint16_t r = X_MAX_PIXEL - 1, uint16_t d = Y_MAX_PIXEL - 1 );
   uint16_t left();
@@ -138,6 +143,8 @@ public:
   void write( const uint16_t *data, uint32_t size );
   void write( uint16_t data, uint32_t size );
   void read( uint32_t adr, uint16_t *dst, uint32_t size = 1 );
+
+  void swivelView( uint8_t r );
 
 private:
   uint16_t va_width,va_height;

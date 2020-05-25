@@ -526,3 +526,12 @@ uint16_t DRAW::rgb24to16( uint8_t r, uint8_t g, uint8_t b )
   return tempUS;
 }
 
+/* ----------------------------------------
+    lcd rotation.
+---------------------------------------- */
+void DRAW::rotation( uint8_t r )
+{
+  wai_sem( SEMID_GCLD );  /* Waiting to get Semaphore. */
+  swivelView( r );
+  sig_sem( SEMID_GCLD );  /* Disarming the semaphore */
+}

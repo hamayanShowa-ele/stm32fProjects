@@ -160,6 +160,8 @@ int main(void)
   backLight.begin( BRIGHT );
   backLight.brightness( BRIGH_LV16 ); // BRIGHTEST
   DRAW draw;
+  /* There is a problem with the read operation from S1D13743 that stops after a while. */
+//  uint8_t s1d13743Revision = draw.revision();
   if( draw.begin() < 0 )
   {
     while( 1 )
@@ -403,14 +405,16 @@ void lcdDemo05( void )
   TEXT_PRINT txt(14);
   txt.vaConfig( 0,200,199,271 );
   txt.clearScreen();
+
   while( 1 )
   {
     for( int count = 0; count < (int)AliceInWonderlandSize; count++ )
     {
       if( count & 1 ) txt.color( RGB565_YELLO );
       else txt.color( RGB565_CYAN );
+      txt.clearScreen();
       txt.puts( AliceInWonderland[ count ] );
-      txt.clearLine();
+//      txt.clearLine();
       dly_tsk( 2 * 1000UL );
     }
     dly_tsk( 10 * 1000UL );

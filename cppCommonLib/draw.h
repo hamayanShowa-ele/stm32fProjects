@@ -115,6 +115,7 @@ public:
   void polygon( APEX *apex, int size, uint16_t color );
   uint16_t rgb24to16( uint32_t color );
   uint16_t rgb24to16( uint8_t r, uint8_t g, uint8_t b );
+  void rotation( uint8_t r = SWIVEL_VIEW_000 );
 
 private:
   void ftriangle( const POLYGON *tri, int minY, int maxY, uint16_t color );
