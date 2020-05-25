@@ -58,13 +58,28 @@ void TEXT_PRINT::color( uint16_t fg, uint16_t bg )
 }
 
 /* ----------------------------------------
-    clear
+    clear screen and clear line.
 ---------------------------------------- */
-void TEXT_PRINT::clear()
+void TEXT_PRINT::clearScreen()
 {
   fillRectangle( 0, 0, right() - left(), down() - up(), bgColor );
   posX = 0;  /* The position at which to start writing the letter. */
   posY = 0;  /* The position at which to start writing the letter. */
+}
+
+void TEXT_PRINT::clearLine()
+{
+  fillRectangle( 0, posY, right() - left(), posY + gapY - 1, bgColor );
+  posX = 0;  /* The position at which to start writing the letter. */
+}
+
+void TEXT_PRINT::clearLine( int line )
+{
+  if( ((line + 1) * gapY) <= down() )
+  {
+    locate( 0, line * gapY );
+    clearLine();
+  }
 }
 
 /* ----------------------------------------
@@ -292,6 +307,18 @@ int TEXT_PRINT::putc( const char *code, int type )
 void TEXT_PRINT::puts( const char *code, int type )
 {
   while( *code )
+  {
+    int len = putc( code, type );
+    code += len;
+  }
+}
+
+/* ----------------------------------------
+    write
+---------------------------------------- */
+void TEXT_PRINT::write( const char *code, size_t len, int type )
+{
+  for( int i = 0; i < (int)len; i++ )
   {
     int len = putc( code, type );
     code += len;

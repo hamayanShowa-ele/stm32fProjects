@@ -296,12 +296,12 @@ void lcdDemo02( void )
   TEXT_PRINT dateTxt(48);
   dateTxt.vaConfig( 200,0,399,49 );
   dateTxt.color( RGB565_GREEN );
-  dateTxt.clear();
+  dateTxt.clearScreen();
 
   TEXT_PRINT timeTxt(48);
   timeTxt.vaConfig( 200,50,399,99 );
   timeTxt.color( RGB565_CYAN );
-  timeTxt.clear();
+  timeTxt.clearScreen();
 
   time_t baseTim = unixTime;
   while( 1 )
@@ -318,14 +318,14 @@ void lcdDemo02( void )
 //      localTime.tm_year + 1900,
       localTime.tm_mon + 1,
       localTime.tm_mday );
-    dateTxt.clear();
+    dateTxt.clearScreen();
     dateTxt.puts( buffer, TYPE_ASCII_48 );
 
     sprintf( buffer, "%02d:%02d:%02d\r\n",
       localTime.tm_hour,
       localTime.tm_min,
       localTime.tm_sec );
-    timeTxt.clear();
+    timeTxt.clearScreen();
     timeTxt.puts( buffer, TYPE_ASCII_48 );
 
     dly_tsk( 0.9 * 1000UL );
@@ -402,14 +402,15 @@ void lcdDemo05( void )
 {
   TEXT_PRINT txt(14);
   txt.vaConfig( 0,200,199,271 );
+  txt.clearScreen();
   while( 1 )
   {
     for( int count = 0; count < (int)AliceInWonderlandSize; count++ )
     {
-      txt.clear();
       if( count & 1 ) txt.color( RGB565_YELLO );
       else txt.color( RGB565_CYAN );
       txt.puts( AliceInWonderland[ count ] );
+      txt.clearLine();
       dly_tsk( 2 * 1000UL );
     }
     dly_tsk( 10 * 1000UL );
@@ -427,7 +428,7 @@ void lcdDemo06( void )
   int wakaIndex = 0;
   while( 1 )
   {
-    kanji.clear();
+    kanji.clearScreen();
     kanji.color( rgb[ rgbIndex++ ] );
     rgbIndex %= 4;
     kanji.puts( sjisMiyabi[ wakaIndex++ ] );

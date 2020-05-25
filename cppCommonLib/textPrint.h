@@ -58,10 +58,13 @@ public:
   ~TEXT_PRINT();
 
   void color( uint16_t fg = RGB565_WHITE, uint16_t bg = RGB565_BLACK );
-  void clear();
+  void clearScreen();
+  void clearLine();
+  void clearLine( int line );
   void locate( int x, int y );
   int  putc( const char *code, int type = TYPE_ASCII_8 );
   void puts( const char *code, int type = TYPE_ASCII_8 );
+  void write( const char *code, size_t len, int type = TYPE_ASCII_8 );
 
   uint16_t fontWidth( int type = TYPE_ASCII_8 );
   uint16_t fontHeight( int type = TYPE_ASCII_8 );
