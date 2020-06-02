@@ -48,10 +48,15 @@ public:
 
   int write( uint8_t data );
   int read();
+  int bitSet( int bit );
+  int bitReset( int bit );
 
 private:
   STM32F_I2C *wire;
   uint8_t slave;
+  uint8_t byteData;
+
+  int bitSetReset( uint8_t data );
 };
 
 
