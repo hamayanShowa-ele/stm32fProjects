@@ -60,41 +60,6 @@ uint16_t GPIO::whatPin( int pin )
 }
 
 /* ----------------------------------------
-    all pin make input pullup.
----------------------------------------- */
-void GPIO::allPullup()
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-  /* the first, all inputs are as input pull up and all outputs are as push/pull.*/
-  GPIO_StructInit( &GPIO_InitStruct );
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-  GPIO_Init( GPIOC, &GPIO_InitStruct );
-  GPIO_Init( GPIOD, &GPIO_InitStruct );
-  GPIO_Init( GPIOE, &GPIO_InitStruct );
-  GPIO_Init( GPIOF, &GPIO_InitStruct );
-  GPIO_Init( GPIOG, &GPIO_InitStruct );
-  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
-  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
-#if 0  /*JTAG*/
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
-  GPIO_InitStruct.GPIO_Pin &= ~(GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
-  GPIO_Init( GPIOA, &GPIO_InitStruct );
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
-  GPIO_InitStruct.GPIO_Pin &= ~(GPIO_Pin_3 | GPIO_Pin_4);
-  GPIO_Init( GPIOB, &GPIO_InitStruct );
-#else  /*SWD*/
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
-  GPIO_InitStruct.GPIO_Pin &= ~(GPIO_Pin_13 | GPIO_Pin_14);
-  GPIO_Init( GPIOA, &GPIO_InitStruct );
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
-  GPIO_Init( GPIOB, &GPIO_InitStruct );
-#endif
-}
-
-/* ----------------------------------------
     pin mode
 ---------------------------------------- */
 void GPIO::pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed )
@@ -134,6 +99,15 @@ void GPIO::reset( int pin )
 }
 
 /* ----------------------------------------
+    digital write
+---------------------------------------- */
+void GPIO::digitalWrite( int pin, int highOrLow )
+{
+  if( highOrLow ) set( pin );
+  else reset( pin );
+}
+
+/* ----------------------------------------
     digital read
 ---------------------------------------- */
 bool GPIO::digitalRead( int pin )
@@ -154,3 +128,74 @@ void GPIO::wordWrite( GPIO_TypeDef *gpiox, uint16_t data, uint16_t mask )
   gpiox->ODR = tempUS;
 }
 
+/* ----------------------------------------
+    all pin make input pullup or pulldown.
+---------------------------------------- */
+void GPIO::allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb )
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+
+  /* the first, all inputs are as input pull up and all outputs are as push/pull.*/
+  GPIO_StructInit( &GPIO_InitStruct );
+  GPIO_InitStruct.GPIO_Mode = mode;
+  GPIO_Init( GPIOC, &GPIO_InitStruct );
+  GPIO_Init( GPIOD, &GPIO_InitStruct );
+  GPIO_Init( GPIOE, &GPIO_InitStruct );
+  GPIO_Init( GPIOF, &GPIO_InitStruct );
+  GPIO_Init( GPIOG, &GPIO_InitStruct );
+  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
+  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
+  GPIO_InitStruct.GPIO_Mode = mode;
+  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
+//  GPIO_InitStruct.GPIO_Pin &= ~(GPIO_Pin_13 | GPIO_Pin_14);
+  GPIO_InitStruct.GPIO_Pin = pa;
+  GPIO_Init( GPIOA, &GPIO_InitStruct );
+//  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_All;
+  GPIO_InitStruct.GPIO_Pin = pb;
+  GPIO_Init( GPIOB, &GPIO_InitStruct );
+}
+
+void GPIO::allPullupOnSWD()
+{
+  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
+  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
+  allPullupPulldown( GPIO_Mode_IPU, GPIO_Pin_All & ~(GPIO_Pin_13 | GPIO_Pin_14), GPIO_Pin_All );
+}
+
+void GPIO::allPulldownOnSWD()
+{
+  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
+  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
+  allPullupPulldown( GPIO_Mode_IPD, GPIO_Pin_All & ~(GPIO_Pin_13 | GPIO_Pin_14), GPIO_Pin_All  );
+}
+
+void GPIO::allPullupOnJTAG()
+{
+  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
+  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
+  allPullupPulldown( GPIO_Mode_IPU, GPIO_Pin_All & ~(GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15), GPIO_Pin_All & ~(GPIO_Pin_3 | GPIO_Pin_4) );
+}
+
+void GPIO::allPulldownOnJTAG()
+{
+  /*GPIOA's 13pin,14pin and 15pin are used as the JTAG. But when using the SWD, only used 13pin and 14pin. */
+  /*GPIOB's 3pin and 4pin are used as the JTAG. But when using the SWD, not used.*/
+  allPullupPulldown( GPIO_Mode_IPD, GPIO_Pin_All & ~(GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15), GPIO_Pin_All & ~(GPIO_Pin_3 | GPIO_Pin_4) );
+}
+
+/* ----------------------------------------
+    SWD enable.
+---------------------------------------- */
+void GPIO::swdEnable()
+{
+  /* The GPIOA pins 13, 14, and 15 are used in JTAG. However, if it is used in SWD, only 13 and 14 pins are applicable. */
+  /* The GPIOB pins 3 and 4 are used in JTAG. However, in the case of SWD, these pins are not used. */
+  GPIO_PinRemapConfig( GPIO_Remap_SWJ_JTAGDisable, ENABLE );
+}
+
+void GPIO::jtagEnable()
+{
+  /* The GPIOA pins 13, 14, and 15 are used in JTAG. However, if it is used in SWD, only 13 and 14 pins are applicable. */
+  /* The GPIOB pins 3 and 4 are used in JTAG. However, in the case of SWD, these pins are not used. */
+  GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE );
+}

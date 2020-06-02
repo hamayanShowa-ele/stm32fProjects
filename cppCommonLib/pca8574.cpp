@@ -55,6 +55,7 @@ void PCA8574::begin( STM32F_I2C *i2c, uint8_t adr )
 {
   wire = i2c;
   slave = adr;
+  byteData = 0;
 }
 
 /* ----------------------------------------
@@ -62,9 +63,10 @@ void PCA8574::begin( STM32F_I2C *i2c, uint8_t adr )
 ---------------------------------------- */
 int PCA8574::write( uint8_t data )
 {
+  byteData = data;
   int ret = wire->beginTransmission( slave );
-  if( ret < 0 )return ret;
-  ret = wire->write( data );
+  if( ret < 0 ) return ret;
+  ret = wire->write( byteData );
   wire->endTransmission();
   return ret;
 }
@@ -80,4 +82,32 @@ int PCA8574::read()
   ret = wire->read();
   wire->endTransmission();
   return ret;
+}
+
+/* ----------------------------------------
+    bit set, bit reset.
+---------------------------------------- */
+int PCA8574::bitSetReset( uint8_t data )
+{
+  int ret = wire->beginTransmission( slave );
+  if( ret < 0 ) return ret;
+  ret = wire->write( data );
+  wire->endTransmission();
+  return ret;
+}
+
+int PCA8574::bitSet( int bit )
+{
+  uint8_t tempUC = 0x01;
+  tempUC <<= bit;
+  byteData |= tempUC;
+  return bitSetReset( byteData );
+}
+
+int PCA8574::bitReset( int bit )
+{
+  uint8_t tempUC = 0x01;
+  tempUC <<= bit;
+  byteData &= ~tempUC;
+  return bitSetReset( byteData );
 }

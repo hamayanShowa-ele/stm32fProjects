@@ -34,6 +34,9 @@
 /* ----------------------------------------
     defines
 ---------------------------------------- */
+#define  LOW   0
+#define  HIGH  ~LOW
+
 /* ----------------------------------------
   type
   GPIO_Mode_AIN or GPIO_Mode_IN_FLOATING
@@ -76,15 +79,24 @@ class GPIO  // : public hoge_class
 public:
   GPIO_TypeDef* whatGPIOType( int pin );
   uint16_t whatPin( int pin );
-  void allPullup();
   void pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed = GPIO_SPEED_FAST );
   void pinMode( int pin, int type, int speed = GPIO_SPEED_FAST );
 
   void set( int pin );
   void reset( int pin );
+  void digitalWrite( int pin, int highOrLow );
   bool digitalRead( int pin );
   void wordWrite( GPIO_TypeDef *gpiox, uint16_t data, uint16_t mask );
+
+  void allPullupOnSWD();
+  void allPulldownOnSWD();
+  void allPullupOnJTAG();
+  void allPulldownOnJTAG();
+  void swdEnable();
+  void jtagEnable();
+
 private:
+  void allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb );
 };
 
 
