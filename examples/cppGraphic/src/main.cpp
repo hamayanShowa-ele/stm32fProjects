@@ -26,10 +26,13 @@
 #include  <time.h>
 #include  <math.h>
 #include  <HardwareSerial.h>
+#include  <Wire.h>
 #include  <Timer.h>
 #include  <led.h>
-#include  <0900.h>
+//#include  "0900.h"
+#include  "1303_1304.h"
 #include  <lt3593.h>
+#include  <pca8574.h>
 #include  <draw.h>
 #include  <textPrint.h>
 #include  <button.h>
@@ -64,8 +67,12 @@ time_t unixTime;
 time_t sumTotalTime;  /* Total time since startup */
 
 Serial Serial1;  /* hardware serial 1 */
-BOARD_0900 board;  /* initialize gpio */
+BOARD  board;  /* initialize gpio */
 LT3593 backLight;
+STM32F_I2C i2c1;
+STM32F_I2C i2c2;
+PCA8574 ic7;
+PCA8574 ic8;
 
 const uint16_t rgb565_colors[] =
 {
@@ -153,12 +160,26 @@ int main(void)
   board.gpioInit();
   board.extBusInit();
 
+  /* initialize i2c */
+  if( i2c1.begin( I2C1, SDA1, SCL1 ) != I2C_SUCCESS )
+  {
+    while( 1 ) {}
+  }
+  if( i2c2.begin( I2C2, SDA2, SCL2 ) != I2C_SUCCESS )
+  {
+    while( 1 ) {}
+  }
+  ic7.begin( &i2c2, BOARD_1304_IC7_ADR );
+  ic7.write( 0xFF );
+  ic8.begin( &i2c2, BOARD_1304_IC8_ADR );
+  ic8.write( 0x00 );
+
   /* initialize LCD and graphic controller IC. */
   board.glcdClockInit();
   board.glcdReset();
   board.glcdSleep( false );
   backLight.begin( BRIGHT );
-  backLight.brightness( BRIGH_LV16 ); // BRIGHTEST
+  backLight.brightness( BRIGHTEST ); // BRIGHTEST
   DRAW draw;
   /* There is a problem with the read operation from S1D13743 that stops after a while. */
 //  uint8_t s1d13743Revision = draw.revision();

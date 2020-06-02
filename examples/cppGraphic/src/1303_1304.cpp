@@ -1,5 +1,5 @@
 /* ----------------------------------------
- board 0900 utilities.
+ board 1303 and 1304 utilities.
   for STMicroelectronics SPL library
 
   Copyright (c) 2020 hamayan (hamayan@showa-ele.jp).
@@ -22,7 +22,7 @@
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
 
-#include  "0900.h"
+#include  "1303_1304.h"
 
 /* ----------------------------------------
     prototypes 
@@ -31,6 +31,8 @@
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
+extern PCA8574 ic7;
+extern PCA8574 ic8;
 
 /* ----------------------------------------
     constructor destructor
@@ -60,34 +62,40 @@ void BOARD::gpioInit()
   /*  PA1： analog input*/
   /*  PA2： analog input*/
   /*  PA3： analog input*/
-  /*  PA4： analog input or dac output*/
-  /*  PA5： analog input or dac output*/
-  /*  PA6： analog input*/
-  /*  PA7： USBON output*/
-  /*  PA8: MCO output*/
-  pinMode( PA8, ALTERNATE_PP, GPIO_SPEED_FAST );
-  /*  PA9: USART1 TXD：Alternate function*/
-  /*  PA10: USART1 RXD：Alternate function*/
-  /*  PA11: USB DM*/
-  /*  PA12: USB DP*/
-  /*  PA13: SWDIO*/
-  /*  PA14: SWDCLK*/
-  /*  PA15： JTAG JTDI but not use.*/
+  /*  PA4： spi1 nss */
+  digitalWrite( PA4, HIGH );
+  pinMode( PA4, OUTPUT, GPIO_SPEED_FAST );
+  /*  PA5： spi1 sck */
+  pinMode( PA5, OUTPUT, GPIO_SPEED_FAST );
+  /*  PA6： spi1 miso */
+  /*  PA7： spi1 mosi*/
+  pinMode( PA7, OUTPUT, GPIO_SPEED_FAST );
+  /*  PA8: not connected or MCO output. */
+//  pinMode( PA8, ALTERNATE_PP, GPIO_SPEED_FAST );
+  /*  PA9: USART1 TXD：Alternate function */
+  /*  PA10: USART1 RXD：Alternate function */
+  /*  PA11: USB DM */
+  /*  PA12: USB DP */
+  /*  PA13: SWDIO */
+  /*  PA14: SWDCLK */
+  /*  PA15： JTAG JTDI but not use. */
 
   GPIOB->ODR = 0x0000;
-  /*  PB0： none*/
+  /*  PB0： serial ram chip select. output */
+  digitalWrite( PB0, HIGH );
+  pinMode( PB0, OUTPUT, GPIO_SPEED_FAST );
   /*  PB1： none*/
   /*  PB2: BOOT1：fixed LOW level.*/
   /*  PB3: JTAG TDO but not use.*/
   /*  PB4: JTAG TRST but not use.*/
-  /*  PB5: none*/
-  /*  PB6: none*/
-  /*  PB7: none*/
-  /*  PB8: BRIGHT output*/
-  /*  PB9: BUZZER output*/
-  /*  PB10: SD CARD DETECT input*/
-  /*  PB11: SD CARD write protect input*/
-  /*  PB12: SD CARD Slave select output*/
+  /*  PB5: SD CARD write protect. input */
+  /*  PB6: SD CARD detect. input */
+  /*  PB7: buzzer TIM4 CH2 output. */
+  /*  PB8: I2C1 SCL */
+  /*  PB9: I2C1 SDA */
+  /*  PB10: I2C2 SCL */
+  /*  PB11: I2C2 SDA */
+  /*  PB12: SD CARD Slave select output */
   set( SD_SS );
   pinMode( SD_SS, OUTPUT, GPIO_SPEED_FAST );
   /*  PB13:SPI2_SCK output Alternate function*/
@@ -101,51 +109,47 @@ void BOARD::gpioInit()
   /*  PC1： analog input*/
   /*  PC2： analog input*/
   /*  PC3： analog input*/
-  /*  PC4： analog input*/
-  /*  PC5： analog input*/
-  /*  PC6: none*/
-  /*  PC7: none*/
-  /*  PC8: none*/
-  /*  PC9: none*/
-  /*  PC10: UART4 TXD：Alternate function*/
-  /*  PC11: UART4 RXD：Alternate function*/
-  /*  PC12: UART5 TXD：Alternate function*/
-  /*  PC13: none*/
+  /*  PC4： gpio or axis X or Y. */
+  /*  PC5： not connect. */
+  /*  PC6: gpio or bright output. */
+  /*  PC7: gpio or xbee2 rts. */
+  /*  PC8: gpio or xbee2 cts. */
+  /*  PC9: gpio or xbee1 rts.  */
+  /*  PC10: gpio or UART4 TXD：Alternate function */
+  /*  PC11: gpio or UART4 RXD：Alternate function */
+  /*  PC12: gpio or UART5 TXD：Alternate function */
+  /*  PC13: gpio or tamper */
   /*  PC14、32kclock input  */
   pinMode( PC14, ANALOG, GPIO_SPEED_NORMAL );  /* PC14 is connected to OSC_IN */
   /*  PC15、32Kclock output  */
   pinMode( PC15, ALTERNATE_PP, GPIO_SPEED_NORMAL );  /*PC15 is connected to OSC_OUT */
 
   GPIOD->ODR = 0x0000;
-  /*  PD0： fsmc data bus bit 2*/
-  /*  PD1： fsmc data bus bit 3*/
-  /*  PD2: UART5 RXD：Alternate function*/
-  /*  PD3： TE LCD controller transmit end input*/
-  /*  PD4： fsmc output enable*/
-  /*  PD5： fsmc write enable*/
-  /*  PD6： LCD reset output*/
-  reset( LCD_RST );
-  pinMode( LCD_RST, OUTPUT, GPIO_SPEED_NORMAL );
+  /*  PD0： fsmc data bus bit 2 */
+  /*  PD1： fsmc data bus bit 3 */
+  /*  PD2: gpio or UART5 RXD：Alternate function */
+  /*  PD3： TE LCD controller transmit end input */
+  /*  PD4： fsmc output enable */
+  /*  PD5： fsmc write enable */
+  /*  PD6：  xbee cts output. */
   /*  PD7：  fsmc NE1*/
-  /*  PD8： fsmc data bus bit 13*/
-  /*  PD9： fsmc data bus bit 14*/
-  /*  PD10： fsmc data bus bit 15*/
-  /*  PD11： fsmc address bus bit 16*/
-  /*  PD12： LCD interrupt input*/
-  /*  PD13： LCD PWRSVE output*/
-  set( PWRSVE );  /* if PWRSVE is high then lcd controller will be enter sleep mode. */
-  pinMode( PWRSVE, OUTPUT, GPIO_SPEED_NORMAL );
-  /*  PD14： fsmc data bus bit 0*/
-  /*  PD15： fsmc data bus bit 1*/
+  /*  PD8： fsmc data bus bit 13 */
+  /*  PD9： fsmc data bus bit 14 */
+  /*  PD10： fsmc data bus bit 15 */
+  /*  PD11： fsmc address bus bit 16 */
+  /*  PD12： BUZZER pwm1 output.  */
+  /*  PD13： not connect.  */
+  /*  PD14： fsmc data bus bit 0 */
+  /*  PD15： fsmc data bus bit 1 */
 
   GPIOE->ODR = 0x0000;
   /*  PE0： none*/
-  /*  PE1： none*/
-  /*  PE2： none*/
-  /*  PE3： none*/
-  /*  PE4： none*/
-  /*  PE5： none*/
-  /*  PE6： none*/
+  /*  PE1：USBON output. */
+  /*  PE2： connect to GND. */
+  /*  PE3： connect to GND. */
+  /*  PE4： connect to GND. */
+  /*  PE5： connect to GND. */
+  /*  PE6： connect to GND. */
   /*  PE7： fsmc data bus bit 4*/
   /*  PE8： fsmc data bus bit 5*/
   /*  PE9： fsmc data bus bit 6*/
@@ -213,24 +217,13 @@ void BOARD::extBusInit()
 }
 
 /* ----------------------------------------
-    graphic lcd clock initialize
----------------------------------------- */
-void BOARD::glcdClockInit()
-{
-//  RCC_MCOConfig( RCC_MCO_SYSCLK );  /* System clock source */
-//  RCC_MCOConfig( RCC_MCO_HSI );  /* HSI oscillator clock source */
-//  RCC_MCOConfig( RCC_MCO_PLLCLK_Div2 );  /* LCD controller CKLI = 8MHz : PLL clock divided by 2 clock source */
-  RCC_MCOConfig( RCC_MCO_HSE );  /* LCD controller CKLI = 8MHz : HSE oscillator clock source */
-}
-
-/* ----------------------------------------
     graphic controller ic reset
 ---------------------------------------- */
 void BOARD::glcdReset()
 {
-  reset( LCD_RST );
+  ic8.bitReset( LCD_RES );  /* 0b0000 1011  */
   dly100us( 20UL );
-  set( LCD_RST );
+  ic8.bitSet( LCD_RES );  /* 0b0000 1111  */
 }
 
 /* ----------------------------------------
@@ -238,8 +231,15 @@ void BOARD::glcdReset()
 ---------------------------------------- */
 void BOARD::glcdSleep( bool onOff )
 {
-  if( onOff ) set( PWRSVE );
-  else reset( PWRSVE );
+  if( onOff ) ic8.bitSet( PWRSVE );  /* 0b0000 1111  */  //set( PWRSVE );
+  else ic8.bitReset( PWRSVE );  /* 0b0000 0111  */  //reset( PWRSVE );
+}
+
+/* ----------------------------------------
+    graphic controller clki dummy code.
+---------------------------------------- */
+void BOARD::glcdClockInit()
+{
 }
 
 /* ----------------------------------------

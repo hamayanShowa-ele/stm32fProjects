@@ -1,5 +1,5 @@
 /* ----------------------------------------
- board 0900 utilities.
+ board 1303 and 1304 utilities.
   for STMicroelectronics SPL library
 
   Copyright (c) 2020 hamayan (hamayan@showa-ele.jp).
@@ -22,11 +22,12 @@
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
 
-#ifndef  __BOARD_0900_H__
-#define  __BOARD_0900_H__
+#ifndef  __BOARD_1303_1304_H__
+#define  __BOARD_1303_1304_H__
 
 #include  <gpio.h>
 #include  <derivertive.h>
+#include  <pca8574.h>
 extern "C"
 {
   #include  <fsmc.h>
@@ -45,20 +46,20 @@ extern "C"
 class BOARD : public GPIO
 {
 public:
-	BOARD();
+  BOARD();
   ~BOARD();
 
   void gpioInit();
   void extBusInit();
-  void glcdClockInit();
   void glcdReset();
   void glcdSleep( bool onOff );
   void glcdInterruptInit();
+  void glcdClockInit();
 
 private:
   void busPortInitialize();
 };
 
 
-#endif  /* __BOARD_0900_H__ */
+#endif  /* __BOARD_1303_1304_H__ */
 

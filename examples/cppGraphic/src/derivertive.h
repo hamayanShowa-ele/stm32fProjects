@@ -7,6 +7,8 @@
 
 #include  <stm32fPeripheral.h>
 
+#define  __BOARD_1303_1304_USE__
+//#define  __BOARD_0900_USE__
 #define  __KANJI_USE__
 
 /*
@@ -39,6 +41,75 @@
 /*
  defines for gpio pins.
 */
+#if  defined( __BOARD_1303_1304_USE__ )
+/* USART1 TXD RXD */
+#define  USART1_TXD_PORT      GPIOA
+#define  USART1_RXD_PORT      GPIOA
+#define  USART1_TXD_PIN       GPIO_Pin_9
+#define  USART1_RXD_PIN       GPIO_Pin_10
+
+/* USART2 TXD RXD */
+#define  USART2_TXD_PORT      GPIOA
+#define  USART2_RXD_PORT      GPIOA
+#define  USART2_TXD_PIN       GPIO_Pin_2
+#define  USART2_RXD_PIN       GPIO_Pin_3
+
+/* USART3 TXD RXD */
+#define  USART3_TXD_PORT      GPIOB
+#define  USART3_RXD_PORT      GPIOB
+#define  USART3_TXD_PIN       GPIO_Pin_10
+#define  USART3_RXD_PIN       GPIO_Pin_11
+
+/* UART4 TXD RXD */
+#define  UART4_TXD_PORT      GPIOC
+#define  UART4_RXD_PORT      GPIOC
+#define  UART4_TXD_PIN       GPIO_Pin_10
+#define  UART4_RXD_PIN       GPIO_Pin_11
+
+/* UART5 TXD RXD */
+#define  UART5_TXD_PORT      GPIOC
+#define  UART5_RXD_PORT      GPIOD
+#define  UART5_TXD_PIN       GPIO_Pin_12
+#define  UART5_RXD_PIN       GPIO_Pin_2
+
+/* SD CARD */
+#define  SD_CD      PB6  /* input */
+#define  SD_WP      PB5  /* input */
+#define  SD_SS      PB12  /* output */
+
+/* I2C1,I2C2 */
+#define  SCL1       PB8
+#define  SDA1       PB9
+#define  SCL2       PB10
+#define  SDA2       PB11
+#define  BOARD_1304_IC7_ADR  0x20
+#define  BOARD_1304_IC8_ADR  0x21
+
+/* ANOTHER */
+#define  LCD_TE     PD3   /* input */
+#define  BRIGHT     PC6   /* output */
+#define  BUZZER     PD12   /* output */
+#define  USBON      PE1   /* output */
+
+/*
+ defines for lcd(s1d13743).
+*/
+#define  LCD_TE_PORT_SOURCE  GPIO_PortSourceGPIOD
+#define  LCD_TE_PIN_SOURCE   GPIO_PinSource3
+#define  LCD_TE_ETXI_LINE    EXTI_Line3
+#define  LCD_TE_IREQn        EXTI3_IRQn
+#define  LCD_DMA_IREQn       DMA2_Channel4_5_IRQn
+#define  LCD_RES    2
+#define  PWRSVE     3
+
+/* S1D13743のGPIO7に接続されているLCD個別の定義 */
+#define  LCD_DISP_PIN  0x80
+/* S1D13743のCLKIの定義 */
+//#define  __CLKI_IS_1M__  /*CLKIが1MHzの時*/
+#define  __CLKI_IS_8M__  /*CLKIが8MHzの時*/
+//#define  __CLKI_IS_36M__  /*CLKIが36MHzの時*/
+
+#elif  defined( __BOARD_0900_USE__ )
 /* USART1 TXD RXD */
 #define  USART1_TXD_PORT      GPIOA
 #define  USART1_RXD_PORT      GPIOA
@@ -88,6 +159,24 @@
 #define  BUZZER     PB9   /* output */
 #define  USBON      PA7   /* output */
 
+/*
+ defines for lcd(s1d13743).
+*/
+#define  LCD_TE_PORT_SOURCE  GPIO_PortSourceGPIOD
+#define  LCD_TE_PIN_SOURCE   GPIO_PinSource3
+#define  LCD_TE_ETXI_LINE    EXTI_Line3
+#define  LCD_TE_IREQn        EXTI3_IRQn
+#define  LCD_DMA_IREQn       DMA2_Channel4_5_IRQn
+
+/* S1D13743のGPIO7に接続されているLCD個別の定義 */
+#define  LCD_DISP_PIN  0x80
+/* S1D13743のCLKIの定義 */
+//#define  __CLKI_IS_1M__  /*CLKIが1MHzの時*/
+#define  __CLKI_IS_8M__  /*CLKIが8MHzの時*/
+//#define  __CLKI_IS_36M__  /*CLKIが36MHzの時*/
+#endif  /* __BOARD_1303_1304_H__ */
+
+/* gpio common. */
 #define  EXT_BUS_D0  PD14   /* input/output */
 #define  EXT_BUS_D1  PD15   /* input/output */
 #define  EXT_BUS_D2  PD0    /* input/output */
@@ -110,21 +199,6 @@
 #define  EXT_BUS_WE  PD5    /* output */
 #define  EXT_BUS_NE1 PD7    /* output */
 
-/*
- defines for lcd(s1d13743).
-*/
-#define  LCD_TE_PORT_SOURCE  GPIO_PortSourceGPIOD
-#define  LCD_TE_PIN_SOURCE   GPIO_PinSource3
-#define  LCD_TE_ETXI_LINE    EXTI_Line3
-#define  LCD_TE_IREQn        EXTI3_IRQn
-#define  LCD_DMA_IREQn       DMA2_Channel4_5_IRQn
-
-/* S1D13743のGPIO7に接続されているLCD個別の定義 */
-#define  LCD_DISP_PIN  0x80
-/* S1D13743のCLKIの定義 */
-//#define  __CLKI_IS_1M__  /*CLKIが1MHzの時*/
-#define  __CLKI_IS_8M__  /*CLKIが8MHzの時*/
-//#define  __CLKI_IS_36M__  /*CLKIが36MHzの時*/
 
 /*
  defines for another types.
