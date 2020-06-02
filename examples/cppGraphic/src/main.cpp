@@ -29,13 +29,17 @@
 #include  <Wire.h>
 #include  <Timer.h>
 #include  <led.h>
-//#include  "0900.h"
-#include  "1303_1304.h"
 #include  <lt3593.h>
-#include  <pca8574.h>
 #include  <draw.h>
 #include  <textPrint.h>
 #include  <button.h>
+
+#if defined( __BOARD_1303_1304_USE__ )
+  #include  "1303_1304.h"
+  #include  <pca8574.h>
+#elif defined( __BOARD_0900_USE__ )
+  #include  "0900.h"
+#endif  /* __BOARD_1303_1304_USE__ */
 
 extern "C"
 {
@@ -160,6 +164,7 @@ int main(void)
   board.gpioInit();
   board.extBusInit();
 
+#if defined( __BOARD_1303_1304_USE__ )
   /* initialize i2c */
   if( i2c1.begin( I2C1, SDA1, SCL1 ) != I2C_SUCCESS )
   {
@@ -173,6 +178,7 @@ int main(void)
   ic7.write( 0xFF );
   ic8.begin( &i2c2, BOARD_1304_IC8_ADR );
   ic8.write( 0x00 );
+#endif  /* __BOARD_1303_1304_USE__ */
 
   /* initialize LCD and graphic controller IC. */
   board.glcdClockInit();
