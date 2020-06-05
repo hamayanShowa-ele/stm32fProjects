@@ -90,9 +90,6 @@ void STM32F_DMA::m2p(
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)src;  /* source memory address */;
   DMA_InitStruct.DMA_BufferSize = count;  /* transmit size */
   DMA_Init( dmaCh, &DMA_InitStruct );
-
-  DMA_ITConfig( dmaCh, DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );   /* enable transmit end and error interrupt. */
-  DMA_Cmd( dmaCh, ENABLE );
 }
 
 
@@ -120,9 +117,6 @@ void STM32F_DMA::p2p(
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)src;  /* source memory address */;
   DMA_InitStruct.DMA_BufferSize = count;  /* transmit size */
   DMA_Init( dmaCh, &DMA_InitStruct );
-
-  DMA_ITConfig( dmaCh, DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );   /* enable transmit end and error interrupt. */
-  DMA_Cmd( dmaCh, ENABLE );
 }
 
 /* ----------------------------------------
@@ -149,9 +143,6 @@ void STM32F_DMA::p2m(
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)dst;  /* destination memory address */;
   DMA_InitStruct.DMA_BufferSize = count;  /* transmit size */
   DMA_Init( dmaCh, &DMA_InitStruct );
-
-  DMA_ITConfig( dmaCh, DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );   /* enable transmit end and error interrupt. */
-  DMA_Cmd( dmaCh, ENABLE );
 }
 
 /* ----------------------------------------

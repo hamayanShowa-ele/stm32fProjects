@@ -245,7 +245,7 @@ void S1D13743::write( const uint16_t *data, uint32_t size )
 
       STM32F_DMA::begin( LCD_DMA_Channel );
       STM32F_DMA::m2p( (uint16_t *)&GLCD_DATA_WORD_ADR, data, sz );
-      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+//      STM32F_DMA::ITConfig( DMA_IT_TC, ENABLE );  /* interrupt set. */
       STM32F_DMA::command( ENABLE );  /* enable dma. */
       while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }
@@ -275,7 +275,7 @@ void S1D13743::write( uint16_t data, uint32_t size )
 
       STM32F_DMA::begin( LCD_DMA_Channel );
       STM32F_DMA::p2p( (uint16_t *)&GLCD_DATA_WORD_ADR, (const uint16_t *)&data, sz );
-      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+//      STM32F_DMA::ITConfig( DMA_IT_TC, ENABLE );  /* interrupt set. */
       STM32F_DMA::command( ENABLE );  /* enable dma. */
       while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }
