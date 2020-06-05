@@ -33,6 +33,7 @@
 #include  <draw.h>
 #include  <textPrint.h>
 #include  <button.h>
+#include  <adcDac.h>
 
 #if defined( __BOARD_1303_1304_USE__ )
   #include  "1303_1304.h"
@@ -66,9 +67,9 @@ void NVIC_Configuration( void );
 ---------------------------------------- */
 SEM_OBJECT sem_obj[ MAX_SEM_NUMBER ];
 
-SYSTIM systim;
-time_t unixTime;
-time_t sumTotalTime;  /* Total time since startup */
+volatile SYSTIM systim;
+volatile time_t unixTime;
+volatile time_t sumTotalTime;  /* Total time since startup */
 
 Serial Serial1;  /* hardware serial 1 */
 BOARD  board;  /* initialize gpio */
@@ -98,6 +99,7 @@ const uint16_t rgb565_colors[] =
   RGB565_GOLD,
 };
 
+STM32F_ADC_DAC adc1;
 /* ----------------------------------------
     tasks
 ---------------------------------------- */
@@ -111,12 +113,12 @@ void lcdDemo06( void );
 void lcdDemo07( void );
 
 uint8_t tsk1_stk[256 * 4];  // stack for task1
-uint8_t tsk2_stk[256 * 3];  // stack for task2
+uint8_t tsk2_stk[256 * 4];  // stack for task2
 uint8_t tsk3_stk[256 * 4];  // stack for task3
 uint8_t tsk4_stk[256 * 4];  // stack for task4
-uint8_t tsk5_stk[256 * 3];  // stack for task5
-uint8_t tsk6_stk[256 * 3];  // stack for task6
-uint8_t tsk7_stk[256 * 3];  // stack for task7
+uint8_t tsk5_stk[256 * 4];  // stack for task5
+uint8_t tsk6_stk[256 * 4];  // stack for task6
+uint8_t tsk7_stk[256 * 4];  // stack for task7
 uint8_t tsk8_stk[256 * 6];  // stack for task8
 
 /* ----------------------------------------
@@ -136,8 +138,8 @@ void tsk_ini( void )
   sta_tsk( ID_stackMonitor );
   sta_tsk( ID_lcdDemo01 );
   sta_tsk( ID_lcdDemo02 );
-  sta_tsk( ID_lcdDemo03 );
-  sta_tsk( ID_lcdDemo04 );
+  sta_tsk( ID_lcdDemo03 );  // filled triangle
+  sta_tsk( ID_lcdDemo04 );  // hexagon
   sta_tsk( ID_lcdDemo05 );
   sta_tsk( ID_lcdDemo06 );
   sta_tsk( ID_lcdDemo07 );
@@ -286,11 +288,78 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
 /* ----------------------------------------
     lcd demo 01
 ---------------------------------------- */
+uint16_t adBuffer[20][3];
+extern volatile uint8_t dma1ch1TC_Update;  /* full transmission complete */
+
 void lcdDemo01( void )
 {
+#if 1
+  #define  AXIS_X_PIN  ADC1_IN15_PIN
+  #define  AXIS_Y_PIN  ADC1_IN14_PIN
+  #define  AXIS_Z_PIN  ADC1_IN6_PIN
+  TEXT_PRINT txt(14);
+  txt.vaConfig( 0,0,199,199 );
+  txt.clearScreen();
+  /* read adc value from axis_x. */
+  adc1.begin( ADC1 );
+  ADC_PIN_AND_DATA accel[3] =
+  {
+    { {AXIS_X_PIN, ADC_SampleTime_7Cycles5}, 0 },
+    { {AXIS_Y_PIN, ADC_SampleTime_7Cycles5}, 0 },
+    { {AXIS_Z_PIN, ADC_SampleTime_7Cycles5}, 0 },
+  };
+
+#if 1
+  volatile uint8_t dma1ch1TC_Update_Base = dma1ch1TC_Update;  /* full transmission complete */
+  adc1.analogRead(
+    accel, sizeof(accel) / sizeof(accel[0]),
+    (uint16_t *)adBuffer, sizeof(adBuffer) / sizeof(adBuffer[0][0]),
+    ADC_ExternalTrigConv_T4_CC4 );
+  STM32F_TIMER timer;
+  timer.begin( TIM4 );
+  timer.frequency( 100UL );
+  timer.adcTrigger( TIMx_CH4 );
+  timer.start();
+#endif
+
+  SYSTIM systim_Base = systim;
+  int count = 0;
+  while( 1 )
+  {
+#if 0
+#if 0
+    int axisX = adc1.analogRead( AXIS_X_PIN ) - 2048;
+    int axisY = adc1.analogRead( AXIS_Y_PIN ) - 2048;
+    int axisZ = adc1.analogRead( AXIS_Z_PIN ) - 2048;
+#else
+    adc1.analogRead( accel, sizeof(accel) / sizeof(accel[0]) );
+    int axisX = accel[0].data - 2048;
+    int axisY = accel[1].data - 2048;
+    int axisZ = accel[2].data - 2048;
+#endif
+#else
+    while( dma1ch1TC_Update == dma1ch1TC_Update_Base ) rot_rdq();
+//    dma1ch1TC_Update_Base = dma1ch1TC_Update;  /* full transmission complete */
+    dma1ch1TC_Update_Base++;  /* full transmission complete */
+    SYSTIM systim_Diff = systim - systim_Base;
+    systim_Base = systim;
+    int axisX = adBuffer[1][0] - 2048;
+    int axisY = adBuffer[1][1] - 2048;
+    int axisZ = adBuffer[1][2] - 2048;
+#endif
+
+    txt.color( (count & 1) ? RGB565_CYAN : RGB24_LIME );
+    char buffer[128];
+    sprintf( buffer, "%d X=%d Y=%d Z=%d \r\n", (int)systim_Diff, axisX, axisY, axisZ );
+    txt.puts( (const char *)buffer );
+    systim_Base = systim;
+
+    count++;
+    rot_rdq();
+  }
+#else
   DRAW draw;
   draw.vaConfig( 0,0,199,199 );
-
   while( 1 )
   {
     draw.fillRectangle( 0, 0, 199, 199, RGB565_BLACK );
@@ -315,6 +384,7 @@ void lcdDemo01( void )
       dly_tsk( 0.05 * 1000UL );
     }
   }
+#endif
 }
 
 /* ----------------------------------------
@@ -340,7 +410,7 @@ void lcdDemo02( void )
     baseTim = unixTime;
 
     struct tm localTime;
-    localtime_r( &unixTime, &localTime );
+    localtime_r( (time_t *)&unixTime, &localTime );
 
     dateTxt.clearScreen();
     dateTxt.printf( TYPE_ASCII_48, "   %02d/%02d", localTime.tm_mon + 1, localTime.tm_mday );
@@ -440,6 +510,9 @@ void lcdDemo05( void )
 }
 
 
+/* ----------------------------------------
+    lcd demo 06
+---------------------------------------- */
 #if  defined( __KANJI_USE__ )
 void lcdDemo06( void )
 {
@@ -460,6 +533,9 @@ void lcdDemo06( void )
 }
 #endif  /* __KANJI_USE__ */
 
+/* ----------------------------------------
+    lcd demo 07
+---------------------------------------- */
 void lcdDemo07( void )
 {
   BUTTON btn[8];
