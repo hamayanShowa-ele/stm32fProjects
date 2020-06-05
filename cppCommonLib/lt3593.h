@@ -25,7 +25,7 @@
 #ifndef  __LT3593_H__
 #define  __LT3593_H__
 
-#include  <led.h>
+#include  <gpio.h>
 extern "C"
 {
   #include  <system.h>
