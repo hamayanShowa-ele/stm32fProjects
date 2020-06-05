@@ -13,63 +13,13 @@
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
-<part id="1"/>
-<part id="2"/>
-<part id="3"/>
-<part id="4"/>
-<part id="5"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="10"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/main.cpp" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/src/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="9" selectionOffset="1046" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw.cpp" partName="draw.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/draw.cpp" title="draw.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/draw.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/draw.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="draw.h" partName="draw.h" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/draw.h" title="draw.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/draw.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/draw.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="7" selectionOffset="5895" selectionTopPixel="1632"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.h" partName="s1d13743.h" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/s1d13743.h" title="s1d13743.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/s1d13743.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/s1d13743.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="10" selectionOffset="6187" selectionTopPixel="1991"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Dma.cpp" partName="Dma.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/Dma.cpp" title="Dma.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/Dma.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/stm32f1xx_cppLib/Dma.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2395" selectionTopPixel="578"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Dma.h" partName="Dma.h" path="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/Dma.h" title="Dma.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/Dma.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/stm32f1xx_cppLib/Dma.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1637" selectionTopPixel="631"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_dma.h" partName="stm32f10x_dma.h" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/stm_lib/inc/stm32f10x_dma.h" title="stm32f10x_dma.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/stm_lib/inc/stm32f10x_dma.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/stm_lib/inc/stm32f10x_dma.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="6" selectionOffset="5315" selectionTopPixel="1904"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" partName="derivertive.h" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/derivertive.h" title="derivertive.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/src/derivertive.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/src/derivertive.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="18" selectionOffset="280" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" partName="stm32f10x.h" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/cmsis_boot/stm32f10x.h" title="stm32f10x.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/cppGraphic/cmsis_boot/stm32f10x.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cmsis_boot/stm32f10x.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="6" selectionOffset="38089" selectionTopPixel="8653"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="adcDac.cpp" partName="adcDac.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/adcDac.cpp" title="adcDac.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/stm32f1xx_cppLib/adcDac.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/stm32f1xx_cppLib/adcDac.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="9247" selectionTopPixel="4386"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.cpp" partName="s1d13743.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/s1d13743.cpp" title="s1d13743.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/s1d13743.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/cppGraphic/cppCommonLib/s1d13743.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="11032" selectionTopPixel="4405"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2441" selectionTopPixel="1037"/>
 </editor>
 </editors>
 <views>
@@ -316,10 +266,8 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/stm32f1xx_cppLib/adcDac.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/s1d13743.cpp"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/cppCommonLib/s1d13743.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/cppGraphic/src/main.cpp"/>
 </editors>
-<item historyLabel="Dma.cpp" index="1">
-<position info="not_deleted" x="2246" y="0"/>
-</item>
 <item historyLabel="Dma.h" index="2">
 <position info="not_deleted" x="1638" y="0"/>
 </item>
@@ -464,8 +412,11 @@
 <item historyLabel="s1d13743.h" index="7">
 <position info="not_deleted" x="6187" y="10"/>
 </item>
-<item active="true" historyLabel="s1d13743.cpp" index="6">
-<position info="not_deleted" x="2314" y="0"/>
+<item historyLabel="s1d13743.cpp" index="6">
+<position info="not_deleted" x="11032" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="8">
+<position info="not_deleted" x="1046" y="9"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -474,6 +425,9 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_it.c" tooltip="cppGraphic/src/stm32f10x_it.c">
+<persistable path="/cppGraphic/src/stm32f10x_it.c"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="s1d13743.cpp" tooltip="cppGraphic/cppCommonLib/s1d13743.cpp">
 <persistable path="/cppGraphic/cppCommonLib/s1d13743.cpp"/>
 </file>
@@ -512,9 +466,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="cppGraphic/myOs/mul_tsk.c">
 <persistable path="/cppGraphic/myOs/mul_tsk.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" tooltip="cppGraphic/src/derivertive.h">
-<persistable path="/cppGraphic/src/derivertive.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="semihosting.c" tooltip="cppGraphic/semihosting/semihosting.c">
 <persistable path="/cppGraphic/semihosting/semihosting.c"/>

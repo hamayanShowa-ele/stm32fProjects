@@ -74,10 +74,12 @@ volatile time_t sumTotalTime;  /* Total time since startup */
 Serial Serial1;  /* hardware serial 1 */
 BOARD  board;  /* initialize gpio */
 LT3593 backLight;
+#if  defined( __BOARD_1303_1304_USE__ )
 STM32F_I2C i2c1;
 STM32F_I2C i2c2;
 PCA8574 ic7;
 PCA8574 ic8;
+#endif  /* __BOARD_1303_1304_USE__ */
 
 const uint16_t rgb565_colors[] =
 {
