@@ -118,9 +118,9 @@ public:
   void start();
   void stop();
   int  frequency( uint32_t freq );
-  int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
   int  toggle( int ch, int pin = 0 );
   int  pwm1( int ch, int pin, uint16_t pulse );
+  int  adcTrigger( int ch );
 
   void setPulse( int ch, uint16_t pulse );
   uint16_t getPulse( int ch );
@@ -139,6 +139,7 @@ private:
   uint32_t rcc;
   int timerType;
 
+  int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
   int OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst );
 };
 

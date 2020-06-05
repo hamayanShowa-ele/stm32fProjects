@@ -232,18 +232,14 @@ int STM32F_TIMER::frequency( uint32_t freq )
 ---------------------------------------- */
 int STM32F_TIMER::OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst )
 {
-  /* gpio initialize (alternate function). */
-  if( pin >= PA0 && pin < PORT_END )
-  {
-    pinMode( pin, ALTERNATE_PP );
-  }
-
   TIM_OCInitTypeDef  TIM_OCInitStructure;
   TIM_OCStructInit( &TIM_OCInitStructure );
 
   TIM_OCInitStructure.TIM_OCMode = ocMode;
+  /* TIM_OutputState : The conversion of AD does not start with disable. */
   TIM_OCInitStructure.TIM_OutputState = (pin >= PA0 && pin < PORT_END) ? TIM_OutputState_Enable : TIM_OutputState_Disable;
-//  TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
+
+  //  TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
   TIM_OCInitStructure.TIM_Pulse = pulse;  /*PWM */
   TIM_OCInitStructure.TIM_OCPolarity = pol;  // TIM_OCPolarity_High
 //  TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
@@ -277,15 +273,31 @@ int STM32F_TIMER::OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t
 
 int STM32F_TIMER::toggle( int ch, int pin )
 {
+  /* gpio initialize (alternate function). */
+  if( pin >= PA0 && pin < PORT_END )
+  {
+    pinMode( pin, ALTERNATE_PP );
+  }
   return OC( ch, TIM_OCMode_Toggle, pin, 0, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
 }
 
 
 int STM32F_TIMER::pwm1( int ch, int pin, uint16_t pulse )
 {
+  /* gpio initialize (alternate function). */
+  if( pin >= PA0 && pin < PORT_END )
+  {
+    pinMode( pin, ALTERNATE_PP );
+  }
   return OC( ch, TIM_OCMode_PWM1, pin, pulse, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
 }
 
+
+int STM32F_TIMER::adcTrigger( int ch )
+{
+  // PORT_END -> PB9 for ARIES ver.2
+  return OC( ch, TIM_OCMode_Toggle, PB9, 0, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
+}
 
 /* ----------------------------------------
     set pulse, get pulse

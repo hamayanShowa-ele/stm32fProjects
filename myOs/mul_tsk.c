@@ -324,8 +324,8 @@ ER wai_sem( ID semid )
       unl_cpu();
       return E_OK;
     }
-    (void)rot_rdq();  // Round robin execution
     if( !(tcb[tid].rdy_flg & TTS_WAI) ) break;  // Loop ends when wait state is released
+    (void)rot_rdq();  // Round robin execution
   }
 
   return E_RLWAI;
@@ -362,7 +362,7 @@ ER sig_sem( ID semid )
   if( semid <= 0 ) return E_ID;
   loc_cpu();
   sem_obj[ semid - 1 ].sigCount++;
-  //sem_obj[ semid - 1 ].sigCount = sem_obj[ semid - 1 ].waiCount;
+//  sem_obj[ semid - 1 ].sigCount = sem_obj[ semid - 1 ].waiCount;
   unl_cpu();
   rot_rdq();
 

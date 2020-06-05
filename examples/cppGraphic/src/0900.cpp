@@ -251,7 +251,7 @@ void BOARD::glcdInterruptInit()
   EXTI_InitTypeDef EXTI_InitStruct;
 
   /* DMA interrupt setting */
-  NVIC_InitStructure.NVIC_IRQChannel = DMA2_Channel4_5_IRQn;  // DMA2_Channel4
+  NVIC_InitStructure.NVIC_IRQChannel = LCD_DMA_IREQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = BASE_PRIORITY;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = BASE_SUB_PRIORITY;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;

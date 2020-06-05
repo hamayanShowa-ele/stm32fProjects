@@ -104,7 +104,7 @@ int Serial::printf( const char *fmt, ... )
   char buf[256];
   va_list args;
   va_start( args, fmt );
-  vsnprintf( buf, 256, fmt, args );
+  vsnprintf( buf, sizeof(buf), fmt, args );
   va_end( args );
   int ret = SCI_Puts( sciNumber, (const char *)buf );
 

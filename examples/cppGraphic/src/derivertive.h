@@ -7,8 +7,8 @@
 
 #include  <stm32fPeripheral.h>
 
-#define  __BOARD_1303_1304_USE__
-//#define  __BOARD_0900_USE__
+//#define  __BOARD_1303_1304_USE__
+#define  __BOARD_0900_USE__
 #define  __KANJI_USE__
 
 /*
@@ -99,6 +99,7 @@
 #define  LCD_TE_ETXI_LINE    EXTI_Line3
 #define  LCD_TE_IREQn        EXTI3_IRQn
 #define  LCD_DMA_IREQn       DMA2_Channel4_5_IRQn
+#define  LCD_DMA_Channel     DMA2_Channel4
 #define  LCD_RES    2
 #define  PWRSVE     3
 
@@ -167,6 +168,7 @@
 #define  LCD_TE_ETXI_LINE    EXTI_Line3
 #define  LCD_TE_IREQn        EXTI3_IRQn
 #define  LCD_DMA_IREQn       DMA2_Channel4_5_IRQn
+#define  LCD_DMA_Channel     DMA2_Channel4
 
 /* S1D13743のGPIO7に接続されているLCD個別の定義 */
 #define  LCD_DISP_PIN  0x80
