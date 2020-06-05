@@ -23,7 +23,7 @@
       <Link useDefault="0">
         <Option name="DiscardUnusedSection" value="0"/>
         <Option name="UserEditLinkder" value=""/>
-        <Option name="UseMemoryLayout" value="1"/>
+        <Option name="UseMemoryLayout" value="0"/>
         <Option name="nostartfiles" value="0"/>
         <Option name="LTO" value="0"/>
         <Option name="IsNewStartupCode" value="1"/>
@@ -36,7 +36,7 @@
           <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
           <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
         </MemoryAreas>
-        <LocateLinkFile path="c:/coocox/coide/configuration/programdata/cppGraphic/link.ld" type="0"/>
+        <LocateLinkFile path="./stm32_flash.ld" type="0"/>
       </Link>
       <Output>
         <Option name="OutputFileType" value="0"/>
@@ -112,9 +112,9 @@
     <File name="cmsis_boot/stm32f10x_conf.h" path="cmsis_boot/stm32f10x_conf.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_flash.h" path="stm_lib/inc/stm32f10x_flash.h" type="1"/>
     <File name="syscalls/syscalls.c" path="syscalls/syscalls.c" type="1"/>
+    <File name="stm32f1xx_cppLib/gpio.cpp" path="../../stm32f1xx_cppLib/gpio.cpp" type="1"/>
     <File name="stm_lib/inc/stm32f10x_spi.h" path="stm_lib/inc/stm32f10x_spi.h" type="1"/>
     <File name="stm32f1xx_cppLib/gpio.h" path="../../stm32f1xx_cppLib/gpio.h" type="1"/>
-    <File name="stm32f1xx_cppLib/gpio.cpp" path="../../stm32f1xx_cppLib/gpio.cpp" type="1"/>
     <File name="stm_lib/src/stm32f10x_adc.c" path="stm_lib/src/stm32f10x_adc.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_dma.h" path="stm_lib/inc/stm32f10x_dma.h" type="1"/>
     <File name="src/interrupt.c" path="src/interrupt.c" type="1"/>
@@ -147,9 +147,9 @@
     <File name="stm32f1xx_cppLib/Wire.h" path="../../stm32f1xx_cppLib/Wire.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_i2c.c" path="stm_lib/src/stm32f10x_i2c.c" type="1"/>
     <File name="stm32f1xx_common_lib/nvic.c" path="../../stm32f1xx_common_lib/nvic.c" type="1"/>
+    <File name="fonts/font48.h" path="../../fonts/font48.h" type="1"/>
     <File name="stm32f1xx_common_lib/fsmc.h" path="../../stm32f1xx_common_lib/fsmc.h" type="1"/>
     <File name="stm32f1xx_common_lib/dispatch.S" path="../../stm32f1xx_common_lib/dispatch.S" type="1"/>
-    <File name="fonts/font48.h" path="../../fonts/font48.h" type="1"/>
     <File name="stm32f1xx_common_lib/peripheral.c" path="../../stm32f1xx_common_lib/peripheral.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_rtc.c" path="stm_lib/src/stm32f10x_rtc.c" type="1"/>
     <File name="cppCommonLib/lt3593.cpp" path="../../cppCommonLib/lt3593.cpp" type="1"/>
