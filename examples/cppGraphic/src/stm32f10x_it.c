@@ -139,8 +139,8 @@ void PendSV_Handler(void)
   */
 #include  <mul_tsk.h>
 #include  <time.h>
-extern SYSTIM systim;
-extern time_t unixTime;
+volatile extern SYSTIM systim;
+volatile extern time_t unixTime;
 
 void SysTick_Handler(void)
 {

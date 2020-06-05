@@ -37,7 +37,8 @@
 ---------------------------------------- */
 void EXTI3_IRQHandler( void )
 {
-  EXTI->PR = 0x00000008;  /* release pending interrupt request. */
+//  EXTI->PR = 0x00000008;  /* release pending interrupt request. */
+  EXTI_ClearITPendingBit( EXTI_Line3 );
 #if 0
   unsigned short x,y;
   static int wptr;
@@ -54,39 +55,114 @@ void EXTI3_IRQHandler( void )
 }
 
 /* ----------------------------------------
-    graphic controller DMA transmit end interrupt handler
+    DMA1 channel 1 interrupt handler.
 ---------------------------------------- */
-extern volatile uint8_t dma2ch4TC_Update;
+extern volatile uint8_t dma1ch1HT_Update;  /* half transmission complete */
+extern volatile uint8_t dma1ch1TC_Update;  /* full transmission complete */
+extern volatile uint8_t dma1ch1TE_Update;  /* transmission error */
 
+void DMA1_Channel1_IRQHandler( void )
+{
+  if( DMA_GetITStatus( DMA1_IT_GL1 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA1_IT_HT1 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_HT1 );
+      dma1ch1HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA1_IT_TC1 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_TC1 );
+      dma1ch1TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA1_IT_TE1 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_TE1 );
+      dma1ch1TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA1_IT_GL1 );
+  }
+}
+
+/* ----------------------------------------
+    DMA2 channel 3 interrupt handler.
+---------------------------------------- */
+extern volatile uint8_t dma2ch3HT_Update;  /* half transmission complete */
+extern volatile uint8_t dma2ch3TC_Update;  /* full transmission complete */
+extern volatile uint8_t dma2ch3TE_Update;  /* transmission error */
+
+void DMA2_Channel3_IRQHandler( void )
+{
+  if( DMA_GetITStatus( DMA2_IT_GL3 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA2_IT_HT3 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_HT3 );
+      dma2ch3HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TC3 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TC3 );
+      dma2ch3TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TE3 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TE3 );
+      dma2ch3TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA2_IT_GL3 );
+  }
+}
+
+
+/* ----------------------------------------
+    DMA2 channel 4 and channel 5 interrupt handler.
+---------------------------------------- */
+extern volatile uint8_t dma2ch4HT_Update;  /* half transmission complete */
+extern volatile uint8_t dma2ch4TC_Update;  /* full transmission complete */
+extern volatile uint8_t dma2ch4TE_Update;  /* transmission error */
+extern volatile uint8_t dma2ch5HT_Update;  /* half transmission complete */
+extern volatile uint8_t dma2ch5TC_Update;  /* full transmission complete */
+extern volatile uint8_t dma2ch5TE_Update;  /* transmission error */
 void DMA2_Channel4_5_IRQHandler( void )
 {
   if( DMA_GetITStatus( DMA2_IT_GL4 ) == SET )
   {
-    if( DMA_GetITStatus( DMA2_IT_TC4 ) == SET )  /* Transfer complete. */
+    if( DMA_GetITStatus( DMA2_IT_HT4 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_HT4 );
+      dma2ch4HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TC4 ) == SET )  /*full transmission complete*/
     {
       DMA_ClearITPendingBit( DMA2_IT_TC4 );
       dma2ch4TC_Update++;
     }
-
-    if( DMA_GetITStatus( DMA2_IT_TE4 ) == SET )  /* transfer error */
+    if( DMA_GetITStatus( DMA2_IT_TE4 ) == SET )  /*transmission error*/
     {
       DMA_ClearITPendingBit( DMA2_IT_TE4 );
+      dma2ch4TE_Update++;
     }
-
-    if( DMA_GetITStatus( DMA2_IT_HT4 ) == SET )  /* half flag */
-    {
-      DMA_ClearITPendingBit( DMA2_IT_HT4 );
-    }
-
     DMA_ClearITPendingBit( DMA2_IT_GL4 );
   }
 
   if( DMA_GetITStatus( DMA2_IT_GL5 ) == SET )
   {
-    if( DMA_GetITStatus( DMA2_IT_TC5 ) == SET )  /**/
+    if( DMA_GetITStatus( DMA2_IT_HT5 ) == SET )  /*half transmission complete*/
     {
+      DMA_ClearITPendingBit( DMA2_IT_HT5 );
+      dma2ch5HT_Update++;
     }
-
-    DMA_ClearITPendingBit( DMA2_IT_GL5 | DMA2_IT_TC5 | DMA2_IT_HT5 | DMA2_IT_TE5 );
+    if( DMA_GetITStatus( DMA2_IT_TC5 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TC5 );
+      dma2ch5TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TE5 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TE5 );
+      dma2ch5TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA2_IT_GL4 );
   }
 }
