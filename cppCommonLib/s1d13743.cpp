@@ -31,7 +31,6 @@
     instances or global variables
 ---------------------------------------- */
 extern SYSTIM systim;
-extern volatile uint8_t dma2ch4TC_Update;
 
 /* ----------------------------------------
     constructor destructor
