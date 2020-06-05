@@ -31,6 +31,7 @@
     instances or global variables
 ---------------------------------------- */
 extern SYSTIM systim;
+extern volatile uint8_t dma2ch4TC_Update;
 
 /* ----------------------------------------
     constructor destructor
@@ -133,6 +134,8 @@ int S1D13743::begin()
 
   swivelView( SWIVEL_VIEW_180 );  /* 180 degree rotation */
 
+  STM32F_DMA::begin( LCD_DMA_Channel );
+
   return 0;
 }
 
@@ -215,8 +218,6 @@ void S1D13743::coordinate( uint16_t x, uint16_t y )
 /* ----------------------------------------
     graphic controller vram write.
 ---------------------------------------- */
-extern volatile uint8_t dma2ch4TC_Update;
-
 void S1D13743::write( uint16_t data )
 {
   GLCD_ADDRESS_SET = GLCD_ADR_MEMORY_DATA_PORT_0;
@@ -243,9 +244,11 @@ void S1D13743::write( const uint16_t *data, uint32_t size )
     {
       uint32_t sz = ( size > 65535UL ) ? 65535UL : size;  // max 65535UL
       size -= sz;
-      volatile uint8_t dma2ch4TC_Update_Base = dma2ch4TC_Update;
-      m2p( DMA2_Channel4, (uint16_t *)&GLCD_DATA_WORD_ADR, data, sz );
-      while( dma2ch4TC_Update == dma2ch4TC_Update_Base ) rot_rdq();
+
+      STM32F_DMA::m2p( (uint16_t *)&GLCD_DATA_WORD_ADR, data, sz );
+//      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+      STM32F_DMA::command( ENABLE );  /* enable dma. */
+      while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }
   }
 }
@@ -270,9 +273,11 @@ void S1D13743::write( uint16_t data, uint32_t size )
     {
       uint32_t sz = ( size > 65535UL ) ? 65535UL : size;  // max 65535UL
       size -= sz;
-      volatile uint8_t dma2ch4TC_Update_Base = dma2ch4TC_Update;
-      p2p( DMA2_Channel4, (uint16_t *)&GLCD_DATA_WORD_ADR, (const uint16_t *)&data, sz );
-      while( dma2ch4TC_Update == dma2ch4TC_Update_Base ) rot_rdq();
+
+      STM32F_DMA::p2p( (uint16_t *)&GLCD_DATA_WORD_ADR, (const uint16_t *)&data, sz );
+//      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+      STM32F_DMA::command( ENABLE );  /* enable dma. */
+      while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }
   }
 }
