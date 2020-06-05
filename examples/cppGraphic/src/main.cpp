@@ -30,17 +30,17 @@
 #include  <Timer.h>
 #include  <led.h>
 #include  <lt3593.h>
-#include  <pca8574.h>
 #include  <draw.h>
 #include  <textPrint.h>
 #include  <button.h>
 #include  <adcDac.h>
 
-#if defined(  __BOARD_1303_1304_USE__ )
-#include  "1303_1304.h"
-#elif defined(  __BOARD_0900_USE__ )
-#include  "0900.h"
-#endif /*  __BOARD_1303_1304_USE__ */
+#if defined( __BOARD_1303_1304_USE__ )
+  #include  "1303_1304.h"
+  #include  <pca8574.h>
+#elif defined( __BOARD_0900_USE__ )
+  #include  "0900.h"
+#endif  /* __BOARD_1303_1304_USE__ */
 
 extern "C"
 {
@@ -74,12 +74,12 @@ volatile time_t sumTotalTime;  /* Total time since startup */
 Serial Serial1;  /* hardware serial 1 */
 BOARD  board;  /* initialize gpio */
 LT3593 backLight;
-#if  defined( __BOARD_1303_1304_USE__ )
+#if defined( __BOARD_1303_1304_USE__ )
 STM32F_I2C i2c1;
 STM32F_I2C i2c2;
 PCA8574 ic7;
 PCA8574 ic8;
-#endif  /* __BOARD_1303_1304_USE__ */
+#endif /* __BOARD_1303_1304_USE__ */
 
 const uint16_t rgb565_colors[] =
 {
@@ -102,7 +102,6 @@ const uint16_t rgb565_colors[] =
 };
 
 STM32F_ADC_DAC adc1;
-
 /* ----------------------------------------
     tasks
 ---------------------------------------- */
@@ -117,11 +116,11 @@ void lcdDemo07( void );
 
 uint8_t tsk1_stk[256 * 4];  // stack for task1
 uint8_t tsk2_stk[256 * 4];  // stack for task2
-uint8_t tsk3_stk[256 * 4];  // stack for task3
-uint8_t tsk4_stk[256 * 8];  // stack for task4
-uint8_t tsk5_stk[256 * 8];  // stack for task5
-uint8_t tsk6_stk[256 * 4];  // stack for task6
-uint8_t tsk7_stk[256 * 4];  // stack for task7
+uint8_t tsk3_stk[256 * 5];  // stack for task3
+uint8_t tsk4_stk[256 * 4];  // stack for task4
+uint8_t tsk5_stk[256 * 3];  // stack for task5
+uint8_t tsk6_stk[256 * 3];  // stack for task6
+uint8_t tsk7_stk[256 * 3];  // stack for task7
 uint8_t tsk8_stk[256 * 6];  // stack for task8
 
 /* ----------------------------------------
@@ -169,7 +168,7 @@ int main(void)
   board.gpioInit();
   board.extBusInit();
 
-#if  defined( __BOARD_1303_1304_USE__ )
+#if defined( __BOARD_1303_1304_USE__ )
   /* initialize i2c */
   if( i2c1.begin( I2C1, SDA1, SCL1 ) != I2C_SUCCESS )
   {
@@ -544,14 +543,14 @@ void lcdDemo07( void )
   BUTTON btn[8];
   static const char *label[] =
   {
-    "BUTTON01",
-    "BUTTON02",
-    "BUTTON03",
-    "BUTTON04",
-    "BUTTON05",
-    "BUTTON06",
-    "BUTTON07",
-    "BUTTON08",
+	"BUTTON 1",
+	"BUTTON 2",
+	"BUTTON 3",
+	"BUTTON 4",
+	"BUTTON 5",
+	"BUTTON 6",
+	"BUTTON 7",
+	"BUTTON 8",
   };
   /* initialize buttons. */
   for( int i = 0; i < 8; i++ )
@@ -617,7 +616,7 @@ void RCC_Configuration( void )
   /* FSMC clock enable */
   RCC_AHBPeriphClockCmd( RCC_AHBPeriph_FSMC, ENABLE );
 
-  #if 0
+#if 0
   /* Enable spi1 clock enable */
   RCC_APB2PeriphClockCmd( RCC_APB2Periph_SPI1, ENABLE );
   RCC_APB2PeriphResetCmd( RCC_APB2Periph_SPI1, DISABLE );
