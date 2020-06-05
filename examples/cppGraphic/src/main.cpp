@@ -116,11 +116,11 @@ void lcdDemo07( void );
 
 uint8_t tsk1_stk[256 * 4];  // stack for task1
 uint8_t tsk2_stk[256 * 4];  // stack for task2
-uint8_t tsk3_stk[256 * 4];  // stack for task3
+uint8_t tsk3_stk[256 * 5];  // stack for task3
 uint8_t tsk4_stk[256 * 4];  // stack for task4
-uint8_t tsk5_stk[256 * 4];  // stack for task5
-uint8_t tsk6_stk[256 * 4];  // stack for task6
-uint8_t tsk7_stk[256 * 4];  // stack for task7
+uint8_t tsk5_stk[256 * 3];  // stack for task5
+uint8_t tsk6_stk[256 * 3];  // stack for task6
+uint8_t tsk7_stk[256 * 3];  // stack for task7
 uint8_t tsk8_stk[256 * 6];  // stack for task8
 
 /* ----------------------------------------

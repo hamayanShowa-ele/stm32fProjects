@@ -355,8 +355,9 @@ uint16_t TEXT_PRINT::fontHeight( int type )
 ---------------------------------------- */
 int TEXT_PRINT::printf( int type, const char *fmt, ... )
 {
-  #define  BUFFER_SIZE  1024
+  #define  BUFFER_SIZE  256  // 1024
   char *buf = new char[BUFFER_SIZE];
+//  char buf[BUFFER_SIZE];
   va_list args;
   va_start( args, fmt );
   vsnprintf( buf, BUFFER_SIZE, fmt, args );
@@ -370,8 +371,9 @@ int TEXT_PRINT::printf( int type, const char *fmt, ... )
 
 int TEXT_PRINT::printf( const char *fmt, ... )
 {
-  #define  BUFFER_SIZE  1024
+  #define  BUFFER_SIZE  256  // 1024
   char *buf = new char[BUFFER_SIZE];
+//  char buf[BUFFER_SIZE];
   va_list args;
   va_start( args, fmt );
   vsnprintf( buf, BUFFER_SIZE, fmt, args );
