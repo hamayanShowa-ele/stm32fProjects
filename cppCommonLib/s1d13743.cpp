@@ -134,8 +134,6 @@ int S1D13743::begin()
 
   swivelView( SWIVEL_VIEW_180 );  /* 180 degree rotation */
 
-  STM32F_DMA::begin( LCD_DMA_Channel );
-
   return 0;
 }
 
@@ -245,8 +243,9 @@ void S1D13743::write( const uint16_t *data, uint32_t size )
       uint32_t sz = ( size > 65535UL ) ? 65535UL : size;  // max 65535UL
       size -= sz;
 
+      STM32F_DMA::begin( LCD_DMA_Channel );
       STM32F_DMA::m2p( (uint16_t *)&GLCD_DATA_WORD_ADR, data, sz );
-//      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
       STM32F_DMA::command( ENABLE );  /* enable dma. */
       while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }
@@ -274,8 +273,9 @@ void S1D13743::write( uint16_t data, uint32_t size )
       uint32_t sz = ( size > 65535UL ) ? 65535UL : size;  // max 65535UL
       size -= sz;
 
+      STM32F_DMA::begin( LCD_DMA_Channel );
       STM32F_DMA::p2p( (uint16_t *)&GLCD_DATA_WORD_ADR, (const uint16_t *)&data, sz );
-//      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+      STM32F_DMA::ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
       STM32F_DMA::command( ENABLE );  /* enable dma. */
       while( DMA_GetCurrDataCounter( LCD_DMA_Channel ) ) rot_rdq();
     }

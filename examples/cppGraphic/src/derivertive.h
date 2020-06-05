@@ -219,7 +219,7 @@ typedef enum
 #define  STDIN                    STDOUT
 
 #define  Cpu_Delay100US(delay)    Dly100us(delay)
-#define  HEAPSIZE                 (10000)  /**/
+#define  HEAPSIZE                 (10000)  /* look at ld file. */
 
 typedef struct
 {

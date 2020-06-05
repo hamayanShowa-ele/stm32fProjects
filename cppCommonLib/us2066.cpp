@@ -361,7 +361,7 @@ int US2066::printf( const char *fmt, ... )
   char buf[64];
   va_list args;
   va_start( args, fmt );
-  vsnprintf( buf, 256, fmt, args );
+  vsnprintf( buf, sizeof(buf), fmt, args );
   va_end( args );
   int ret = write( (const char *)buf );
 
