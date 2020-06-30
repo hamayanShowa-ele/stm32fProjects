@@ -182,13 +182,14 @@ void TEXT_PRINT::moji( uint16_t *dst, char code, int width, int height, int type
   {
     const uint8_t *bmp = ascii48GraphicBMPTable;
     uint32_t nextLine = ascii48PixWidth / 8;
-    code *= width / 8;
+    int codeI = code;
+    codeI *= width / 8;
     for( int h = 0; h < height; h++ )
     {
       uint32_t c;
-      c =  (uint32_t)*(bmp + code + (h * nextLine) + 0) << 16;
-      c |= (uint32_t)*(bmp + code + (h * nextLine) + 1) << 8;
-      c |= (uint32_t)*(bmp + code + (h * nextLine) + 2) << 0;
+      c =  (uint32_t)*(bmp + codeI + (h * nextLine) + 0) << 16;
+      c |= (uint32_t)*(bmp + codeI + (h * nextLine) + 1) << 8;
+      c |= (uint32_t)*(bmp + codeI + (h * nextLine) + 2) << 0;
       txtLine( ptr, c, width );
       ptr += width;
     }
