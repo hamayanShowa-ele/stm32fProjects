@@ -25,6 +25,8 @@
 #define  __SYSTEM_H__
 
 #include  <stm32f10x.h>
+#include  <string.h>
+#include  <math.h>
 
 /*****************************************************/
 /* defines                                           */
@@ -38,8 +40,14 @@
 /*****************************************************/
 /* prototypes                                        */
 /*****************************************************/
+void wait140ns( void );
+void dly1us( void );
+void dly2R5us( void );
+void dly5us( void );
 void dly10us( uint32_t dly_us );
 void dly100us( uint32_t dly_us );
 void dly1ms( uint32_t dly_ms );
+
+char *dtostrf(double number, signed char width, unsigned char prec, char *s);
 
 #endif  /* __SYSTEM_H__ */
