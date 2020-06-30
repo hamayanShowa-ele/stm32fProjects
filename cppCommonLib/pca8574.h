@@ -26,6 +26,7 @@
 #define  __PCA8574_H__
 
 #include  <Wire.h>
+#include  <softWire.h>
 extern "C"
 {
 }
@@ -38,21 +39,45 @@ extern "C"
     instances or global variables
 ---------------------------------------- */
 
-class PCA8574 //  : public GPIO
+class PCA8574 //: public STM32F_I2C
 {
 public:
   PCA8574();
-  PCA8574( STM32F_I2C *i2c, uint8_t adr );
+  PCA8574( STM32F_I2C *_i2c, uint8_t adr );
   ~PCA8574();
-  void begin( STM32F_I2C *i2c, uint8_t adr );
+  void begin( STM32F_I2C *_i2c, uint8_t adr );
 
   int write( uint8_t data );
   int read();
   int bitSet( int bit );
   int bitReset( int bit );
+  int toggle( int bit );
 
 private:
-  STM32F_I2C *wire;
+  STM32F_I2C *i2c;
+  uint8_t slave;
+  uint8_t byteData;
+
+  int bitSetReset( uint8_t data );
+};
+
+
+class SOFT_PCA8574
+{
+public:
+  SOFT_PCA8574();
+  SOFT_PCA8574( STM32F_SOFT_I2C *_i2c, uint8_t adr );
+  ~SOFT_PCA8574();
+  void begin( STM32F_SOFT_I2C *_i2c, uint8_t adr );
+
+  int write( uint8_t data );
+  int read();
+  int bitSet( int bit );
+  int bitReset( int bit );
+  int toggle( int bit );
+
+private:
+  STM32F_SOFT_I2C *i2c;
   uint8_t slave;
   uint8_t byteData;
 
