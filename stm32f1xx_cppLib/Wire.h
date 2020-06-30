@@ -66,18 +66,24 @@ public:
   void setClock( uint32_t speed );
 
   int beginTransmission( uint8_t adr );
+  int addressTransmitOnly( uint8_t adr );
+  int requestFrom( uint8_t adr );
   void endTransmission();
   int write( uint8_t c );
   int write( const uint8_t *data, size_t size );
-  int read();
+  int read( bool ack );
   int read( uint8_t *data, size_t size );
   int read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t rcvSize );
 
+  void generalCallReset();
+  void softReset();
+
 private:
+  I2C_TypeDef *wire;
   GPIO_TypeDef *sdaPort,*sclPort;
   uint16_t sdaPin,sclPin;
-  I2C_TypeDef *wire;
-  uint8_t slave;
+
+  int pinsAlternate();
 };
 
 

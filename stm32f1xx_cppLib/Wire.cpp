@@ -23,6 +23,7 @@
 ---------------------------------------- */
 #include  <Wire.h>
 
+#define  TIMEOUT  5UL  /* 10ms */
 /* ----------------------------------------
     prototypes 
 ---------------------------------------- */
@@ -50,21 +51,13 @@ STM32F_I2C::~STM32F_I2C()
 }
 
 /* ----------------------------------------
-    begin and end
+    pins alternate
 ---------------------------------------- */
-int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
+int STM32F_I2C::pinsAlternate()
 {
-  /* save scl and sda pin numbers. */
-  wire = i2c;
-  sdaPin = whatPin( sda );
-  sclPin =  whatPin( scl );
-  sdaPort = whatGPIOType( sda );
-  sclPort = whatGPIOType( scl );
-
-  /* clear i2c bus. */
   /* gpio set. */
-  pinMode( sda, OUTPUT );
-  pinMode( scl, OUTPUT );
+  pinMode( sdaPort, sdaPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
+  pinMode( sclPort, sclPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
 
   /* start condition. */
   sdaPort->BSRR = sdaPin << 0;  /* sda set 1 */
@@ -83,8 +76,22 @@ int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
   sdaPort->BSRR = sdaPin << 0;  /* sda set 1 */
 
   /* check bus busy. */
-  if( digitalRead( sda ) == false || digitalRead( scl ) == false ) return (-1);
+  dly10us(5UL);
+  if( !(sdaPort->IDR & sdaPin) || !(sclPort->IDR & sclPin) ) return I2C_ERROR_WIRE_OTHER_ERROR;
 
+  /* alternate function set. */
+//  GPIO_PinRemapConfig( GPIO_Remap_I2C1 , ENABLE );  // If you are using PB8 and PB9 in I2C1, then you will need a REMAP.
+  pinMode( sdaPort, sdaPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+  pinMode( sclPort, sclPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+
+  return I2C_SUCCESS;
+}
+
+/* ----------------------------------------
+    begin and end
+---------------------------------------- */
+int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
+{
   /* initialize i2c bus. */
   if( i2c == I2C1 )
   {
@@ -96,11 +103,17 @@ int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
     RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, ENABLE );
     RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C2, DISABLE );
   }
-  else return (-1);
+  else return I2C_ERROR_WIRE_OTHER_ERROR;
 
-  /* alternate function set. */
-  pinMode( sda, ALTERNATE_OD );
-  pinMode( scl, ALTERNATE_OD );
+  /* save scl and sda pin numbers. */
+  wire = i2c;
+  sdaPin = whatPin( sda );
+  sclPin =  whatPin( scl );
+  sdaPort = whatGPIOType( sda );
+  sclPort = whatGPIOType( scl );
+
+  /* clear i2c bus. */
+  if( pinsAlternate() < 0 ) return I2C_ERROR_WIRE_OTHER_ERROR;
 
   I2C_DeInit( wire );
   I2C_InitTypeDef I2C_InitStruct;
@@ -142,35 +155,82 @@ void STM32F_I2C::setClock( uint32_t speed )
 ---------------------------------------- */
 int STM32F_I2C::beginTransmission( uint8_t adr )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
+  adr <<= 1;
   SYSTIM baseTim;
-
-  /* save slave address. */
-  slave = adr << 1;
 
   /* While the bus is busy */
   baseTim = systim;
-
-  while( I2C_GetFlagStatus(wire, I2C_FLAG_BUSY) )
-//  while( I2C_GetFlagStatus( I2C2, I2C_FLAG_BUSY) )
+  while( I2C_GetFlagStatus(wire, I2C_FLAG_BUSY) == SET )
   {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_BUS_BUSY;
+    }
     rot_rdq();
   }
 
-  //start condition
+  /* initiate start sequence */
   I2C_GenerateSTART( wire, ENABLE );
-//  I2C_GenerateSTART( I2C2, ENABLE );
   //EV5 and clear it：マスターモードでstartコンディション完了後、通信を開始している事を確認している。
   baseTim = systim;
   while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_MODE_SELECT) == ERROR )
-//  while( I2C_CheckEvent( I2C2, I2C_EVENT_MASTER_MODE_SELECT) == ERROR )
   {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_BUS_BUSY;
+    }
     rot_rdq();
   }
 
-  return I2C_SUCCESS;  /* success! */
+  //Send address for write
+  I2C_Send7bitAddress( wire, adr, I2C_Direction_Transmitter );
+  //EV6 and clear it：アドレス送信確認、送信データレジスタ空き、データbyte(アドレスのR/Wbit)送信、
+  //通信中(BUS BUSY)、マスター
+  baseTim = systim;
+  while( I2C_CheckEvent(wire,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
+    }
+    rot_rdq();
+  }
+
+  return I2C_SUCCESS;
+}
+
+int STM32F_I2C::addressTransmitOnly( uint8_t adr )
+{
+  adr <<= 1;
+  SYSTIM baseTim;
+  /* While the bus is busy */
+  baseTim = systim;
+  while( I2C_GetFlagStatus(wire, I2C_FLAG_BUSY) == SET )
+  {
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_BUS_BUSY;
+    }
+    rot_rdq();
+  }
+
+  /* initiate start sequence */
+  I2C_GenerateSTART( wire, ENABLE );
+  //EV5 and clear it：マスターモードでstartコンディション完了後、通信を開始している事を確認している。
+  baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_MODE_SELECT) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_BUS_BUSY;
+    }
+    rot_rdq();
+  }
+
+  //Send address for write
+  I2C_Send7bitAddress( wire, adr, I2C_Direction_Transmitter );
+
+  return I2C_SUCCESS;
 }
 
 /* ----------------------------------------
@@ -180,6 +240,58 @@ void STM32F_I2C::endTransmission()
 {
   //stop condition
   I2C_GenerateSTOP( wire, ENABLE );
+
+  /*stop bit flag*/
+  SYSTIM baseTim = systim;
+  while( I2C_GetFlagStatus( wire, I2C_FLAG_STOPF ) == SET )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return;
+    rot_rdq();
+  }
+}
+
+/* ----------------------------------------
+    request from
+---------------------------------------- */
+int STM32F_I2C::requestFrom( uint8_t adr )
+{
+  adr <<= 1;
+  SYSTIM baseTim;
+
+  /* While the bus is busy */
+  baseTim = systim;
+  while( I2C_GetFlagStatus(wire, I2C_FLAG_BUSY) == SET )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    rot_rdq();
+  }
+
+  /* initiate start sequence */
+//  I2C_AcknowledgeConfig( wire, ENABLE );  //ACK
+  I2C_GenerateSTART( wire, ENABLE );
+
+  //EV5 and clear it：マスターモードでstartコンディション完了後、通信を開始している事を確認している。
+  baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_MODE_SELECT) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_BUS_BUSY;
+    }
+    rot_rdq();
+  }
+
+  /* Send module address and behave as receiver */
+  I2C_Send7bitAddress( wire, adr, I2C_Direction_Receiver );
+  /* Test on EV6 and clear it */
+  baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
+    rot_rdq();
+  }
+
+  return I2C_SUCCESS;
 }
 
 /* ----------------------------------------
@@ -187,19 +299,7 @@ void STM32F_I2C::endTransmission()
 ---------------------------------------- */
 int STM32F_I2C::write( uint8_t c )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
   SYSTIM baseTim;
-
-  //Send address for write
-  I2C_Send7bitAddress( wire, slave, I2C_Direction_Transmitter );
-  //EV6 and clear it：アドレス送信確認、送信データレジスタ空き、データbyte(アドレスのR/Wbit)送信、
-  //通信中(BUS BUSY)、マスター
-  baseTim = systim;
-  while( I2C_CheckEvent(wire,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
-    rot_rdq();
-  }
 
   //Send the data to write to
   I2C_SendData( wire, c );
@@ -207,7 +307,10 @@ int STM32F_I2C::write( uint8_t c )
   baseTim = systim;
   while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_TRANSMITTED) == ERROR )
   {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+    if( (systim - baseTim) >= TIMEOUT )
+    {
+      return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+    }
     rot_rdq();
   }
 
@@ -216,19 +319,7 @@ int STM32F_I2C::write( uint8_t c )
 
 int STM32F_I2C::write( const uint8_t *data, size_t size )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
   SYSTIM baseTim;
-
-  //Send address for write
-  I2C_Send7bitAddress( wire, slave, I2C_Direction_Transmitter );
-  //EV6 and clear it：アドレス送信確認、送信データレジスタ空き、データbyte(アドレスのR/Wbit)送信、
-  //通信中(BUS BUSY)、マスター
-  baseTim = systim;
-  while( I2C_CheckEvent(wire,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
-    rot_rdq();
-  }
 
   //Send the data to write to
   int count;
@@ -239,7 +330,10 @@ int STM32F_I2C::write( const uint8_t *data, size_t size )
     baseTim = systim;
     while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_TRANSMITTED) == ERROR )
     {
-      if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      if( (systim - baseTim) >= TIMEOUT )
+      {
+        return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      }
       rot_rdq();
     }
   }
@@ -250,60 +344,40 @@ int STM32F_I2C::write( const uint8_t *data, size_t size )
 /* ----------------------------------------
     read
 ---------------------------------------- */
-int STM32F_I2C::read()
+int STM32F_I2C::read( bool ack )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
-  SYSTIM baseTim;
-  int c;
-
-  /* Send module address and behave as receiver */
-  I2C_Send7bitAddress( wire, slave, I2C_Direction_Receiver );
-  /* Test on EV6 and clear it */
-  baseTim = systim;
-  while( !I2C_CheckEvent(wire, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED) )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
-    rot_rdq();
-  }
-
-  baseTim = systim;
-  while( !I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_RECEIVED) )
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_RECEIVED) == ERROR )
   {
     if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
     rot_rdq();
   }
+//  while( !(wire->SR1 & I2C_SR1_RXNE) ) {}
   /* Read a byte from the module */
-  c = I2C_ReceiveData( wire );
-
+  int c = I2C_ReceiveData( wire );
   /* Disable Acknowledgment */
-  I2C_AcknowledgeConfig( wire, DISABLE );
+  I2C_AcknowledgeConfig( wire, (ack) ? DISABLE : ENABLE );
 
   return c & 0x00FF;
 }
 
 int STM32F_I2C::read( uint8_t *data, size_t size )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
-  SYSTIM baseTim;
-
-  /* Send module address and behave as receiver */
-  I2C_Send7bitAddress( wire, slave, I2C_Direction_Receiver );
-  /* Test on EV6 and clear it */
-  baseTim = systim;
-  while( !I2C_CheckEvent(wire, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED) )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
-    rot_rdq();
-  }
-
+  /* Enable Acknowledgment */
+  I2C_AcknowledgeConfig( wire, ENABLE );
   /* Read a byte from the module */
-  int count;
-  for( count = 0; count < (int)size; count++ )
+  int count = 0;
+  for( ; count < (int)size; count++ )
   {
-    baseTim = systim;
-    while( !I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_RECEIVED) )
+    SYSTIM baseTim = systim;
+    while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_RECEIVED) == ERROR )
+//    while( !(wire->SR1 & I2C_SR1_RXNE) )
     {
-      if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+   	  if( (systim - baseTim) >= TIMEOUT )
+      {
+        I2C_AcknowledgeConfig( wire, DISABLE );
+        return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      }
       rot_rdq();
     }
     *data++ = I2C_ReceiveData( wire );
@@ -317,20 +391,8 @@ int STM32F_I2C::read( uint8_t *data, size_t size )
 
 int STM32F_I2C::read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t rcvSize )
 {
-  #define  TIMEOUT  10UL  /* 10ms */
   SYSTIM baseTim;
   int count;
-
-  //Send address for write
-  I2C_Send7bitAddress( wire, slave, I2C_Direction_Transmitter );
-  //EV6 and clear it：アドレス送信確認、送信データレジスタ空き、データbyte(アドレスのR/Wbit)送信、
-  //通信中(BUS BUSY)、マスター
-  baseTim = systim;
-  while( I2C_CheckEvent(wire,I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED) == ERROR )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
-    rot_rdq();
-  }
 
   //Send the data to write to
   for( count = 0; count < (int)sndSize; count++ )
@@ -340,12 +402,14 @@ int STM32F_I2C::read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t r
     baseTim = systim;
     while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_BYTE_TRANSMITTED) == ERROR )
     {
-      if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      if( (systim - baseTim) >= TIMEOUT )
+      {
+        return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      }
       rot_rdq();
     }
   }
 
-#if 1
   //restart condition
   I2C_GenerateSTART( wire, DISABLE );
   I2C_GenerateSTART( wire, ENABLE );
@@ -356,8 +420,9 @@ int STM32F_I2C::read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t r
     if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
     rot_rdq();
   }
-#endif
 
+  /* Enable Acknowledgment */
+  I2C_AcknowledgeConfig( wire, ENABLE );
   /* Read a byte from the module */
   for( count = 0; count < (int)rcvSize; count++ )
   {
@@ -374,4 +439,23 @@ int STM32F_I2C::read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t r
   I2C_AcknowledgeConfig( wire, DISABLE );
 
   return count;
+}
+
+/* ----------------------------------------
+    i2c general call reset.
+---------------------------------------- */
+void STM32F_I2C::generalCallReset()
+{
+  /* general call reset. */
+  beginTransmission( 0x00 );
+  write( 0x06 );
+  endTransmission();
+}
+
+/* ----------------------------------------
+    i2c software reset.
+---------------------------------------- */
+void STM32F_I2C::softReset()
+{
+  I2C_SoftwareResetCmd( wire, ENABLE );
 }
