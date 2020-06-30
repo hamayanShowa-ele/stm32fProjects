@@ -22,6 +22,7 @@
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
 #include  <stm32f10x.h>
+#include  "nvic.h"
 
 /* ----------------------------------------
     defines
