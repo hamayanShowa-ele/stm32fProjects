@@ -18,10 +18,15 @@
  
 
 /*----------Stack Configuration-----------------------------------------------*/  
-#define STACK_SIZE       0x00000100      /*!< The Stack size suggest using even number     */
+//#define STACK_SIZE       0x00000100      /*!< The Stack size suggest using even number     */
+#define HEAP_SIZE        10000UL /* 10000byte */ /*!< The Heap size suggest using even number     */
+#define STACK_SIZE       (0x00000100 + (HEAP_SIZE / sizeof(unsigned long)))  /*!< The Stack size suggest using even number     */
 __attribute__ ((section(".co_stack")))
 unsigned long pulStack[STACK_SIZE];      
 
+/*----------Heap Configuration-----------------------------------------------*/
+//#define HEAP_SIZE       0x00002710 /* 10000byte */ /*!< The Heap size suggest using even number     */
+//static unsigned char heap[HEAP_SIZE]   __attribute__ ((aligned(8), used, section(".heap")));
 
 /*----------Macro definition--------------------------------------------------*/  
 #define WEAK __attribute__ ((weak))           
