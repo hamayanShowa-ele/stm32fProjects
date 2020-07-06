@@ -35,7 +35,7 @@
     defines
 ---------------------------------------- */
 #define  LOW   0
-#define  HIGH  ~LOW
+#define  HIGH  !LOW
 
 /* ----------------------------------------
   type
