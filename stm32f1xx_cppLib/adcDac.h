@@ -61,11 +61,12 @@ typedef struct
     instances or global variables
 ---------------------------------------- */
 
-class STM32F_ADC_DAC : public GPIO
+class STM32F_ADC : public GPIO
 {
 public:
-  STM32F_ADC_DAC();
-  ~STM32F_ADC_DAC();
+  STM32F_ADC();
+  STM32F_ADC( ADC_TypeDef *adcx );
+  ~STM32F_ADC();
   void begin( ADC_TypeDef *adcx );
 //  void end();
   uint16_t analogRead( int pin, uint8_t cycle = ADC_SampleTime_7Cycles5 );
@@ -81,6 +82,31 @@ private:
   void whatADCType( int pin, uint8_t *channel );
 };
 
+class STM32F_DAC : public GPIO
+{
+public:
+  STM32F_DAC();
+  STM32F_DAC( uint32_t ch, uint32_t trig = DAC_Trigger_Software );
+  ~STM32F_DAC();
+
+  void begin( uint32_t ch, uint32_t trig = DAC_Trigger_Software );
+  void start();
+  void stop();
+  void write( uint16_t data );
+  void write( uint16_t data1, uint16_t data2 );
+  void write( const uint16_t *data, size_t size, TIM_TypeDef *tim = TIM7, bool repeat = true );
+  void write( const uint32_t *data, size_t size, uint32_t freq, TIM_TypeDef *tim );
+
+  uint16_t read();
+  void dmaSet( DMA_Channel_TypeDef *DMAx_Channelx, const uint16_t *data, uint16_t size );
+
+private:
+//  DAC_TypeDef *DACx;
+  uint32_t channel;
+  uint32_t trigger;
+
+  void whatADCType( int pin, uint8_t *channel );
+};
 
 #endif  /* __ADC_DAC_H__ */
 
