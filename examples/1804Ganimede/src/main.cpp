@@ -35,7 +35,7 @@ extern "C"
 {
   #include  <peripheral.h>
   #include  <mul_tsk.h>
-//#include  <strutil.h>
+  #include  <strutil.h>
 }
 
 /* ----------------------------------------
@@ -50,11 +50,6 @@ void gpioInit( void );
 void RCC_Configuration( void );
 void NVIC_Configuration( void );
 static unsigned int RemainStack( void *stk, unsigned int sz );
-
-void compileDate(int *year, int *month, int *day);
-void compileTime(int *hour, int *minute, int *second);
-int split( char *str , char *argv[], int sz );
-int split_char( char comp, char *str , char *argv[], int sz );
 
 /* ----------------------------------------
   global variables and instance.
@@ -198,116 +193,6 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
   return sz - i;
 }
 
-/* ----------------------------------------
-   コンパイル日を扱いやすいint型で返す
-  Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
----------------------------------------- */
-void compileDate(int *year, int *month, int *day)
-{
-  char *argv[4],*str;
-  char date[] = __DATE__;
-
-  split( date, argv, 3 );
-
-  *year = atoi(argv[2]);
-  *day = atoi(argv[1]);
-  str = argv[0];
-  *month =
-    (*str == 'F') ? 2 :
-    (*str == 'S') ? 9 :
-    (*str == 'O') ? 10 :
-    (*str == 'N') ? 11 :
-    (*str == 'D') ? 12 : 0;
-  if( *month == 0 )  //jan,jun,jul,
-  {
-    if(*str == 'J')
-    {
-      if(str[1] == 'a')
-      {
-        *month = 1;
-      }
-      else
-      {
-        if(str[2] == 'n')
-          *month = 6;
-        else
-          *month = 7;
-      }
-    }
-    else if(*str == 'M')  //mar,may,
-    {
-      if(str[2] == 'r')
-        *month = 3;
-      else
-        *month = 5;
-    }
-    else  //apr,aug,
-    {
-      if(str[1] == 'p')
-        *month = 4;
-      else
-        *month = 8;
-    }
-  }
-}
-
-/* ----------------------------------------
-  コンパイル時を扱いやすいint型で返す
----------------------------------------- */
-void compileTime(int *hour, int *minute, int *second)
-{
-  char *argv[4];
-  char Time[] = __TIME__;
-
-  split_char( ':', Time, argv, 3 );
-  *hour   = atoi(argv[0]);
-  *minute = atoi(argv[1]);
-  *second = atoi(argv[2]);
-}
-
-/* ----------------------------------------
-  文字列分割ユーティリティ
----------------------------------------- */
-int split( char *str , char *argv[], int sz )
-{
-  int argc = 0;
-
-  while( *str != '\0' && argc < sz )
-  {
-    if( isgraph( (int)*str ) != 0 )
-    {
-      argv[ argc++ ] = str;
-      while( *str != '\0' && isgraph( (int)*str ) != 0 ) str++;
-    }
-    else *str++ = '\0';
-  }
-
-  return argc;
-}
-
-/* ----------------------------------------
-  文字指定型文字列分割ユーティリティ
----------------------------------------- */
-int split_char( char comp, char *str , char *argv[], int sz )
-{
-  int argc = 0;
-
-  while( *str != '\0' && argc < sz )
-  {
-    if( *str != comp && isgraph( (int)*str ) != 0 )
-    {
-      argv[ argc++ ] = str;
-      while( *str != '\0' && *str != comp && isgraph( (int)*str ) != 0 ) str++;
-    }
-//    else if( *str == comp )
-//    {
-//      argv[ argc++ ] = str++;
-//    }
-    else *str++ = '\0';
-  }
-
-  return argc;
-}
 
 
 /*******************************************************************************
@@ -340,7 +225,7 @@ void RCC_Configuration( void )
   RCC_AHB3PeriphResetCmd( RCC_AHB3Periph_FSMC, DISABLE );
   RCC_AHB3PeriphClockCmd( RCC_AHB3Periph_FSMC, ENABLE );
 
-  /* Enable clock for SYSCFG */
+  /* Enable clock for SYSCFG. When using an EXTI interrupt. */
   RCC_APB2PeriphClockCmd( RCC_APB2Periph_SYSCFG, ENABLE );
 }
 
