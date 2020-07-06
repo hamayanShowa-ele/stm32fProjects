@@ -24,7 +24,7 @@
 #ifndef  __TIMER_H__
 #define  __TIMER_H__
 
-#include  "gpio.h"
+#include  <gpio.h>
 
 extern "C"
 {
@@ -111,6 +111,7 @@ class STM32F_TIMER : public GPIO
 {
 public:
   STM32F_TIMER();
+  STM32F_TIMER( TIM_TypeDef *tim );
   ~STM32F_TIMER();
   int  begin( TIM_TypeDef *tim );
   void end();
@@ -130,6 +131,8 @@ public:
 
   void startInterrupt( uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
   void startInterrupt( int ch, uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
+
+  void trigger( uint16_t trig );
 
 //  void callBack( int name, void *cb );
   void callBack( int name, void(*cb)(void) );

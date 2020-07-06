@@ -46,6 +46,11 @@ STM32F_TIMER::STM32F_TIMER()
 {
 }
 
+STM32F_TIMER::STM32F_TIMER( TIM_TypeDef *tim )
+{
+  begin( tim );
+}
+
 STM32F_TIMER::~STM32F_TIMER()
 {
 }
@@ -215,7 +220,7 @@ int STM32F_TIMER::frequency( uint32_t freq )
   TIM_TimeBaseStructure.TIM_Prescaler = (uint16_t)(prescaler - 1);  /* prescaler */
   /* set period */
 //  TIM_TimeBaseStructure.TIM_Period = (uint16_t)((ck_int / freq) - 1);  /* 周期設定 */
-  TIM_TimeBaseStructure.TIM_Period = (uint16_t)(period - 1);  /* 周期設定 */
+  TIM_TimeBaseStructure.TIM_Period = (uint16_t)(period - 0);  /* 周期設定 */
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /* クロック分周比=1 内部クロックを使う限り関係しない？ */
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
@@ -295,8 +300,11 @@ int STM32F_TIMER::pwm1( int ch, int pin, uint16_t pulse )
 
 int STM32F_TIMER::adcTrigger( int ch )
 {
+  /* TIMx TRGO selection */
+  TIM_SelectOutputTrigger( TIMx, TIM_TRGOSource_Update );
+  return 0;
   // PORT_END -> PB9 for ARIES ver.2
-  return OC( ch, TIM_OCMode_Toggle, PB9, 0, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
+//  return OC( ch, TIM_OCMode_Toggle, PORT_END, 0, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
 }
 
 /* ----------------------------------------
@@ -434,6 +442,15 @@ void STM32F_TIMER::startInterrupt( int ch, uint8_t pri, uint8_t sub )
 }
 
 /* ----------------------------------------
+    timer trigger.
+---------------------------------------- */
+void STM32F_TIMER::trigger( uint16_t trig )
+{
+  TIM_SelectOutputTrigger( TIMx, trig );
+}
+
+
+/* ----------------------------------------
     register call back routine.
 ---------------------------------------- */
 #if 0
@@ -448,6 +465,7 @@ void STM32F_TIMER::callBack( int name, void(*cb)(void) )
   cbList[ name ] = cb;
   startInterrupt();
 }
+
 
 /* ----------------------------------------
     interrupt handlers
