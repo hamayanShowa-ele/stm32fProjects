@@ -50,11 +50,15 @@ class STM32F_DMA // : public GPIO
 {
 public:
   STM32F_DMA();
+  STM32F_DMA( DMA_Channel_TypeDef* ch );
   ~STM32F_DMA();
   void begin( DMA_Channel_TypeDef* ch );
 
   void m2p(
     uint16_t *dst, const uint16_t *src, uint32_t count,
+    uint32_t mode = DMA_Mode_Normal );
+  void m2p(
+    uint32_t *dst, const uint32_t *src, uint32_t count,
     uint32_t mode = DMA_Mode_Normal );
   void p2p(
     uint16_t *dst, const uint16_t *src, uint32_t count,
@@ -62,6 +66,7 @@ public:
   void p2m(
     uint16_t *dst, const uint16_t *src, uint32_t count,
     uint32_t mode = DMA_Mode_Normal );
+
   void ITConfig( uint32_t it, FunctionalState enableDisable );
   void command( FunctionalState enableDisable );
 

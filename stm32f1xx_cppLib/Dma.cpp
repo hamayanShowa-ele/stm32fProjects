@@ -53,6 +53,11 @@ STM32F_DMA::STM32F_DMA()
 {
 }
 
+STM32F_DMA::STM32F_DMA( DMA_Channel_TypeDef* ch )
+{
+  begin( ch );
+}
+
 STM32F_DMA::~STM32F_DMA()
 {
 }
@@ -90,6 +95,33 @@ void STM32F_DMA::m2p(
   DMA_InitStruct.DMA_MemoryBaseAddr = (uint32_t)src;  /* source memory address */;
   DMA_InitStruct.DMA_BufferSize = count;  /* transmit size */
   DMA_Init( dmaCh, &DMA_InitStruct );
+}
+
+void STM32F_DMA::m2p(
+  uint32_t *dst, const uint32_t *src, uint32_t count, uint32_t mode )
+{
+  DMA_InitTypeDef DMA_InitStructure;
+  DMA_Cmd( dmaCh, DISABLE );
+  DMA_DeInit( dmaCh );
+  DMA_StructInit( &DMA_InitStructure );
+
+//  DMA_InitStruct.DMA_M2M = DMA_M2M_Enable;  /* Enables transfer between memory to memory. */
+  DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;  /* Disables transfer between memory to memory. */
+  DMA_InitStructure.DMA_Priority = DMA_Priority_Low;  /* set low priority.  */
+  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
+  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+  DMA_InitStructure.DMA_Mode = mode;  /* normal mode(one shot mode). */
+//  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)dst; /* destination memory address */
+  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)src;  /* source memory address */;
+  DMA_InitStructure.DMA_BufferSize = count;  /* transmit size */
+  DMA_Init( dmaCh, &DMA_InitStructure );
+
+  /* Enable DMAx Channelx */
+//  DMA_Cmd( DMAx_Channelx, ENABLE );
 }
 
 
