@@ -48,6 +48,4 @@ void dly10us( uint32_t dly_us );
 void dly100us( uint32_t dly_us );
 void dly1ms( uint32_t dly_ms );
 
-char *dtostrf(double number, signed char width, unsigned char prec, char *s);
-
 #endif  /* __SYSTEM_H__ */

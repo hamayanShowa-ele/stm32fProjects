@@ -196,13 +196,12 @@ void cris_ex( void );  // start he interrupt.
 /*
  configures for multi tasks.
 */
-#define  MAX_TASK_NUMBER  4  //
+#define  MAX_TASK_NUMBER  3  //
 enum GR_SAKURA_TSK_ID
 {
   ID_stackMonitor,
-  ID_lcdDemo01,
-  ID_actLed,
   ID_temperature,
+  ID_dacOutput,
 };
 
 #define  MAX_MBX_NUMBER    1

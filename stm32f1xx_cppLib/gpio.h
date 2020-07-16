@@ -77,14 +77,37 @@ enum GPIO_PIN_SPEED
 class GPIO  // : public hoge_class
 {
 public:
-  GPIO_TypeDef* whatGPIOType( int pin );
-  uint16_t whatPin( int pin );
+  GPIO_TypeDef* whatGPIOType( int pin )
+  {
+    if( pin >= PA0 && pin <= PA15 ) return GPIOA;
+    else if( pin >= PB0 && pin <= PB15 ) return GPIOB;
+    else if( pin >= PC0 && pin <= PC15 ) return GPIOC;
+    else if( pin >= PD0 && pin <= PD15 ) return GPIOD;
+    else if( pin >= PE0 && pin <= PE15 ) return GPIOE;
+    else if( pin >= PF0 && pin <= PF15 ) return GPIOF;
+    else if( pin >= PG0 && pin <= PG15 ) return GPIOG;
+    return 0;
+  }
+  uint8_t  whatPortSource( int pin )
+  {
+    if( pin >= PA0 && pin <= PA15 ) return GPIO_PortSourceGPIOA;
+    else if( pin >= PB0 && pin <= PB15 ) return GPIO_PortSourceGPIOB;
+    else if( pin >= PC0 && pin <= PC15 ) return GPIO_PortSourceGPIOC;
+    else if( pin >= PD0 && pin <= PD15 ) return GPIO_PortSourceGPIOD;
+    else if( pin >= PE0 && pin <= PE15 ) return GPIO_PortSourceGPIOE;
+    else if( pin >= PF0 && pin <= PF15 ) return GPIO_PortSourceGPIOF;
+    else if( pin >= PG0 && pin <= PG15 ) return GPIO_PortSourceGPIOG;
+    return 0xFF;
+  }
+  uint16_t whatPin( int pin ) {return 0x0001 << pin % 16;}  /* response pin's define */
+  uint8_t  whatPinSource( int pin ) {return pin % 16;}  /* response pin's source */
+
   void pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed = GPIO_SPEED_FAST );
   void pinMode( int pin, int type, int speed = GPIO_SPEED_FAST );
 
   void set( int pin );
   void reset( int pin );
-  void digitalWrite( int pin, int highOrLow );
+  void digitalWrite( int pin, bool highOrLow );
   bool digitalRead( int pin );
   void wordWrite( GPIO_TypeDef *gpiox, uint16_t data, uint16_t mask );
 

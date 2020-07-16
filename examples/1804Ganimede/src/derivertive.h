@@ -59,6 +59,7 @@
 #define  ACT_IS_1       ACT_PORT->BSRRL = (ACT_PIN << 0)
 #define  ACT_IS         (ACT_PORT->ODR & ACT_PIN)
 #define  ACT_RCC        RCC_AHB1Periph_GPIOG  //for virgo
+#define  ACT_LED        PG11
 
 /* PB6 :SCL1 */
 /* PB7 :SDA1 */

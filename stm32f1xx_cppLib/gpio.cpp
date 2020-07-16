@@ -36,30 +36,6 @@
 ---------------------------------------- */
 
 /* ----------------------------------------
-    response pin's gpio type
----------------------------------------- */
-GPIO_TypeDef* GPIO::whatGPIOType( int pin )
-{
-  if( pin >= PA0 && pin <= PA15 ) return GPIOA;
-  else if( pin >= PB0 && pin <= PB15 ) return GPIOB;
-  else if( pin >= PC0 && pin <= PC15 ) return GPIOC;
-  else if( pin >= PD0 && pin <= PD15 ) return GPIOD;
-  else if( pin >= PE0 && pin <= PE15 ) return GPIOE;
-  else if( pin >= PF0 && pin <= PF15 ) return GPIOF;
-  else if( pin >= PG0 && pin <= PG15 ) return GPIOG;
-//  else if( pin >= PH0 && pin <= PH15 ) return GPIOH;
-  return 0;
-}
-
-/* ----------------------------------------
-    response pin's define
----------------------------------------- */
-uint16_t GPIO::whatPin( int pin )
-{
-  return 0x0001 << pin % 16;
-}
-
-/* ----------------------------------------
     pin mode
 ---------------------------------------- */
 void GPIO::pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed )
@@ -78,8 +54,6 @@ void GPIO::pinMode( int pin, int type, int speed )
   uint16_t gpioPin = whatPin( pin );
   pinMode( gpiox, gpioPin, type, speed );
 }
-
-
 
 /* ----------------------------------------
     output pin set/reset
@@ -101,7 +75,7 @@ void GPIO::reset( int pin )
 /* ----------------------------------------
     digital write
 ---------------------------------------- */
-void GPIO::digitalWrite( int pin, int highOrLow )
+void GPIO::digitalWrite( int pin, bool highOrLow )
 {
   if( highOrLow ) set( pin );
   else reset( pin );

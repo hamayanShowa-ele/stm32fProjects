@@ -36,65 +36,6 @@
 ---------------------------------------- */
 
 /* ----------------------------------------
-    response pin's gpio type
----------------------------------------- */
-GPIO_TypeDef* GPIO::whatGPIOType( int pin )
-{
-  if( pin >= PA0 && pin <= PA15 ) return GPIOA;
-  else if( pin >= PB0 && pin <= PB15 ) return GPIOB;
-  else if( pin >= PC0 && pin <= PC15 ) return GPIOC;
-  else if( pin >= PD0 && pin <= PD15 ) return GPIOD;
-  else if( pin >= PE0 && pin <= PE15 ) return GPIOE;
-  else if( pin >= PF0 && pin <= PF15 ) return GPIOF;
-  else if( pin >= PG0 && pin <= PG15 ) return GPIOG;
-  else if( pin >= PH0 && pin <= PH15 ) return GPIOH;
-  else if( pin >= PI0 && pin <= PI15 ) return GPIOI;
-  return 0;
-}
-
-/* ----------------------------------------
-    response pin's define
----------------------------------------- */
-uint16_t GPIO::whatPin( int pin )
-{
-  return 0x0001 << pin % 16;
-}
-
-/* ----------------------------------------
-    response pin's source
----------------------------------------- */
-uint8_t GPIO::whatPinSource( int pin )
-{
-  return pin % 16;
-}
-
-/* ----------------------------------------
-    response exti pin's port source
----------------------------------------- */
-uint8_t GPIO::whatExtiPortSource( int pin )
-{
-  GPIO_TypeDef* GPIOx = whatGPIOType( pin );
-  if( GPIOx == GPIOA ) return EXTI_PortSourceGPIOA;
-  if( GPIOx == GPIOB ) return EXTI_PortSourceGPIOB;
-  if( GPIOx == GPIOC ) return EXTI_PortSourceGPIOC;
-  if( GPIOx == GPIOD ) return EXTI_PortSourceGPIOD;
-  if( GPIOx == GPIOE ) return EXTI_PortSourceGPIOE;
-  if( GPIOx == GPIOF ) return EXTI_PortSourceGPIOF;
-  if( GPIOx == GPIOG ) return EXTI_PortSourceGPIOG;
-  if( GPIOx == GPIOH ) return EXTI_PortSourceGPIOH;
-  if( GPIOx == GPIOI ) return EXTI_PortSourceGPIOI;
-  return 0xFF;
-}
-
-/* ----------------------------------------
-    response exti pin's pin source
----------------------------------------- */
-uint8_t GPIO::whatExtiPinSource( int pin )
-{
-  return pin % 16;
-}
-
-/* ----------------------------------------
     response exti pin's interrupt number.
 ---------------------------------------- */
 int GPIO::whatExtiIntNumber( int pin )
@@ -216,6 +157,26 @@ void GPIO::pinAFConfig( int pin, uint8_t type )
   GPIO_PinAFConfig( gpiox, gpioSpurce, type );
 }
 
+/* ----------------------------------------
+    read output data register.
+---------------------------------------- */
+bool GPIO::odr( int pin )
+{
+  GPIO_TypeDef *gpiox = whatGPIOType( pin );
+  uint16_t gpioPin = whatPin( pin );
+  return (gpiox->ODR & gpioPin) ? true : false;
+}
+
+/* ----------------------------------------
+    read input data register.
+---------------------------------------- */
+bool GPIO::idr( int pin )
+{
+  GPIO_TypeDef *gpiox = whatGPIOType( pin );
+  uint16_t gpioPin = whatPin( pin );
+  return (gpiox->IDR & gpioPin) ? true : false;
+}
+
 
 /* ----------------------------------------
     output pin set/reset
@@ -237,7 +198,7 @@ void GPIO::reset( int pin )
 /* ----------------------------------------
     digital write
 ---------------------------------------- */
-void GPIO::digitalWrite( int pin, int highOrLow )
+void GPIO::digitalWrite( int pin, bool highOrLow )
 {
   if( highOrLow ) set( pin );
   else reset( pin );

@@ -39,33 +39,29 @@ LED::LED()
 {
 }
 
-LED::LED( int pin )
+LED::LED( int pin, bool active )
 {
-  pinNumber = pin;
-  gpiox = whatGPIOType( pin );
-  gpioPin = whatPin( pin );
-  pinMode( pin, OUTPUT, GPIO_SPEED_SLOW );
+  begin( pin, active );
 }
 
 LED::~LED()
 {
-  pinMode( pinNumber, INPUT_PULLUP );
+  GPIO::pinMode( pinNumber, INPUT_PULLUP );
 }
 
 /* ----------------------------------------
     begin and end
 ---------------------------------------- */
-void LED::begin( int pin )
+void LED::begin( int pin, bool active )
 {
   pinNumber = pin;
-  gpiox = whatGPIOType( pin );
-  gpioPin = whatPin( pin );
-  pinMode( pin, OUTPUT, GPIO_SPEED_SLOW );
+  activeHigh = active;
+  GPIO::pinMode( pin, OUTPUT, GPIO_SPEED_SLOW );
 }
 
 void LED::end()
 {
-  pinMode( pinNumber, INPUT_PULLUP );
+  GPIO::pinMode( pinNumber, INPUT_PULLUP );
 }
 
 
@@ -74,14 +70,14 @@ void LED::end()
 ---------------------------------------- */
 void LED::On()
 {
-//  set( pinNumber );
-  gpiox->BSRR = gpioPin;
+  if( activeHigh ) GPIO::set( pinNumber );
+  else GPIO::reset( pinNumber );
 }
 
 void LED::Off()
 {
-//  reset( pinNumber );
-  gpiox->BSRR = gpioPin << 16;
+  if( activeHigh ) GPIO::reset( pinNumber );
+  else GPIO::set( pinNumber );
 }
 
 void LED::OnOff( bool bit )
@@ -92,21 +88,6 @@ void LED::OnOff( bool bit )
 
 void LED::toggle()
 {
-  OnOff( (odr()) ? false : true );
+  GPIO::digitalWrite( pinNumber, !GPIO::digitalRead(pinNumber) );
 }
 
-/* ----------------------------------------
-    read odr
----------------------------------------- */
-bool LED::odr()
-{
-  return (gpiox->ODR & gpioPin) ? true : false;
-}
-
-/* ----------------------------------------
-    read idr
----------------------------------------- */
-bool LED::idr()
-{
-  return (gpiox->IDR & gpioPin) ? true : false;
-}

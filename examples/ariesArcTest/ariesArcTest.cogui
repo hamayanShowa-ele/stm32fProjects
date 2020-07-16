@@ -11,20 +11,36 @@
 <editorArea activeWorkbook="DefaultEditorWorkbook">
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+</presentation>
 </folder>
 </info>
 </editorArea>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/main.cpp" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/src/main.cpp"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4994" selectionTopPixel="2504"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="led.cpp" partName="led.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/led.cpp" title="led.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/led.cpp" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/cppCommonLib/led.cpp"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2351" selectionTopPixel="719"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="led.h" partName="led.h" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/led.h" title="led.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/led.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/cppCommonLib/led.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1577" selectionTopPixel="394"/>
+</editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
+<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="3">
 <expanded>
 <element path="/ariesArcTest"/>
-<element path="/ariesArcTest/syscalls"/>
+<element path="/ariesArcTest/cppCommonLib"/>
 </expanded>
 <selection>
-<element path="/ariesArcTest"/>
+<element path="/ariesArcTest/cppCommonLib/led.h"/>
 </selection>
 </viewState>
 </view>
@@ -45,7 +61,7 @@
 </view>
 <view id="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" partName="Memory Browser">
 <viewState>
-<MemoryBroser ComboItemsValue="0x20000ecc;" FocuseTabIndex="0" TabsValue="" TextValue="0x20000ecc" horizontalPosition="0" verticalPosition="0"/>
+<MemoryBroser ComboItemsValue="0x20001804;" FocuseTabIndex="0" TabsValue="" TextValue="0x20001804" horizontalPosition="0" verticalPosition="0"/>
 </viewState>
 </view>
 <view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view" partName="Disassembly">
@@ -64,7 +80,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.coocox.builder.ui.views.ProjectView" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
@@ -123,8 +139,13 @@
 </presentation>
 </folder>
 </info>
-<info part="org.coocox.builder.ui.exampleView" ratio="0.19464146" ratioLeft="247" ratioRight="1022" relationship="2" relative="org.eclipse.ui.internal.ViewStack@72fcf6"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@19288c2" ratio="0.7099903" ratioLeft="732" ratioRight="299" relationship="2" relative="org.coocox.builder.ui.exampleView">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1365a27" ratio="0.19464146" ratioLeft="247" ratioRight="1022" relationship="2" relative="org.eclipse.ui.internal.ViewStack@72fcf6">
+<folder appearance="2" expanded="2">
+<page content="org.coocox.builder.ui.exampleView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@19288c2" ratio="0.7332687" ratioLeft="756" ratioRight="275" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1365a27">
 <folder activePageID="org.coocox.component.ui.Help" appearance="2" expanded="2">
 <page content="org.coocox.component.ui.Help" label="Help"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
@@ -136,7 +157,7 @@
 </presentation>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.4485842" ratioLeft="301" ratioRight="370" relationship="4" relative="org.coocox.builder.ui.exampleView"/>
+<info part="org.eclipse.ui.editorss" ratio="0.30708662" ratioLeft="195" ratioRight="440" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1365a27"/>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@13dba4e" ratio="0.3695976" ratioLeft="248" ratioRight="423" relationship="4" relative="org.eclipse.ui.internal.ViewStack@72fcf6">
 <folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
 <page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
@@ -204,57 +225,41 @@
 <view id="org.eclipse.debug.ui.RegisterView"/>
 <fastViewBars/>
 <viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
-<layout>
-<mainWindow>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@f351a0">
-<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
-<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@f351a0">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.7496318" ratioLeft="1018" ratioRight="340" relationship="2" relative="org.eclipse.ui.internal.ViewStack@f351a0">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.7496318" ratioLeft="1018" ratioRight="340" relationship="2" relative="org.eclipse.ui.internal.ViewStack@f351a0">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@45901a" ratio="0.61377245" ratioLeft="410" ratioRight="258" relationship="4" relative="org.eclipse.ui.internal.ViewStack@f351a0">
-<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@45901a" ratio="0.61377245" ratioLeft="410" ratioRight="258" relationship="4" relative="org.eclipse.ui.internal.ViewStack@f351a0">&#x0A;<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="Breakpoints"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@18c27bd" ratio="0.5" ratioLeft="679" ratioRight="679" relationship="2" relative="org.eclipse.ui.internal.ViewStack@45901a">
-<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">
-<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@18c27bd" ratio="0.5" ratioLeft="679" ratioRight="679" relationship="2" relative="org.eclipse.ui.internal.ViewStack@45901a">&#x0A;<folder activePageID="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
 <page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="Memory Browser"/>
 <page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser:PIN_CLONE_VIEW_1" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@e09781" ratio="0.7915691" ratioLeft="1014" ratioRight="267" relationship="2" relative="org.eclipse.ui.internal.ViewStack@f351a0">
-<folder activePageID="org.eclipse.cdt.dsf.debug.ui.disassembly.view" appearance="2" expanded="2">
-<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@e09781" ratio="0.7915691" ratioLeft="1014" ratioRight="267" relationship="2" relative="org.eclipse.ui.internal.ViewStack@f351a0">&#x0A;<folder activePageID="org.eclipse.cdt.dsf.debug.ui.disassembly.view" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
 <page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
 <page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
 <page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
@@ -266,64 +271,118 @@
 </perspective>
 </perspectives>
 <workingSets/>
-<navigationHistory/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/src/main.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/led.cpp"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/led.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/am2320.cpp"/>
+</editors>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="4994" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1572" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1572" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="4994" y="0"/>
+</item>
+<item historyLabel="am2320.cpp" index="3">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="0">
+<position info="not_deleted" x="4994" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1362" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="1740" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1579" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="1740" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="1716" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1577" y="0"/>
+</item>
+<item historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="2351" y="0"/>
+</item>
+<item historyLabel="led.h" index="2">
+<position info="not_deleted" x="1577" y="0"/>
+</item>
+<item active="true" historyLabel="led.cpp" index="1">
+<position info="not_deleted" x="2351" y="0"/>
+</item>
+</navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
 </page>
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
-<persistable>
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</persistable>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="led.h" tooltip="ariesArcTest/cppCommonLib/led.h">
+<persistable path="/ariesArcTest/cppCommonLib/led.h"/>
 </file>
-<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" name="link.ld" tooltip="D:\Dropbox\projects\ARM\stm32fProjects\examples\ariesArcTest\link.ld">
-<persistable uri="file:/D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/link.ld"/>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
-<persistable>
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</persistable>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="ariesArcTest/src/main.cpp">
-<persistable path="/ariesArcTest/src/main.cpp"/>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
-<persistable>
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</persistable>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="textPrint.cpp" tooltip="ariesArcTest/cppCommonLib/textPrint.cpp">
-<persistable path="/ariesArcTest/cppCommonLib/textPrint.cpp"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="syscalls.c" tooltip="ariesArcTest/syscalls/syscalls.c">
-<persistable path="/ariesArcTest/syscalls/syscalls.c"/>
-</file>
-<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.ui.DefaultTextEditor" name="stm32_flash.ld" tooltip="D:\Dropbox\projects\ARM\stm32fProjects\examples\ariesArcTest\stm32_flash.ld">
-<persistable uri="file:/D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/stm32_flash.ld"/>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
-<persistable>
-<org.coocox.builder.ui.editors.ConfigEditor/>
-</persistable>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f10x_hd.c" tooltip="ariesArcTest/cmsis_boot/startup/startup_stm32f10x_hd.c">
-<persistable path="/ariesArcTest/cmsis_boot/startup/startup_stm32f10x_hd.c"/>
-</file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
-<persistable>
-<org.coocox.welcome.ui.WelcomePage/>
-</persistable>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" tooltip="ariesArcTest/cmsis_boot/stm32f10x.h">
-<persistable path="/ariesArcTest/cmsis_boot/stm32f10x.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="led.cpp" tooltip="ariesArcTest/cppCommonLib/led.cpp">
+<persistable path="/ariesArcTest/cppCommonLib/led.cpp"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="am2320.cpp" tooltip="ariesArcTest/cppCommonLib/am2320.cpp">
 <persistable path="/ariesArcTest/cppCommonLib/am2320.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" tooltip="cppGraphic/src/derivertive.h">
-<persistable path="/cppGraphic/src/derivertive.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="ariesArcTest/src/main.cpp">
+<persistable path="/ariesArcTest/src/main.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpioInit.cpp" tooltip="1804Ganimede/src/gpioInit.cpp">
+<persistable path="/1804Ganimede/src/gpioInit.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" tooltip="1804Ganimede/src/derivertive.h">
+<persistable path="/1804Ganimede/src/derivertive.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="led.cpp" tooltip="1804Ganimede/cppCommonLib/led.cpp">
+<persistable path="/1804Ganimede/cppCommonLib/led.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="led.h" tooltip="1804Ganimede/cppCommonLib/led.h">
+<persistable path="/1804Ganimede/cppCommonLib/led.h"/>
+</file>
+<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.h" tooltip="d:\dropbox\projects\arm\stm32fprojects\stm32f1xx_cpplib\gpio.h">
+<persistable uri="file:/d:/dropbox/projects/arm/stm32fprojects/stm32f1xx_cpplib/gpio.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.h" tooltip="1804Ganimede/stm32f4xx_cppLib/gpio.h">
+<persistable path="/1804Ganimede/stm32f4xx_cppLib/gpio.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.cpp" tooltip="1804Ganimede/stm32f4xx_cppLib/gpio.cpp">
+<persistable path="/1804Ganimede/stm32f4xx_cppLib/gpio.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_gpio.h" tooltip="ariesArcTest/stm_lib/inc/stm32f10x_gpio.h">
+<persistable path="/ariesArcTest/stm_lib/inc/stm32f10x_gpio.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x.h" tooltip="ariesArcTest/cmsis_boot/stm32f10x.h">
+<persistable path="/ariesArcTest/cmsis_boot/stm32f10x.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.h" tooltip="ariesArcTest/stm32f1xx_cppLib/gpio.h">
+<persistable path="/ariesArcTest/stm32f1xx_cppLib/gpio.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.cpp" tooltip="ariesArcTest/stm32f1xx_cppLib/gpio.cpp">
+<persistable path="/ariesArcTest/stm32f1xx_cppLib/gpio.cpp"/>
 </file>
 </mruList>
 </workbench>

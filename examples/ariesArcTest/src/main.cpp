@@ -22,11 +22,9 @@
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
 #include  <stm32f10x.h>
-//#include  "stm32f10x_conf.h"
 #include  <time.h>
 #include  <math.h>
 #include  <HardwareSerial.h>
-//#include  <Wire.h>
 #include  <Timer.h>
 #include  <led.h>
 #include  <lt3593.h>
@@ -37,8 +35,9 @@
 #include  <0900.h>
 #include  <arcTest.h>
 #include  <am2320.h>
-#include  <pca8574.h>
+//#include  <pca8574.h>
 #include  <softWire.h>
+#include  <adcDac.h>
 
 extern "C"
 {
@@ -46,6 +45,7 @@ extern "C"
   #include  <system.h>
   #include  <mul_tsk.h>
   #include  <sw8025.h>
+  #include  <strutil.h>
 }
 
 /* ----------------------------------------
@@ -68,11 +68,13 @@ volatile time_t unixTime;
 volatile time_t sumTotalTime;  /* Total time since startup */
 
 Serial Serial1;  /* hardware serial 1 */
-STM32F_I2C i2c1;
-
+//STM32F_I2C i2c1;
 BOARD  board;  /* initialize gpio */
 LT3593 backLight;
 ARC_TEST arc;  /* board aries arc test instance. */
+STM32F_SOFT_I2C softI2C;
+LED actLed;
+//STM32F_ADC adc1;
 
 const uint16_t rgb565_colors[] =
 {
@@ -94,19 +96,16 @@ const uint16_t rgb565_colors[] =
   RGB565_GOLD,
 };
 
-STM32F_ADC_DAC adc1;
 /* ----------------------------------------
     tasks
 ---------------------------------------- */
 void stackMonitor( void );
-void lcdDemo01( void );
-void actLed( void );
-void temperature( void );
+//void temperature( void );
+void dacOutput( void );
 
-uint8_t tsk1_stk[256 * 4];  // stack for task1
-uint8_t tsk2_stk[256 * 6];  // stack for task2
-uint8_t tsk3_stk[256 * 2];  // stack for task3
-uint8_t tsk4_stk[256 * 6];  // stack for task4
+uint8_t tsk1_stk[256 * 5];  // stack for task1
+uint8_t tsk2_stk[256 * 4];  // stack for task2
+uint8_t tsk3_stk[256 * 4];  // stack for task3
 
 /* ----------------------------------------
     task initialize
@@ -114,14 +113,12 @@ uint8_t tsk4_stk[256 * 6];  // stack for task4
 void tsk_ini( void )
 {
   reg_tsk( ID_stackMonitor,(void *)stackMonitor, tsk1_stk, sizeof(tsk1_stk), 0,0,0,0 );
-  reg_tsk( ID_lcdDemo01,(void *)lcdDemo01, tsk2_stk, sizeof(tsk2_stk), 0,0,0,0 );
-  reg_tsk( ID_actLed,(void *)actLed, tsk3_stk, sizeof(tsk3_stk), 0,0,0,0 );
-  reg_tsk( ID_temperature,(void *)temperature, tsk4_stk, sizeof(tsk4_stk), 0,0,0,0 );
+//  reg_tsk( ID_temperature,(void *)temperature, tsk2_stk, sizeof(tsk2_stk), 0,0,0,0 );
+  reg_tsk( ID_dacOutput,(void *)dacOutput, tsk3_stk, sizeof(tsk3_stk), 0,0,0,0 );
 
   sta_tsk( ID_stackMonitor );
-  sta_tsk( ID_lcdDemo01 );
-  sta_tsk( ID_actLed );
-  sta_tsk( ID_temperature );
+//  sta_tsk( ID_temperature );
+  sta_tsk( ID_dacOutput );
 }
 
 
@@ -141,84 +138,37 @@ int main(void)
     while (1);
   }
 
+  struct tm localTime =
+    {0,21,21,24,5-1,2020-1900,0,0,0};
+#if 1
+  unixTime = mktime( &localTime );
+#endif
+
   /* initialize GPIO and external CPU bus. */
   board.gpioInit();
   board.extBusInit();
   arc.gpioInit();
+  actLed.begin( ACT_LED );
+  actLed.On();
 
-  dly_tsk( 1 * 1000UL );
+  /* initialize serial */
+  Serial1.begin( SCI_1, 115200UL );
+  Serial1.puts( "ARIES 0900 Arc Detector Test.\r\n" );
 
   /* initialize i2c */
 #if 0
-//  if( i2c1.begin( I2C1, SDA1, SCL1 ) != I2C_SUCCESS )
-  if( i2c1.begin( I2C2, SDA2, SCL2 ) != I2C_SUCCESS )
+  /* stm32f103のエラッタに拠ると、外部バスを有効にするとI2C1のPB6、PB7で不具合が起きる。 */
+  /* 対策としてPB6、PB7ではなくPB8、PB9をREMAPして使うか、あきらめてソフトウエアI2Cとするか。 */
+  if( i2c1.begin( I2C1, SDA1, SCL1 ) != I2C_SUCCESS )
   {
     while( 1 ) {}
   }
+#else
+  softI2C.begin( I2C1, SDA1, SCL1 );
 #endif
-
-#if 0
-  PCA8574 pca1( &i2c1, 0x3F );
-  PCA8574 pca2( &i2c1, 0x3E );
-  dly_tsk( 1UL );
-  pca2.write( 0xFF );
-  volatile uint8_t pcaCount = 0;
-  while( 1 )
-  {
-    int result;
-    result = pca1.write( pcaCount );
-    dly100us(1);
-    if( result < 0 )
-    {
-      dly100us(1);
-      continue;
-    }
-    result = pca2.read();
-    if( result >= 0 )
-    {
-      pcaCount = (uint8_t)result;
-      pcaCount++;
-    }
-    dly_tsk( 500UL );
-  }
-#endif
-
-#if 0
-//  STM32F_SOFT_I2C softI2C( I2C1, SDA1, SCL1 );
-  STM32F_SOFT_I2C softI2C( I2C2, SDA2, SCL2 );
-  SOFT_PCA8574 pca1( &softI2C, 0x3F );
-  SOFT_PCA8574 pca2( &softI2C, 0x3E );
-  dly_tsk( 1UL );
-  int result;
-  while( (result = pca2.write( 0xFF )) < 0 )
-  {
-	  dly_tsk( 1UL );
-  }
-
-  volatile uint8_t pcaCount = 0;
-  while( 1 )
-  {
-    result = pca1.write( pcaCount );
-    dly100us(1);
-    result = pca2.read();
-    if( result>= 0 )
-    {
-      pcaCount = (uint8_t)result;
-      pcaCount++;
-    }
-
-    dly_tsk( 500UL );
-  }
-#endif
-
-  LED led( ACT_LED );
-  led.On();
-#if 1
-  STM32F_SOFT_I2C softI2C( I2C1, SDA1, SCL1 );
-  SOFT_AM2320 am2320( &softI2C );
-  dly_tsk( 1UL );
 
   /* initialize LCD and graphic controller IC. */
+#if 0
   board.glcdClockInit();
   board.glcdReset();
   board.glcdSleep( false );
@@ -237,86 +187,7 @@ int main(void)
   board.glcdInterruptInit();
   draw.vaConfig();
   draw.fillRectangle( 0, 0, 480 - 1, 272 - 1, RGB565_DARKGRAY );  // RGB565_DARKGRAY
-
-  TEXT_PRINT tempTxt(48);
-  tempTxt.vaConfig( 0,0,143,49 );
-  tempTxt.color( RGB565_MAGENTA );
-  tempTxt.clearScreen();
-  tempTxt.printf( TYPE_ASCII_48, "Temperature." );
-
-  TEXT_PRINT humiTxt(48);
-  humiTxt.vaConfig( 0,50,143,99 );
-  humiTxt.color( RGB565_CYAN );
-  humiTxt.clearScreen();
-  humiTxt.printf( TYPE_ASCII_48, "Humidity." );
-  while( 1 )
-  {
-    am2320.wakeUp();
-    float temperature,humidity;
-    int result = am2320.update( &temperature, &humidity );
-
-    char buffer[16];
-    dtostrf( temperature, 4, 1, buffer );
-    tempTxt.clearScreen();
-    tempTxt.printf( TYPE_ASCII_48, "%s%c", buffer, 'c' );
-
-    dtostrf( humidity, 3, 1, buffer );
-    humiTxt.clearScreen();
-    humiTxt.printf( TYPE_ASCII_48, "%s%c", buffer, '%' );
-
-    dly_tsk( 2 * 1000UL );
-  }
-#else
-#if 1
-  STM32F_SOFT_I2C softI2C( I2C1, SDA1, SCL1 );
-//  STM32F_SOFT_I2C softI2C( I2C1, SDA2, SCL2 );
-  SOFT_AM2320 am2320( &softI2C );
-  dly_tsk( 1UL );
-  while( 1 )
-  {
-    am2320.wakeUp();
-    float temperature,humidity;
-    int result = am2320.update( &temperature, &humidity );
-    dly_tsk( 2 * 1000UL );
-  }
-#else
-  AM2320 am2320( &i2c1 );
-  while( 1 )
-  {
-    int result = am2320.wakeUp();
-    float temperature,humidity;
-    result = am2320.update( &temperature, &humidity );
-    if( result == AM2320_SUCCESS )
-    {
-#if defined( __SIMIHOSTTING_IMPL )
-      char buffer[128];
-      sprintf( buffer, "temperature = %f humidity = %f\r\n", temperature, humidity );
-      SH_SendString( (const char *)buffer );
-#else
-      led.toggle();
 #endif
-    }
-    else
-    {
-#if 0
-      SH_SendString( "am2320 read error.\r\n" );
-#endif
-    }
-    dly_tsk( 2 * 1000UL );
-  }
-#endif
-#endif
-
-  struct tm localTime =
-    {0,21,21,24,5-1,2020-1900,0,0,0};
-#if 1
-  unixTime = mktime( &localTime );
-#endif
-
-  /* initialize serial */
-  Serial1.begin( SCI_1, 115200UL );
-  Serial1.printf( "    0900 ARIES rev.2\r\n" );
-  Serial1.printf( "    designed by hamayan.\r\n" );
 
   /* initialize tasks and start dispatch. */
   tsk_ini();  //
@@ -340,30 +211,21 @@ void stackMonitor( void )
     {
       baseTim = systim;
 #if defined( __SIMIHOSTTING_IMPL )
-      char buffer[128];
+      char buffer[64];
       sprintf( buffer, "  TASK1:%d/%d\r\n", RemainStack( tsk1_stk, sizeof(tsk1_stk) ), sizeof(tsk1_stk) );
       SH_SendString( (const char *)buffer );
       sprintf( buffer, "  TASK2:%d/%d\r\n", RemainStack( tsk2_stk, sizeof(tsk2_stk) ), sizeof(tsk2_stk) );
       SH_SendString( (const char *)buffer );
-      sprintf( buffer, "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
-      SH_SendString( (const char *)buffer );
-      sprintf( buffer, "  TASK4:%d/%d\r\n", RemainStack( tsk4_stk, sizeof(tsk4_stk) ), sizeof(tsk4_stk) );
-      SH_SendString( (const char *)buffer );
       SH_SendString( "\r\n" );
+#else /* __SIMIHOSTTING_IMPL */
+      Serial1.printf( "  TASK1:%d/%d\r\n", RemainStack( tsk1_stk, sizeof(tsk1_stk) ), sizeof(tsk1_stk) );
+      Serial1.printf( "  TASK2:%d/%d\r\n", RemainStack( tsk2_stk, sizeof(tsk2_stk) ), sizeof(tsk2_stk) );
+      Serial1.printf( "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
+      Serial1.puts( "\r\n" );
 #endif /* __SIMIHOSTTING_IMPL */
+      actLed.toggle();
     }
-#if 0
-    struct tm localTime;
-    localtime_r( &unixTime, &localTime );
-    Serial1.printf( "  %d/%d/%d %d:%d:%d\r\n",
-      localTime.tm_year + 1900,
-      localTime.tm_mon + 1,
-      localTime.tm_mday,
-      localTime.tm_hour,
-      localTime.tm_min,
-      localTime.tm_sec
-    );
-#endif
+
     rot_rdq();
   }
 }
@@ -383,63 +245,175 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
 }
 
 /* ----------------------------------------
-    lcd demo 01
----------------------------------------- */
-void lcdDemo01( void )
-{
-  TEXT_PRINT dateTxt(48);
-  dateTxt.vaConfig( 200,0,399,49 );
-  dateTxt.color( RGB565_GREEN );
-  dateTxt.clearScreen();
-
-  TEXT_PRINT timeTxt(48);
-  timeTxt.vaConfig( 200,50,399,99 );
-  timeTxt.color( RGB565_CYAN );
-  timeTxt.clearScreen();
-
-  time_t baseTim = unixTime;
-  while( 1 )
-  {
-    while( unixTime == baseTim ) rot_rdq();
-
-    baseTim = unixTime;
-
-    struct tm localTime;
-    localtime_r( (time_t *)&unixTime, &localTime );
-
-    dateTxt.clearScreen();
-    dateTxt.printf( TYPE_ASCII_48, "   %02d/%02d", localTime.tm_mon + 1, localTime.tm_mday );
-
-    timeTxt.clearScreen();
-    timeTxt.printf( TYPE_ASCII_48, "%02d:%02d:%02d", localTime.tm_hour, localTime.tm_min, localTime.tm_sec );
-
-    dly_tsk( 0.9 * 1000UL );
-  }
-}
-
-/* ----------------------------------------
-    act led
----------------------------------------- */
-void actLed( void )
-{
-  LED led( ACT_LED );
-  while( 1 )
-  {
-    led.toggle();
-    dly_tsk( 0.1 * 1000UL );
-  }
-}
-
-/* ----------------------------------------
     temperature and humidity
 ---------------------------------------- */
+#if 0
 void temperature( void )
 {
+  SOFT_AM2320 am2320( &softI2C );
+  dly_tsk( 1UL );
+
+  TEXT_PRINT tempTxt(48);
+  tempTxt.vaConfig( 0,0,143,49 );
+  tempTxt.color( RGB565_MAGENTA );
+  tempTxt.clearScreen();
+  tempTxt.printf( TYPE_ASCII_48, "Temperature." );
+
+  TEXT_PRINT humiTxt(48);
+  humiTxt.vaConfig( 0,50,143,99 );
+  humiTxt.color( RGB565_CYAN );
+  humiTxt.clearScreen();
+  humiTxt.printf( TYPE_ASCII_48, "Humidity." );
+
   while( 1 )
   {
-    dly_tsk( 1 * 1000UL );
+    am2320.wakeUp();
+    float temperature,humidity;
+    am2320.update( &temperature, &humidity );
+
+    char buffer[16];
+    dtostrf( temperature, 4, 1, buffer );
+    tempTxt.clearScreen();
+    tempTxt.printf( TYPE_ASCII_48, "%s%c", buffer, 'c' );
+
+    dtostrf( humidity, 3, 1, buffer );
+    humiTxt.clearScreen();
+    humiTxt.printf( TYPE_ASCII_48, "%s%c", buffer, '%' );
+
+    dly_tsk( 2 * 1000UL );
   }
 }
+#endif
+
+/* ----------------------------------------
+    dac output
+---------------------------------------- */
+uint32_t dacData[36];
+
+void dacOutput( void )
+{
+  /* generate sine data.  */
+  for( int i = 0; i < 36; i++ )
+  {
+    float tempF = sin(2 * M_PI * 10.0 * i / 360.0);
+    tempF *= 1024.0F;  /* scale 2048.0F */
+    tempF += 2047.0F;  /* offset */
+#if 0
+    union
+    {
+      uint16_t us[2];
+      uint32_t ul;
+    } d;
+    d.us[0] = (uint16_t)tempF;
+    d.us[1] = (uint16_t)tempF;
+    dacData[ i ] = d.ul;
+#else
+    dacData[ i ] = ((uint32_t)tempF << 16) | ((uint32_t)tempF << 0);
+#endif
+  }
+#if 1
+  STM32F_DAC dac1( DAC_Channel_1, DAC_Trigger_T7_TRGO );
+  dac1.start();
+  dac1.write( (const uint32_t *)dacData, sizeof(dacData) / sizeof(dacData[0]),
+    50 * 36, TIM7 );
+  while( 1 )
+  {
+    rot_rdq();
+  }
+#else
+  /* DAC defines */
+#define  DAC_TIMx             TIM7
+#define  RCC_APBxPeriph_TIMx  RCC_APB1Periph_TIM7
+#define  DAC_RCC_APBxPeriph_TIMx  RCC_APB1Periph_TIM7
+#define  DAC_Trigger_Tx_TRGO  DAC_Trigger_T7_TRGO
+//  #define  DAC_DHR12RD_Address      &(DAC->DHR12RD)  /* DHR12RD = 0x40007420 */
+//  #define  DAC_TIMx                 TIM7
+//  #define  DAC_Trigger_Tx_TRGO      DAC_Trigger_T7_TRGO
+#define  DAC_DMAx_Channelx        DMA2_Channel3
+#define  TIMx_CKCNT  (APB1_CLK / 1)
+#define  DAC_DHR12RD_Address      &(DAC->DHR12RD)  /* DHR12RD = 0x40007420 */
+#define  DMAx_Channelx        DAC_DMAx_Channelx
+//  #define  DMAx_Channelx        DMA2_Channel4  /* not able */
+#define  DMAx_Flag_TCx        DMA2_FLAG_TC3
+#define  DMAx_Flag_TEx        DMA2_FLAG_TE3
+
+  uint32_t tempUL = dacData[0];
+  uint16_t elementSize = sizeof(dacData) / sizeof(dacData[0]);
+  TIM_TypeDef *TIMx = DAC_TIMx;
+//  uint16_t period = (uint16_t)((72000000UL / 3600 / 50) - 1);
+  uint16_t period = (uint16_t)(72000000UL / 36 / 50);
+
+  /* DAC Periph clock enable */
+  RCC_APB1PeriphClockCmd( RCC_APB1Periph_DAC, ENABLE );
+  /* TIMx Periph clock enable */
+  RCC_APB1PeriphClockCmd( DAC_RCC_APBxPeriph_TIMx, ENABLE );
+
+  GPIO_InitTypeDef GPIO_InitStructure;
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_4 | GPIO_Pin_5;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AIN;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  /* TIMx Configuration */
+  /* Time base configuration */
+  TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  TIM_TimeBaseStructInit( &TIM_TimeBaseStructure );
+  TIM_TimeBaseStructure.TIM_Period = period;  /* period */
+  TIM_TimeBaseStructure.TIM_Prescaler = 1 - 1;  /**/
+  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /**/
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
+  TIM_TimeBaseInit( TIMx, &TIM_TimeBaseStructure );
+
+  /* TIMx TRGO selection */
+  TIM_SelectOutputTrigger( TIMx, TIM_TRGOSource_Update );
+
+  DAC_InitTypeDef DAC_InitStructure;
+
+  /* DAC channel1 Configuration */
+  DAC_InitStructure.DAC_Trigger = DAC_Trigger_Tx_TRGO;
+  DAC_InitStructure.DAC_WaveGeneration = DAC_WaveGeneration_None;
+  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
+//  DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Disable;
+  DAC_Init( DAC_Channel_1, &DAC_InitStructure );
+  /* DAC channel2 Configuration */
+  DAC_Init( DAC_Channel_2, &DAC_InitStructure );
+
+  /* dma initialize */
+  DMA_DeInit( DAC_DMAx_Channelx );
+  DMA_InitTypeDef DMA_InitStructure;
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)DAC_DHR12RD_Address;
+  DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)dacData;
+  DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
+  DMA_InitStructure.DMA_BufferSize = elementSize;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+  DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+  DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
+  DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
+  DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+  DMA_InitStructure.DMA_Priority = DMA_Priority_Low;
+  DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+  DMA_Init( DAC_DMAx_Channelx, &DMA_InitStructure );
+  DMA_ClearFlag( DMAx_Flag_TCx | DMAx_Flag_TEx );
+  DMA_ITConfig( DAC_DMAx_Channelx, DMA_IT_TC | DMA_IT_TE, ENABLE );   /*転送/エラー割り込み許可*/
+  /* Enable DMAx Channelx */
+  DMA_Cmd( DMAx_Channelx, ENABLE );
+
+  DAC->DHR12RD = tempUL;
+  /* Enable DAC Channel1: Once the DAC channel1 is enabled, PA.04 is
+     automatically connected to the DAC converter. */
+  DAC_Cmd( DAC_Channel_1, ENABLE );
+  /* Enable DAC Channel2: Once the DAC channel2 is enabled, PA.05 is
+     automatically connected to the DAC converter. */
+  DAC_Cmd( DAC_Channel_2, ENABLE );
+
+  /* Enable DMA for DAC Channel2 */
+  DAC_DMACmd( DAC_Channel_1, ENABLE );  /* DMA2_Channel3 */
+  //DAC_DMACmd( DAC_Channel_2, ENABLE );  /* DMA2_Channel4 : not able */
+  TIM_Cmd( TIMx, ENABLE );
+#endif
+}
+
+
 
 /*******************************************************************************
 * Function Name  : RCC_Configuration

@@ -82,20 +82,52 @@ enum GPIO_PIN_SPEED
 class GPIO  // : public hoge_class
 {
 public:
-  GPIO_TypeDef* whatGPIOType( int pin );
-  uint16_t whatPin( int pin );
-  uint8_t whatPinSource( int pin );
-  uint8_t whatExtiPortSource( int pin );
-  uint8_t whatExtiPinSource( int pin );
+  GPIO_TypeDef* whatGPIOType( int pin )
+  {
+    if( pin >= PA0 && pin <= PA15 ) return GPIOA;
+    else if( pin >= PB0 && pin <= PB15 ) return GPIOB;
+    else if( pin >= PC0 && pin <= PC15 ) return GPIOC;
+    else if( pin >= PD0 && pin <= PD15 ) return GPIOD;
+    else if( pin >= PE0 && pin <= PE15 ) return GPIOE;
+    else if( pin >= PF0 && pin <= PF15 ) return GPIOF;
+    else if( pin >= PG0 && pin <= PG15 ) return GPIOG;
+    else if( pin >= PH0 && pin <= PH15 ) return GPIOH;
+    else if( pin >= PI0 && pin <= PI15 ) return GPIOI;
+    return 0;
+  }
+
+  uint16_t whatPin( int pin ) {return 0x0001 << pin % 16;}
+  uint8_t whatPinSource( int pin ) {return pin % 16;}
+  uint8_t whatExtiPortSource( int pin )
+  {
+    if( pin >= PA0 && pin <= PA15 ) return EXTI_PortSourceGPIOA;
+    else if( pin >= PB0 && pin <= PB15 ) return EXTI_PortSourceGPIOB;
+    else if( pin >= PC0 && pin <= PC15 ) return EXTI_PortSourceGPIOC;
+    else if( pin >= PD0 && pin <= PD15 ) return EXTI_PortSourceGPIOD;
+    else if( pin >= PE0 && pin <= PE15 ) return EXTI_PortSourceGPIOE;
+    else if( pin >= PF0 && pin <= PF15 ) return EXTI_PortSourceGPIOF;
+    else if( pin >= PG0 && pin <= PG15 ) return EXTI_PortSourceGPIOG;
+    else if( pin >= PH0 && pin <= PH15 ) return EXTI_PortSourceGPIOH;
+    else if( pin >= PI0 && pin <= PI15 ) return EXTI_PortSourceGPIOI;
+    return 0xFF;
+  }
+
+  uint8_t whatExtiPinSource( int pin ) {return pin % 16;}
   int  whatExtiIntNumber( int pin );
 
   void pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed = GPIO_SPEED_NORMAL );
   void pinMode( int pin, int type, int speed = GPIO_SPEED_NORMAL );
   void pinAFConfig( int pin, uint8_t type );
+  bool odr( GPIO_TypeDef *gpiox, uint16_t gpioPin ) { return (gpiox->ODR & gpioPin) ? true : false; }
+  bool odr( int pin );
+  bool idr( GPIO_TypeDef *gpiox, uint16_t gpioPin ) { return (gpiox->IDR & gpioPin) ? true : false; }
+  bool idr( int pin );
 
+  void set( GPIO_TypeDef *gpiox, uint16_t gpioPin ) {gpiox->BSRRL = gpioPin;}
   void set( int pin );
+  void reset( GPIO_TypeDef *gpiox, uint16_t gpioPin ) {gpiox->BSRRH = gpioPin;}
   void reset( int pin );
-  void digitalWrite( int pin, int highOrLow );
+  void digitalWrite( int pin, bool highOrLow );
   bool digitalRead( int pin );
   void wordWrite( GPIO_TypeDef *gpiox, uint16_t data, uint16_t mask );
 

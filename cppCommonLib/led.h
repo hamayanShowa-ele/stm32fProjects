@@ -25,7 +25,7 @@
 #ifndef  __LED_H__
 #define  __LED_H__
 
-#include  <..\stm32f1xx_cppLib\gpio.h>
+#include  <gpio.h>
 
 /* ----------------------------------------
     prototypes 
@@ -39,21 +39,18 @@ class LED : public GPIO
 {
 public:
   LED();
-  LED( int pin );
+  LED( int pin, bool active = true );
   ~LED();
-  void begin( int pin );
+  void begin( int pin, bool active = true );
   void end();
   void On();
   void Off();
   void OnOff( bool bit );
   void toggle();
-  bool odr();
-  bool idr();
 
 private:
   int pinNumber;
-  GPIO_TypeDef* gpiox;
-  uint16_t gpioPin;
+  bool activeHigh;
 };
 
 
