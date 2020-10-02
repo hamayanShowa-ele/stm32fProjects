@@ -11,26 +11,10 @@
 <editorArea activeWorkbook="DefaultEditorWorkbook">
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
-<part id="1"/>
-<part id="2"/>
-</presentation>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
 </folder>
 </info>
 </editorArea>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/main.cpp" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/src/main.cpp"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4743" selectionTopPixel="2315"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="lt3593.h" partName="lt3593.h" path="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/lt3593.h" title="lt3593.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/lt3593.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/cppCommonLib/lt3593.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1641" selectionTopPixel="531"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" partName="derivertive.h" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/derivertive.h" title="derivertive.h" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/ariesArcTest/src/derivertive.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/ariesArcTest/src/derivertive.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="6" selectionOffset="2841" selectionTopPixel="1332"/>
-</editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
@@ -80,7 +64,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.coocox.component.ui.ComponentView" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
@@ -271,217 +255,55 @@
 </perspective>
 </perspectives>
 <workingSets/>
-<navigationHistory>
-<editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/led.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/led.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/src/main.cpp"/>
-<editor factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" uri="file:/D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/strutil.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/Wire.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/board/0900.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/board/arcTest.cpp"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/lt3593.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/src/derivertive.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/ariesArcTest/cppCommonLib/led.h"/>
-</editors>
-<item historyLabel="led.h" index="1">
-<position info="not_deleted" x="1579" y="0"/>
-</item>
-<item historyLabel="led.cpp" index="0">
-<position info="not_deleted" x="1740" y="0"/>
-</item>
-<item historyLabel="led.cpp" index="0">
-<position info="not_deleted" x="1716" y="0"/>
-</item>
-<item historyLabel="led.h" index="1">
-<position info="not_deleted" x="1577" y="0"/>
-</item>
-<item historyLabel="led.cpp" index="0">
-<position info="not_deleted" x="2351" y="0"/>
-</item>
-<item historyLabel="led.h" index="1">
-<position info="not_deleted" x="1577" y="0"/>
-</item>
-<item historyLabel="led.cpp" index="0">
-<position info="not_deleted" x="2351" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="5534" y="0"/>
-</item>
-<item historyLabel="strutil.h" index="3">
-<position info="not_deleted" x="1992" y="60"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1561" y="0"/>
-</item>
-<item historyLabel="Wire.cpp" index="4">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="strutil.h" index="3">
-<position info="not_deleted" x="1992" y="60"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1417" y="0"/>
-</item>
-<item historyLabel="0900.h" index="5">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="arcTest.cpp" index="6">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="0900.h" index="5">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1417" y="0"/>
-</item>
-<item historyLabel="Wire.cpp" index="4">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1417" y="0"/>
-</item>
-<item historyLabel="strutil.h" index="3">
-<position info="not_deleted" x="1992" y="60"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1417" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="1417" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1969" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4328" y="0"/>
-</item>
-<item historyLabel="derivertive.h" index="8">
-<position info="not_deleted" x="2841" y="6"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4866" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="2013" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4866" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4406" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1264" y="9"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4406" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4861" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1335" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4466" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1384" y="10"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4528" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1445" y="10"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4528" y="0"/>
-</item>
-<item historyLabel="led.h" index="9">
-<position info="not_deleted" x="1577" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1445" y="10"/>
-</item>
-<item historyLabel="led.h" index="9">
-<position info="not_deleted" x="1577" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1518" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4837" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1641" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4805" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1641" y="0"/>
-</item>
-<item historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4681" y="0"/>
-</item>
-<item historyLabel="lt3593.h" index="7">
-<position info="not_deleted" x="1641" y="0"/>
-</item>
-<item active="true" historyLabel="main.cpp" index="2">
-<position info="not_deleted" x="4681" y="0"/>
-</item>
-</navigationHistory>
+<navigationHistory/>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
 </page>
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" tooltip="ariesArcTest/src/derivertive.h">
-<persistable path="/ariesArcTest/src/derivertive.h"/>
+<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
+<persistable>
+<org.coocox.welcome.ui.WelcomePage/>
+</persistable>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="lt3593.h" tooltip="ariesArcTest/cppCommonLib/lt3593.h">
-<persistable path="/ariesArcTest/cppCommonLib/lt3593.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="1703NTPClient/myOs/mul_tsk.c">
+<persistable path="/1703NTPClient/myOs/mul_tsk.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="arcTest.cpp" tooltip="ariesArcTest/board/arcTest.cpp">
-<persistable path="/ariesArcTest/board/arcTest.cpp"/>
+<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
+<persistable>
+<org.coocox.welcome.ui.WelcomePage/>
+</persistable>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="0900.h" tooltip="ariesArcTest/board/0900.h">
-<persistable path="/ariesArcTest/board/0900.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="1703ChronosBasic/myOs/mul_tsk.c">
+<persistable path="/1703ChronosBasic/myOs/mul_tsk.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Wire.cpp" tooltip="ariesArcTest/cppCommonLib/Wire.cpp">
-<persistable path="/ariesArcTest/cppCommonLib/Wire.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="derivertive.h" tooltip="1703ChronosBasic/src/derivertive.h">
+<persistable path="/1703ChronosBasic/src/derivertive.h"/>
 </file>
-<file factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="strutil.h" tooltip="D:\Dropbox\projects\ARM\stm32fProjects\cppCommonLib\strutil.h">
-<persistable uri="file:/D:/Dropbox/projects/ARM/stm32fProjects/cppCommonLib/strutil.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_tim.c" tooltip="1703ChronosBasic/stm_lib/src/stm32f10x_tim.c">
+<persistable path="/1703ChronosBasic/stm_lib/src/stm32f10x_tim.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="usart.h" tooltip="1401Virgo/stm32f4xx_common_lib/usart.h">
-<persistable path="/1401Virgo/stm32f4xx_common_lib/usart.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Timer.h" tooltip="1703ChronosBasic/stm32f1xx_cppLib/Timer.h">
+<persistable path="/1703ChronosBasic/stm32f1xx_cppLib/Timer.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="w5300.h" tooltip="1401Virgo/wiznet/Ethernet/W5300/w5300.h">
-<persistable path="/1401Virgo/wiznet/Ethernet/W5300/w5300.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_tim.h" tooltip="1703ChronosBasic/stm_lib/inc/stm32f10x_tim.h">
+<persistable path="/1703ChronosBasic/stm_lib/inc/stm32f10x_tim.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="dhcp.h" tooltip="1401Virgo/wiznet/Internet/DHCP/dhcp.h">
-<persistable path="/1401Virgo/wiznet/Internet/DHCP/dhcp.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="adcDac.h" tooltip="1303_1426Pixis/stm32f1xx_cppLib/adcDac.h">
+<persistable path="/1303_1426Pixis/stm32f1xx_cppLib/adcDac.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="dhcp.c" tooltip="1401Virgo/wiznet/Internet/DHCP/dhcp.c">
-<persistable path="/1401Virgo/wiznet/Internet/DHCP/dhcp.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="phaseCompare.cpp" tooltip="1303_1426Pixis/cppCommonLib/phaseCompare.cpp">
+<persistable path="/1303_1426Pixis/cppCommonLib/phaseCompare.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Ethernet.cpp" tooltip="1401Virgo/cppCommonLib/Ethernet.cpp">
-<persistable path="/1401Virgo/cppCommonLib/Ethernet.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="1303_1426Pixis/src/main.cpp">
+<persistable path="/1303_1426Pixis/src/main.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Ethernet.h" tooltip="1401Virgo/cppCommonLib/Ethernet.h">
-<persistable path="/1401Virgo/cppCommonLib/Ethernet.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="sh_cmd.s" tooltip="1303_1426Pixis/semihosting/sh_cmd.s">
+<persistable path="/1303_1426Pixis/semihosting/sh_cmd.s"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="socket.h" tooltip="1401Virgo/wiznet/Ethernet/socket.h">
-<persistable path="/1401Virgo/wiznet/Ethernet/socket.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="socket.c" tooltip="1401Virgo/wiznet/Ethernet/socket.c">
-<persistable path="/1401Virgo/wiznet/Ethernet/socket.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="mul_tsk.c" tooltip="1303_1426Pixis/myOs/mul_tsk.c">
+<persistable path="/1303_1426Pixis/myOs/mul_tsk.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f4xx.c" tooltip="1401Virgo/cmsis_boot/startup/startup_stm32f4xx.c">
 <persistable path="/1401Virgo/cmsis_boot/startup/startup_stm32f4xx.c"/>
