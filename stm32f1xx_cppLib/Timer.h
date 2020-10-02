@@ -97,6 +97,46 @@ enum TIMER_INTERRUPT_NAME
   TIM_INT_END,  /* 必ず配列の最後に記述する */
 };
 
+#define  SRC_TIM5_DST_TIM1  TIM_TS_ITR0
+#define  SRC_TIM2_DST_TIM1  TIM_TS_ITR1
+#define  SRC_TIM3_DST_TIM1  TIM_TS_ITR2
+#define  SRC_TIM4_DST_TIM1  TIM_TS_ITR3
+
+#define  SRC_TIM1_DST_TIM8  TIM_TS_ITR0
+#define  SRC_TIM2_DST_TIM8  TIM_TS_ITR1
+#define  SRC_TIM4_DST_TIM8  TIM_TS_ITR2
+#define  SRC_TIM5_DST_TIM8  TIM_TS_ITR3
+
+#define  SRC_TIM1_DST_TIM2  TIM_TS_ITR0
+#define  SRC_TIM8_DST_TIM2  TIM_TS_ITR1
+#define  SRC_TIM3_DST_TIM2  TIM_TS_ITR2
+#define  SRC_TIM4_DST_TIM2  TIM_TS_ITR3
+
+#define  SRC_TIM1_DST_TIM3  TIM_TS_ITR0
+#define  SRC_TIM2_DST_TIM3  TIM_TS_ITR1
+#define  SRC_TIM5_DST_TIM3  TIM_TS_ITR2
+#define  SRC_TIM4_DST_TIM3  TIM_TS_ITR3
+
+#define  SRC_TIM1_DST_TIM4  TIM_TS_ITR0
+#define  SRC_TIM2_DST_TIM4  TIM_TS_ITR1
+#define  SRC_TIM3_DST_TIM4  TIM_TS_ITR2
+#define  SRC_TIM8_DST_TIM4  TIM_TS_ITR3
+
+#define  SRC_TIM2_DST_TIM5  TIM_TS_ITR0
+#define  SRC_TIM3_DST_TIM5  TIM_TS_ITR1
+#define  SRC_TIM4_DST_TIM5  TIM_TS_ITR2
+#define  SRC_TIM8_DST_TIM5  TIM_TS_ITR3
+
+#define  SRC_TIM2_DST_TIM9   TIM_TS_ITR0
+#define  SRC_TIM3_DST_TIM9   TIM_TS_ITR1
+#define  SRC_TIM10_DST_TIM9  TIM_TS_ITR2
+#define  SRC_TIM11_DST_TIM9  TIM_TS_ITR3
+
+#define  SRC_TIM4_DST_TIM12  TIM_TS_ITR0
+#define  SRC_TIM5_DST_TIM12  TIM_TS_ITR1
+#define  SRC_TIM13_DST_TIM12 TIM_TS_ITR2
+#define  SRC_TIM14_DST_TIM12 TIM_TS_ITR3
+
 
 /* ----------------------------------------
     prototypes
@@ -119,31 +159,41 @@ public:
   void start();
   void stop();
   int  frequency( uint32_t freq );
+  volatile uint16_t getCounter();
+  void setAutoReload( uint16_t reload );
+  uint16_t getAutoReload();
+  void master();
+  void slave( uint16_t parent, uint16_t prescaler, uint16_t period );
+
   int  toggle( int ch, int pin = 0 );
   int  pwm1( int ch, int pin, uint16_t pulse );
-  int  adcTrigger( int ch );
-
+  int  adcTrigger( int ch, int pin, uint16_t pulse );
   void setPulse( int ch, uint16_t pulse );
   uint16_t getPulse( int ch );
 
-  uint8_t updateInterruptChannel();  /* timer update interrupt */
-  uint8_t ccInterruptChannel();  /* timer compare capture interrupt */
+  void encoderEnable();
+  uint16_t encoderRead();
 
   void startInterrupt( uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
   void startInterrupt( int ch, uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
 
-  void trigger( uint16_t trig );
-
 //  void callBack( int name, void *cb );
   void callBack( int name, void(*cb)(void) );
+  void rejectCallBack( int name );
 
 private:
   TIM_TypeDef *TIMx;
   uint32_t rcc;
   int timerType;
 
+  void config( uint16_t prescaler, uint16_t period );
   int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
-  int OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst );
+  void trigger( uint16_t trig );
+
+  uint8_t updateInterruptChannel();  /* timer update interrupt */
+  uint8_t ccInterruptChannel();  /* timer compare capture interrupt */
+
+  int  OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst );
 };
 
 

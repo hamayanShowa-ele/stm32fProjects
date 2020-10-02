@@ -71,6 +71,25 @@ int Serial::begin( int sci, uint32_t baud, uint16_t txSize, uint16_t rxSize )
   return SCI_Init( sciNumber, &rxBuffer, &txBuffer, &errors, baud );
 }
 
+int Serial::begin( int sci, uint32_t baud, uint8_t *txBuf, uint8_t *rxBuf, size_t txSize, size_t rxSize )
+{
+  sciNumber = sci;
+
+  sndBuffer = 0;
+  txBuffer.buf = txBuf;
+  txBuffer.rptr = txBuffer.wptr = 0;
+  txBuffer.size = txSize;
+
+  rcvBuffer = 0;
+  rxBuffer.buf = rxBuf;
+  rxBuffer.rptr = rxBuffer.wptr = 0;
+  rxBuffer.size = rxSize;
+
+  errors.FE_cnt = errors.NE_cnt = errors.ORE_cnt = errors.PE_cnt = 0UL;
+
+  return SCI_Init( sciNumber, &rxBuffer, &txBuffer, &errors, baud );
+}
+
 void Serial::end()
 {
   SCI_Deinit( sciNumber );

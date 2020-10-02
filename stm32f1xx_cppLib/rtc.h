@@ -39,6 +39,10 @@ public:
   void end();
   void unixTime_Set( time_t unixTime );
 
+#if 0
+  void alarmInit();
+#endif
+
 private:
   int inPin,outPin;
 };

@@ -25,12 +25,14 @@
 #define	_USART_H_
 
 #include  <stm32f4xx.h>
-#include  <string.h>
+#include  <stdio.h>
 #include  <stdlib.h>
+#include  <string.h>
+#include  <stdarg.h>
 #include  <ctype.h>
 #include  <priority.h>
 #include  <derivertive.h>
-#include  <peripheral.h>
+//#include  <peripheral.h>
 #include  <mul_tsk.h>
 
 /* ----------------------------------------
@@ -99,6 +101,7 @@ void SCI_ISR( int ch );
 unsigned long SCI_Status( int ch );
 char SCI_DirectRead( int ch );
 void SCI_Purge( int ch );
+int  SCI_printf( int ch, const char *fmt, ... );
 
 int  SCI_Write( int ch, const void *src, size_t size );
 char *GetLine( char *buf, int ch, int BufSz );

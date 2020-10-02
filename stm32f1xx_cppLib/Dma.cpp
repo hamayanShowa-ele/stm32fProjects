@@ -194,3 +194,157 @@ void STM32F_DMA::command( FunctionalState enableDisable )
   //DMA_Cmd( dmaCh, ENABLE );
   DMA_Cmd( dmaCh, enableDisable );
 }
+
+
+/* ----------------------------------------
+    dma interrupt.
+---------------------------------------- */
+extern "C"
+{
+
+/* ----------------------------------------
+    DMA1 channel 1 interrupt handler.
+    ADC1,TIM2_CH3,TIM4_CH1
+---------------------------------------- */
+void DMA1_Channel1_IRQHandler( void )
+{
+  if( DMA_GetITStatus( DMA1_IT_GL1 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA1_IT_HT1 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_HT1 );
+      dma1ch1HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA1_IT_TC1 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_TC1 );
+      dma1ch1TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA1_IT_TE1 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA1_IT_TE1 );
+      dma1ch1TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA1_IT_GL1 );
+  }
+}
+
+/* ----------------------------------------
+    DMA1 channel 2 interrupt handler.
+    SPI1_RX,USART3_TX,TIM1_CH1,TIM2_UP,TIM3_CH3
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA1 channel 3 interrupt handler.
+    SPI1_TX,USART3_RX,TIM1_CH2,TIM3_UP,TIM3_CH4
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA1 channel 4 interrupt handler.
+    SPI/I2S2_RX,USART1_TX,I2C2_TX,TIM1_CH4,TIM1_TRG,TIM1_COM,TIM4_CH2
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA1 channel 5 interrupt handler.
+    SPI/I2S2_TX,USART1_RX,I2C2_RX,TIM1_UP,TIM2_CH1,TIM4_CH3
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA1 channel 6 interrupt handler.
+    USART2_RX,I2C1_TX,TIM1_CH3,TIM3_CH1,TIM3_TRG
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA1 channel 7 interrupt handler.
+    USART2_TX,I2C1_RX,TIM2_CH2,TIM2_CH4,TIM4_UP
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA2 channel 1 interrupt handler.
+    SPI/I2S3_RX,TIM5_CH4,TIM5_TRIG,TIM8_CH3,TIM8_UP
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA2 channel 2 interrupt handler.
+    SPI/I2S3_TX,TIM5_CH3,TIM5_UP,TIM8_CH4,TIM8_TRIG,TIM8_COM
+---------------------------------------- */
+
+/* ----------------------------------------
+    DMA2 channel 3 interrupt handler.
+    UART4_RX,TIM6_UP,DAC1,TIM8_CH1
+---------------------------------------- */
+void DMA2_Channel3_IRQHandler( void )
+{
+  if( DMA_GetITStatus( DMA2_IT_GL3 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA2_IT_HT3 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_HT3 );
+      dma2ch3HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TC3 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TC3 );
+      dma2ch3TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TE3 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TE3 );
+      dma2ch3TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA2_IT_GL3 );
+  }
+}
+
+
+/* ----------------------------------------
+    DMA2 channel 4 and channel 5 interrupt handler.
+    SDIO,TIM5_CH2,TIM7_UP,DAC2
+
+    DMA2 channel 5 and channel 5 interrupt handler.
+    ADC3,UART4_TX,TIM5_CH1,TIM8_CH2
+---------------------------------------- */
+void DMA2_Channel4_5_IRQHandler( void )
+{
+  if( DMA_GetITStatus( DMA2_IT_GL4 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA2_IT_HT4 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_HT4 );
+      dma2ch4HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TC4 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TC4 );
+      dma2ch4TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TE4 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TE4 );
+      dma2ch4TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA2_IT_GL4 );
+  }
+
+  if( DMA_GetITStatus( DMA2_IT_GL5 ) == SET )
+  {
+    if( DMA_GetITStatus( DMA2_IT_HT5 ) == SET )  /*half transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_HT5 );
+      dma2ch5HT_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TC5 ) == SET )  /*full transmission complete*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TC5 );
+      dma2ch5TC_Update++;
+    }
+    if( DMA_GetITStatus( DMA2_IT_TE5 ) == SET )  /*transmission error*/
+    {
+      DMA_ClearITPendingBit( DMA2_IT_TE5 );
+      dma2ch5TE_Update++;
+    }
+    DMA_ClearITPendingBit( DMA2_IT_GL4 );
+  }
+}
+
+}  /* extern "C" */

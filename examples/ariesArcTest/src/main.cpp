@@ -38,6 +38,7 @@
 //#include  <pca8574.h>
 #include  <softWire.h>
 #include  <adcDac.h>
+#include  <strutil.h>
 
 extern "C"
 {
@@ -45,7 +46,6 @@ extern "C"
   #include  <system.h>
   #include  <mul_tsk.h>
   #include  <sw8025.h>
-  #include  <strutil.h>
 }
 
 /* ----------------------------------------
@@ -154,6 +154,27 @@ int main(void)
   /* initialize serial */
   Serial1.begin( SCI_1, 115200UL );
   Serial1.puts( "ARIES 0900 Arc Detector Test.\r\n" );
+
+  LT3593 lt3593( BRIGHT );
+  while( 1 )
+  {
+    lt3593.brightness( BRIGHTEST );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV5 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV10 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV15 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV20 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV25 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( BRIGH_LV30 );
+    dly_tsk( 1000UL );
+    lt3593.brightness( DARK );
+    dly_tsk( 1000UL );
+  }
 
   /* initialize i2c */
 #if 0

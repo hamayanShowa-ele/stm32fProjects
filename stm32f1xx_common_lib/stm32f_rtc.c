@@ -25,73 +25,24 @@
 #include  <stm32f_rtc.h>
 #include  <nvic.h>
 
-/*************************************************************************/
-/* 端子定義                                                              */
-/*************************************************************************/
+/* ----------------------------------------
+    defines.
+---------------------------------------- */
 
-/*************************************************************************/
-/* その他の定義                                                          */
-/*************************************************************************/
+/* ----------------------------------------
+    global variables.
+---------------------------------------- */
+extern volatile unsigned long sumTotalTime;
+extern volatile time_t unixTime;
 
-/*************************************************************************/
-/* 大域変数宣言                                                          */
-/*************************************************************************/
-volatile unsigned long sumTotalTime;
-
-#if 0
-extern unsigned long RTC_Counter;     /*RTCから取得したカウンターの値*/
-extern signed char date_time[];       /*yy/mm/dd hh:mm:ss*/
-extern const signed char default_date_time_strings[];  /*yy/mm/dd hh:mm:ss*/
-#else
-extern time_t unixTime;
-#endif
-
-#if 0
-static const unsigned long month_of_secs[][12] =
-{
-  {  /*閏年では無い時*/
-    DAY31,  /*1月*/
-    DAY31 + DAY28,  /*2月*/
-    DAY31 + DAY28 + DAY31,  /*3月*/
-    DAY31 + DAY28 + DAY31 + DAY30,  /*4月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31,  /*5月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30,  /*6月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31,  /*7月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31,  /*8月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30,  /*9月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31,  /*10月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31 + DAY30,  /*11月*/
-    DAY31 + DAY28 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31,  /*12月*/
-  },
-  {  /*閏年*/
-    DAY31,  /*1月*/
-    DAY31 + DAY29,  /*2月*/
-    DAY31 + DAY29 + DAY31,  /*3月*/
-    DAY31 + DAY29 + DAY31 + DAY30,  /*4月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31,  /*5月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30,  /*6月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31,  /*7月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31,  /*8月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30,  /*9月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31,  /*10月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31 + DAY30,  /*11月*/
-    DAY31 + DAY29 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31 + DAY31 + DAY30 + DAY31 + DAY30 + DAY31,  /*12月*/
-  },
-};
-#endif
-
-/*************************************************************************/
-/* プロトタイプ宣言                                                      */
-/*************************************************************************/
+/* ----------------------------------------
+    prototypes.
+---------------------------------------- */
 static int RTC_LSE_Clock_Start( void );
-#if 0
-static void Sec2Time( unsigned long sec );
-static void Sec2Date( unsigned long sec );
-#endif
 
-/*************************************************************************/
-/* RTC LSEクロックスタート                                               */
-/*************************************************************************/
+/* ----------------------------------------
+    start the RTC LSE clock.
+---------------------------------------- */
 static int RTC_LSE_Clock_Start( void )
 {
   int limit;
@@ -104,7 +55,7 @@ static int RTC_LSE_Clock_Start( void )
   PWR_CR_REG *PWRCR = (PWR_CR_REG *)PWR_CR;
 #endif
 
-  /*RTC APB1へクロックの供給開始*/
+  /* Start supplying the clock to the RTC APB1. */
   /* Enable PWR and BKP clocks */
   RCC_APB1PeriphClockCmd( RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE );
   /* Allow access to BKP Domain */
@@ -113,7 +64,8 @@ static int RTC_LSE_Clock_Start( void )
 
   temp = BKP_ReadBackupRegister( BKP_DR1 );
 
-  if( temp != 0xa5a5 )  /*バックアップレジスタの一番最初の奴にA5A5が書かれていない時は、再初期化*/
+  /* When A5A5 is not written at the beginning of the backup register, it is reinitialized. */
+  if( temp != 0xa5a5 )
   {
     reStartRTC = 1;
     /* Enable PWR and BKP clocks */
@@ -157,10 +109,10 @@ static int RTC_LSE_Clock_Start( void )
 #if 0
     Date_Time_Set( default_date_time_strings );
 #else
-    unixTime_Set( unixTime );
+//    unixTime_Set( unixTime );
 #endif
 
-    /*A5A5を書いて置く*/
+    /* Write A5A5. */
     BKP_WriteBackupRegister( BKP_DR1, 0xa5a5 );
   }
   else
@@ -198,35 +150,32 @@ static int RTC_LSE_Clock_Start( void )
   return reStartRTC;
 }
 
-/*************************************************************************/
-/* RTC初期化                                                             */
-/* クロックの供給と割込みの設定のみ                                      */
-/*************************************************************************/
+/* ----------------------------------------
+    initialize RTC.
+---------------------------------------- */
 int RTC_Init( void )
 {
-  /*RTC APB1へクロックの供給開始*/
+  /* Start with the LSE clock. */
   int ret = RTC_LSE_Clock_Start();
-
   /* interrupt enable */
-  nvicInit( RTC_IRQn, BASE_PRIORITY, BASE_SUB_PRIORITY );
+  if( ret >= 0 ) nvicInit( RTC_IRQn, BASE_PRIORITY, BASE_SUB_PRIORITY );
 
   return ret;
 }
 
-/*************************************************************************/
-/* RTCアラーム初期化                                                     */
-/* クロックの供給と割込みの設定のみ                                      */
-/*************************************************************************/
 #if 0
+/* ----------------------------------------
+    initialize RTC Alarm.
+---------------------------------------- */
 void RTC_Alarm_Init( void )
 {
   NVIC_InitTypeDef NVIC_InitStructure;
   RCC_BDCR_REG *BDCR = (RCC_BDCR_REG *)&RCC_BDCR;
 
-  /*RTCのクロックとしてLSEを選択*/
+  /* Select the LSE as the clock for the RTC. */
   BDCR->BIT.RTCSEL = 1;
 
-  /*RTC APB1へクロックの供給開始*/
+  /* Start supplying the clock to RTC APB1. */
   RTC_LSE_Clock_Start();
 
   /* interrupt enable */
@@ -236,152 +185,10 @@ void RTC_Alarm_Init( void )
 #endif
 
 #if 0
-/*************************************************************************/
-/* 時刻換算処理                                                          */
-/*************************************************************************/
-static void Sec2Time( unsigned long sec )
-{
-  date_time[ HOUR ] = (sec % (24 * 3600UL)) / 3600UL;
-  date_time[ MINUTE ] = (sec % 3600UL) / 60;
-  date_time[ SECOND ] = sec % 60;
-}
-#endif
-
-#if 0
-/*************************************************************************/
-/* 日付換算処理                                                          */
-/*************************************************************************/
-static void Sec2Date( unsigned long sec )
-{
-  int i,leap;
-  unsigned long temp,old_temp;
-
-  for( i = 9, temp = old_temp = 0; i < 100; i++ )
-  {
-    temp += (i % 4) ? YEAR_OF_SEC : LEAP_YEAR_OF_SEC;  /*新しい比較値*/
-    if( sec <= temp ) break;  /*年が判ったのでここで脱出*/
-    old_temp = temp;  /*ここまでの秒数を覚えておく*/
-  }
-  date_time[ YEAR ] = i;  /*年が判った*/
-  leap = (i % 4) ? 0 : 1;  /*閏年なら1*/
-  sec -= old_temp;  /*年の秒数を引いて置く*/
-  old_temp = sec;  /* 年変わりの1/1の日がおかしくなるため(by naito) */
-
-  for( i = 0, temp = 0; i < 12; i++ )
-  {
-    temp = month_of_secs[ leap ][ i ];
-    if( sec <= temp ) break;
-    old_temp = temp;
-  }
-  date_time[ MONTH ] = i + 1;  /*月が判った*/
-  sec -= old_temp;
-
-  date_time[ DAY ] = (sec / DAY_OF_SEC) + 1;
-}
-#endif
-
-#if 0
-/*************************************************************************/
-/* RTC設定                                                               */
-/* Date_Time_Set( date_time_strings );                                   */
-/* date_time_stringsはyy/mm/dd hh:mm:ssの形式を取る。                    */
-/* 2009年10月26日 21時26分0秒ならば{9,10,26,21,26,0}                     */
-/*************************************************************************/
-void Date_Time_Set( const signed char str[] )
-{
-  int i,leap;
-  unsigned long sec,temp;
-
-  sec = 0;
-  if( str[ YEAR ] > 9 )  /*2009年以降を累積させる*/
-  {
-    for( i = 9, temp = 0; i < str[ YEAR ]; i++ )
-    {
-      temp += (i % 4) ? YEAR_OF_SEC : LEAP_YEAR_OF_SEC;  /*新しい比較値*/
-    }
-    sec += temp;  /*累積*/
-  }
-  leap = (str[ YEAR ] % 4) ? 0 : 1;  /*閏年判定*/
-
-  if( str[ MONTH ] > 1 )  /*1月以降を累積させる*/
-  {
-    sec += month_of_secs[ leap ][ str[ MONTH ] - 2 ];  /*累積*/
-  }
-
-  if( str[ DAY ] > 1 )  /*1日以降を累積させる*/
-  {
-    for( i = 1, temp = 0; i < str[ DAY ]; i++ )
-    {
-      temp += DAY_OF_SEC;
-    }
-    sec += temp;  /*累積*/
-  }
-
-  if( str[ HOUR ] >= 1 )  /*1時間以降を累積させる*/
-  {
-    for( i = 0, temp = 0; i < str[ HOUR ]; i++ )
-    {
-      temp += 3600UL;
-    }
-    sec += temp;  /*累積*/
-  }
-
-  if( str[ MINUTE ] >= 1 )  /*1分以降を累積させる*/
-  {
-    for( i = 0, temp = 0; i < str[ MINUTE ]; i++ )
-    {
-      temp += 60UL;
-    }
-    sec += temp;  /*累積*/
-  }
-
-  sec += str[ SECOND ];  /*累積*/
-
-  /* Wait until last write operation on RTC registers has finished */
-  RTC_WaitForLastTask();
-  /* Change the current time */
-  RTC_SetCounter( sec );
-  /* Wait until last write operation on RTC registers has finished */
-//  RTC_WaitForLastTask();
-}
-#endif
-
-#if 0
-/*************************************************************************/
-/* 日付及び時刻の文字列の生成                                            */
-/*************************************************************************/
-char *DateTime2Strings( char *dest, const signed char str[] )
-{
-  dest[0]  = '2';
-  dest[1]  = '0';
-  dest[2]  = (str[ YEAR ] / 10) + '0';
-  dest[3]  = (str[ YEAR ] % 10) + '0';
-  dest[4]  = '/';
-  dest[5]  = (str[ MONTH ] / 10) + '0';
-  dest[6]  = (str[ MONTH ] % 10) + '0';
-  dest[7]  = '/';
-  dest[8]  = (str[ DAY ] / 10) + '0';
-  dest[9]  = (str[ DAY ] % 10) + '0';
-  dest[10] = ' ';
-  dest[11] = (str[ HOUR ] / 10) + '0';
-  dest[12] = (str[ HOUR ] % 10) + '0';
-  dest[13] = ':';
-  dest[14] = (str[ MINUTE ] / 10) + '0';
-  dest[15] = (str[ MINUTE ] % 10) + '0';
-  dest[16] = ':';
-  dest[17] = (str[ SECOND ] / 10) + '0';
-  dest[18] = (str[ SECOND ] % 10) + '0';
-  dest[19] = '\0';
-
-  return dest;
-}
-#endif
-
-#if 0
-/*************************************************************************/
-/* get fattime                                                           */
-/* date_timeはyy/mm/dd hh:mm:ssの形式となっている。                      */
-/*************************************************************************/
+/* ----------------------------------------
+    get fattime.
+    The date_time is in the format of yy/mm/dd hh:mm:ss.
+---------------------------------------- */
 unsigned long get_fattime( void )
 {
   struct tm localTime;
@@ -395,8 +202,9 @@ unsigned long get_fattime( void )
   res |= date_time[ MINUTE ] << 5;
   res |= date_time[ SECOND ] >> 1;
 #else
-  localtime_r( &unixTime, &localTime );  /*unixTimeをlocalTimeに変換*/
-  res = (localTime.tm_year + (1900 - 1980)) << 25;  /*unix timeは1900年を基準としている。fat timeは1980年を基準*/
+  localtime_r( &unixTime, &localTime );  /* Convert unixTime to localTime. */
+  /* unix time is based on 1900, however, fat time is based on 1980. */
+  res = (localTime.tm_year + (1900 - 1980)) << 25;
   res |= (localTime.tm_mon + 1) << 21;
   res |= (localTime.tm_mday) << 16;
   res |= (localTime.tm_hour) << 11;
@@ -410,11 +218,11 @@ unsigned long get_fattime( void )
 
 #ifdef  _FATFSUTIL_H_
 #if 1
-bool rtc_gettime( RTC_t *rtc )					/* Get time */
+bool rtc_gettime( RTC_t *rtc )  /* Get time */
 {
   struct tm localTime;
 
-  localtime_r( &unixTime, &localTime );  /*unixTimeをlocalTimeに変換*/
+  localtime_r( &unixTime, &localTime );  /* Convert unixTime to localTime. */
   rtc->year  = localTime.tm_year + 1900;
   rtc->month = localTime.tm_mon + 1;
   rtc->mday  = localTime.tm_mday;
@@ -431,7 +239,7 @@ int rtc_gettime (RTCTIME* rtc)
 {
   struct tm localTime;
 
-  localtime_r( &unixTime, &localTime );  /*unixTimeをlocalTimeに変換*/
+  localtime_r( &unixTime, &localTime );  /* Convert unixTime to localTime. */
   rtc->year  = localTime.tm_year + 1900;
   rtc->month = localTime.tm_mon + 1;
   rtc->mday  = localTime.tm_mday;
@@ -446,9 +254,9 @@ int rtc_gettime (RTCTIME* rtc)
 #endif
 #endif  /*_FATFSUTIL_H_*/
 
-/*************************************************************************/
-/* Unix時間をRTCカウンターに設定する                                     */
-/*************************************************************************/
+/* ----------------------------------------
+    Set the Unix time to the RTC counter.
+---------------------------------------- */
 void unixTime_Set( time_t unixTime )
 {
   /* Wait until last write operation on RTC registers has finished */
@@ -459,28 +267,23 @@ void unixTime_Set( time_t unixTime )
   //  RTC_WaitForLastTask();
 }
 
-/*************************************************************************/
-/* RTC割り込み                                                           */
-/*************************************************************************/
+/* ----------------------------------------
+    RTC initialize
+---------------------------------------- */
 void RTC_IRQHandler( void )
 {
-  RTC->CRL &= ~RTC_CRL_SECF;  /*ステータスのクリア*/
-  sumTotalTime++;  /*起動時からの通算時間*/
+  RTC->CRL &= ~RTC_CRL_SECF;  /* Clear status. */
+  sumTotalTime++;  /* Total time since startup. */
 #if 1
   unixTime = RTC_GetCounter();  /*unix time*/
 #else
   unixTime++;  /*unix time*/
 #endif
-#if 0
-  RTC_Counter = RTC_GetCounter() + 1;
-  Sec2Date( RTC_Counter );
-  Sec2Time( RTC_Counter );
-#endif
 }
 
-/*************************************************************************/
-/* RTCアラーム割り込み                                                   */
-/*************************************************************************/
+/* ----------------------------------------
+    RTC alarm initialize
+---------------------------------------- */
 void RTCAlarm_IRQHandler( void )
 {
 }

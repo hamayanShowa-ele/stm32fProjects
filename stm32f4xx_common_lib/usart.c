@@ -487,6 +487,21 @@ int SCI_GetsWithTmout( char *buf, int ch, int BufSz, unsigned long tmout )
   return 0;
 }
 
+/* ----------------------------------------
+    print
+---------------------------------------- */
+int SCI_printf( int ch, const char *fmt, ... )
+{
+  char buf[256];
+  va_list args;
+  va_start( args, fmt );
+  vsnprintf( buf, sizeof(buf), fmt, args );
+  va_end( args );
+  int ret = SCI_Puts( ch, (const char *)buf );
+
+  return ret;
+}
+
 
 
 /* ----------------------------------------

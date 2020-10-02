@@ -27,7 +27,7 @@
 #include  <stdarg.h>
 #include  <stdio.h>
 #include  <string.h>
-#include  "gpio.h"
+#include  <gpio.h>
 
 extern "C"
 {
@@ -55,6 +55,7 @@ public:
   ~Serial();
 
   int begin( int sci, uint32_t baud = BAUD_115200, uint16_t txSize = 256, uint16_t rxSize = 256 );
+  int begin( int sci, uint32_t baud, uint8_t *txBuf, uint8_t *rxBuf, size_t txSize, size_t rxSize );
   void end();
 
   int printf( const char *fmt, ... );

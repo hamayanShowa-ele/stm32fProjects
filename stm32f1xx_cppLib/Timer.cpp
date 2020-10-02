@@ -64,7 +64,7 @@ int STM32F_TIMER::begin( TIM_TypeDef *tim )
   /* initialize call back routine to default. */
   for( int i = 0; i < TIM_INT_END; i++ )
   {
-    cbList[i] = defaultHandler;
+    if( cbList[i] == nullptr ) cbList[i] = defaultHandler;
   }
 
   /* timer clock enable. */
@@ -126,11 +126,14 @@ void STM32F_TIMER::end()
   /* TIM disable counter */
   TIM_Cmd( TIMx, DISABLE );
 
-  /* initialize call back routine to default. */
+  /* initialize call back routine to nullptr. */
+  /* Use rejectCallBack to unregister the callback routine. */
+#if 0
   for( int i = 0; i < TIM_INT_END; i++ )
   {
-    cbList[i] = defaultHandler;
+    cbList[i] = nullptr;
   }
+#endif
 
   /* timer clock disable. */
   if( timerType == ADVANCED_CONTROL_TIMER )
@@ -175,6 +178,57 @@ void STM32F_TIMER::stop()
   TIM_Cmd( TIMx, DISABLE );
 }
 
+/* ----------------------------------------
+    get counter value.
+---------------------------------------- */
+volatile uint16_t STM32F_TIMER::getCounter()
+{
+  return TIM_GetCounter( TIMx );
+}
+
+/* ----------------------------------------
+    set auto reload register.
+---------------------------------------- */
+void STM32F_TIMER::setAutoReload( uint16_t reload )
+{
+  TIM_SetAutoreload( TIMx, reload );
+}
+
+
+/* ----------------------------------------
+    get auto reload register.
+---------------------------------------- */
+uint16_t STM32F_TIMER::getAutoReload()
+{
+  return TIMx->ARR;
+}
+
+/* ----------------------------------------
+    timer trigger.
+---------------------------------------- */
+void STM32F_TIMER::trigger( uint16_t trig )
+{
+  TIM_SelectOutputTrigger( TIMx, trig );
+}
+
+/* ----------------------------------------
+    configure time base.
+---------------------------------------- */
+void STM32F_TIMER::config( uint16_t prescaler, uint16_t period )
+{
+  /* Time base configuration */
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+  TIM_TimeBaseStructInit( &TIM_TimeBaseStructure );
+
+  TIM_TimeBaseStructure.TIM_Prescaler = prescaler - 1;  /* prescaler */
+  TIM_TimeBaseStructure.TIM_Period = period - 1;  /* 周期設定 */
+  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /* クロック分周比=1 内部クロックを使う限り関係しない？ */
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
+  TIM_TimeBaseInit( TIMx, &TIM_TimeBaseStructure );
+
+  TIM_ARRPreloadConfig( TIMx, ENABLE );
+}
 
 /* ----------------------------------------
     calculate period.
@@ -197,7 +251,7 @@ int STM32F_TIMER::prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period 
   if( presc == 65536UL ) return (-1);
 
   *prescaler = presc;
-  *period = (ck_int / presc / freq) - 1;  /* 周期設定 */
+  *period = ck_int / presc / freq;  /* 周期設定 */
   return 0;
 }
 
@@ -216,21 +270,23 @@ int STM32F_TIMER::frequency( uint32_t freq )
   /* get prescaler and period */
   uint32_t prescaler,period;
   if( prePeri( freq, &prescaler, &period ) < 0 ) return (-1);
-
+#if 1
+  config( (uint16_t)prescaler, (uint16_t)period );
+#else
   TIM_TimeBaseStructure.TIM_Prescaler = (uint16_t)(prescaler - 1);  /* prescaler */
   /* set period */
 //  TIM_TimeBaseStructure.TIM_Period = (uint16_t)((ck_int / freq) - 1);  /* 周期設定 */
-  TIM_TimeBaseStructure.TIM_Period = (uint16_t)(period - 0);  /* 周期設定 */
+  TIM_TimeBaseStructure.TIM_Period = (uint16_t)(period - 1);  /* 周期設定 */
   TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /* クロック分周比=1 内部クロックを使う限り関係しない？ */
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
   TIM_TimeBaseInit( TIMx, &TIM_TimeBaseStructure );
 
   TIM_ARRPreloadConfig( TIMx, ENABLE );
+#endif
 
   return 0;
 }
-
 
 /* ----------------------------------------
     output compare match.
@@ -298,13 +354,18 @@ int STM32F_TIMER::pwm1( int ch, int pin, uint16_t pulse )
 }
 
 
-int STM32F_TIMER::adcTrigger( int ch )
+int STM32F_TIMER::adcTrigger( int ch, int pin, uint16_t pulse )
 {
+#if 0
   /* TIMx TRGO selection */
   TIM_SelectOutputTrigger( TIMx, TIM_TRGOSource_Update );
   return 0;
+#else
   // PORT_END -> PB9 for ARIES ver.2
-//  return OC( ch, TIM_OCMode_Toggle, PORT_END, 0, TIM_OCPolarity_High, TIM_OCIdleState_Reset );
+//  TIM_SelectOutputTrigger( TIMx, TIM_TRGOSource_OC1 );  // Not required.
+//  return OC( ch, TIM_OCMode_PWM1, pin, pulse, TIM_OCPolarity_High, TIM_OCIdleState_Reset );  // TIM_OCMode_Toggle,PORT_END
+  return OC( ch, TIM_OCMode_PWM1, pin, pulse, TIM_OCPolarity_Low, TIM_OCIdleState_Set );  // TIM_OCMode_Toggle,PORT_END
+#endif
 }
 
 /* ----------------------------------------
@@ -353,6 +414,40 @@ uint16_t STM32F_TIMER::getPulse( int ch )
     pulse = TIMx->CCR4;
   }
   return pulse;
+}
+
+
+/* ----------------------------------------
+    configure the encoder
+    and read the encoder counter.
+---------------------------------------- */
+void STM32F_TIMER::encoderEnable()
+{
+  TIM_SetCounter( TIMx, 0 );
+  TIM_SetAutoreload( TIMx, 0xFFFF );
+  TIM_EncoderInterfaceConfig
+  ( TIMx,
+    TIM_EncoderMode_TI12,
+    TIM_ICPolarity_Rising,
+    TIM_ICPolarity_Rising );
+  /* set fDTS (1/tDTS). */
+  volatile uint16_t tempUS = TIMx->CR1;
+  tempUS &= ~0x0300;
+  tempUS |= 0x0200;  // 0b0000 00 10 0000 0000
+  TIMx->CR1 = tempUS;
+  /* set digital filter. */
+  tempUS = TIMx->CCMR1;
+  tempUS &= ~0xFCFC;
+  tempUS |= 0xF0F0;  // 0x3030
+  tempUS |= 0x0000;  // 0b0000 00 00 0000 00 00
+  TIMx->CCMR1 = tempUS;
+
+  TIM_Cmd( TIMx, ENABLE );
+}
+
+uint16_t STM32F_TIMER::encoderRead()
+{
+  return TIM_GetCounter( TIMx );
 }
 
 
@@ -442,16 +537,8 @@ void STM32F_TIMER::startInterrupt( int ch, uint8_t pri, uint8_t sub )
 }
 
 /* ----------------------------------------
-    timer trigger.
----------------------------------------- */
-void STM32F_TIMER::trigger( uint16_t trig )
-{
-  TIM_SelectOutputTrigger( TIMx, trig );
-}
-
-
-/* ----------------------------------------
-    register call back routine.
+    register call back routine
+    and unregister call back routine.
 ---------------------------------------- */
 #if 0
 void STM32F_TIMER::callBack( int name, void *cb )
@@ -463,8 +550,32 @@ void STM32F_TIMER::callBack( int name, void *cb )
 void STM32F_TIMER::callBack( int name, void(*cb)(void) )
 {
   cbList[ name ] = cb;
-  startInterrupt();
+//  startInterrupt();
 }
+
+void STM32F_TIMER::rejectCallBack( int name )
+{
+  cbList[ name ] = nullptr;
+}
+
+/* ----------------------------------------
+    timer master cascade connection
+    and timer slave cascade connection.
+---------------------------------------- */
+void STM32F_TIMER::master()
+{
+  TIM_SelectOutputTrigger( TIMx, TIM_TRGOSource_Update );
+}
+
+void STM32F_TIMER::slave( uint16_t parent, uint16_t prescaler, uint16_t period )
+{
+  config( prescaler, period );
+  TIM_SelectMasterSlaveMode( TIMx, TIM_MasterSlaveMode_Enable );
+  TIM_ITRxExternalClockConfig( TIMx, parent );
+  TIM_SelectSlaveMode( TIMx, TIM_SlaveMode_External1 );
+}
+
+
 
 
 /* ----------------------------------------

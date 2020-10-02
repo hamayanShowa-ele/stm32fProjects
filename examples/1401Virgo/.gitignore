@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1804Ganimede.cogui
+1804Ganimede.comarker
+1804Ganimede.comemgui
+
+# not need 1804Ganimede folder
+1804Ganimede/
+
+# not need logs folder
+logs/
+
+

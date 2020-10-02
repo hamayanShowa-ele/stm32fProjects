@@ -73,7 +73,7 @@ public:
   void analogRead( ADC_PIN_AND_DATA data[], size_t size );
   void analogRead(
     ADC_PIN_AND_DATA ad[], size_t size,
-    uint16_t *dst, size_t count,
+    volatile uint16_t *dst, size_t count,
     uint32_t trigger = ADC_ExternalTrigConv_T1_CC3 );
 
 private:

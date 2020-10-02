@@ -31,7 +31,13 @@
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
+volatile uint16_t adc1Buffer[1];
+volatile uint16_t adc1BufferWptr,adc1BufferRptr;
+volatile uint8_t  adc1BufferUpdate;
 
+volatile uint16_t adc2Buffer[1];
+volatile uint16_t adc2BufferWptr,adc2BufferRptr;
+volatile uint8_t  adc2BufferUpdate;
 
 /* ----------------------------------------
   adc constructor destructor
@@ -77,16 +83,16 @@ void STM32F_ADC::begin( ADC_TypeDef *adcx )
   ADC_DeInit( ADCx );
   ADC_InitTypeDef ADC_InitStruct;
   ADC_StructInit( &ADC_InitStruct );
-  ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;  /*右詰*/
-  ADC_InitStruct.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;  /*外部イベントによる変換は行わない*/
-  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /*SCAN禁止*/
-  ADC_InitStruct.ADC_NbrOfChannel = 1;  /*変換チャンネル数*/
-  ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;  /*ENABLEにすると大変な事になる*/
-  ADC_InitStruct.ADC_Mode = ADC_Mode_Independent;  /*独立モード*/
+  ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;  /* right-aligned */
+  ADC_InitStruct.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;  /* No conversion by external events. */
+  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /* SCAN mode is disable.*/
+  ADC_InitStruct.ADC_NbrOfChannel = 1;  /* Number of conversion channels. */
+  ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;  /* If you make it ENABLE, you're in big trouble. */
+  ADC_InitStruct.ADC_Mode = ADC_Mode_Independent;  /* independent mode */
   ADC_Init( ADCx, &ADC_InitStruct );
 
   ADC_Cmd( ADCx, ENABLE );
-  // A-Dコンバータ補正
+  // ADC calibration.
   ADC_ResetCalibration( ADCx );
   while( ADC_GetCalibrationStatus( ADCx ) != RESET ) rot_rdq();
   ADC_StartCalibration( ADCx );
@@ -147,7 +153,7 @@ uint16_t STM32F_ADC::analogRead( int pin, uint8_t cycle )
   ADC_StructInit( &ADC_InitStruct );
   ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;  /* right-aligned */
   ADC_InitStruct.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;  /* No conversion by external events. */
-  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /* SCAN mode */
+  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /* SCAN mode is disable. */
   ADC_InitStruct.ADC_NbrOfChannel = 1;  /* Number of conversion channels. */
   ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;  /* If you make it ENABLE, you're in big trouble. */
   ADC_InitStruct.ADC_Mode = ADC_Mode_Independent;  /* independent mode */
@@ -169,9 +175,7 @@ uint16_t STM32F_ADC::analogRead( int pin, uint8_t cycle )
   return tempUS;
 }
 
-volatile uint16_t adcBuffer[3];
-volatile uint16_t adcBufferWptr,adcBufferRptr;
-volatile uint16_t adcBufferUpdate;
+/* No! interrupt use. */
 void STM32F_ADC::analogRead( ADC_PIN_AND_DATA ad[], size_t size )
 {
   for( int i = 0; i < (int)size; i++ )
@@ -184,7 +188,7 @@ void STM32F_ADC::analogRead( ADC_PIN_AND_DATA ad[], size_t size )
   ADC_StructInit( &ADC_InitStruct );
   ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;  /* right-aligned */
   ADC_InitStruct.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;  /* No conversion by external events. */
-  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /* SCAN mode */
+  ADC_InitStruct.ADC_ScanConvMode = DISABLE;  /* SCAN mode is disable.*/
   ADC_InitStruct.ADC_NbrOfChannel = 1;  /* Number of conversion channels. */
   ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;  /* If you make it ENABLE, you're in big trouble. */
   ADC_InitStruct.ADC_Mode = ADC_Mode_Independent;  /* independent mode */
@@ -211,25 +215,25 @@ void STM32F_ADC::analogRead( ADC_PIN_AND_DATA ad[], size_t size )
   NVIC_Init( &NVIC_InitStructure );
   ADC_ITConfig( ADCx, ADC_IT_EOC, ENABLE );
 
-  uint16_t adcBufferUpdateBase = adcBufferUpdate;
+  uint16_t adc1BufferUpdateBase = adc1BufferUpdate;
   ADC_Cmd( ADCx, ENABLE );
   ADC_SoftwareStartConvCmd( ADCx, ENABLE );
-  while( adcBufferUpdate == adcBufferUpdateBase ) rot_rdq();
+  while( adc1BufferUpdate == adc1BufferUpdateBase ) rot_rdq();
   ADC_ITConfig( ADCx, ADC_IT_EOC, DISABLE );
   for( int i = 0; i < (int)size; i++ )
   {
-    ad[i].data = adcBuffer[i] & 0x0FFF;
+    ad[i].data = adc1Buffer[i] & 0x0FFF;
   }
   ADC_Cmd( ADCx, DISABLE );
 #endif
 }
 
+/* YES! dma use. */
 void STM32F_ADC::analogRead(
   ADC_PIN_AND_DATA ad[], size_t size,
-  uint16_t *dst, size_t count,
+  volatile uint16_t *dst, size_t count,
   uint32_t trigger )
 {
-  /* YES! dma use. */
   for( int i = 0; i < (int)size; i++ )
   {
     GPIO::pinMode( ad[i].config.pin, ANALOG, GPIO_SPEED_NORMAL );
@@ -241,7 +245,7 @@ void STM32F_ADC::analogRead(
   ADC_StructInit( &ADC_InitStruct );
   ADC_InitStruct.ADC_DataAlign = ADC_DataAlign_Right;  /* right-aligned */
   ADC_InitStruct.ADC_ExternalTrigConv = trigger;  /**/
-  ADC_InitStruct.ADC_ScanConvMode = ENABLE;  /* SCAN mode */
+  ADC_InitStruct.ADC_ScanConvMode = (size <= 1) ? DISABLE : ENABLE;  /* SCAN mode */
   ADC_InitStruct.ADC_NbrOfChannel = size;  /* Number of conversion channels. */
   ADC_InitStruct.ADC_ContinuousConvMode = DISABLE;  /* If you make it ENABLE, you're in big trouble. */
   ADC_InitStruct.ADC_Mode = ADC_Mode_Independent;  /* independent mode */
@@ -269,8 +273,9 @@ void STM32F_ADC::analogRead(
   }
   STM32F_DMA dma;
   dma.begin( DMAx_channelY );
-  dma.p2m( dst, (const uint16_t *)&ADCx->DR, count, DMA_Mode_Circular );  /* configure the dma controller. */
-  dma.ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+  dma.p2m( (uint16_t *)dst, (const uint16_t *)&ADCx->DR, count, DMA_Mode_Circular );  /* configure the dma controller. */
+//  dma.ITConfig( DMA_IT_TC | DMA_IT_HT | DMA_IT_TE, ENABLE );  /* interrupt set. */
+  dma.ITConfig( DMA_IT_TC | DMA_IT_TE, ENABLE );  /* interrupt set. */
   dma.command( ENABLE );  /* enable dma. */
 
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -377,7 +382,7 @@ void STM32F_DAC::write( const uint16_t *data, size_t size, TIM_TypeDef *tim, boo
   /* configure a convert timing timer. */
   STM32F_TIMER timer( tim );
   timer.frequency( 50UL );
-  timer.adcTrigger( TIMx_CH4 );
+  timer.adcTrigger( TIMx_CH4, ADC1_IN0_PIN, 0 );
 
   /* configure a dma controller. */
   /* DAC1:dma2 channel 3, DAC2:dma2 channel 4  */
@@ -502,25 +507,28 @@ void STM32F_DAC::dmaSet( DMA_Channel_TypeDef *DMAx_Channelx, const uint16_t *dat
 ---------------------------------------- */
 extern "C"
 {
-//uint16_t adcBuffer[3];
-//int adcBufferWptr,adcBufferRptr;
 void ADC1_2_IRQHandler( void )
 {
   if( ADC_GetFlagStatus( ADC1, ADC_FLAG_EOC ) == SET )
   {
 //    ADC_ClearFlag( ADC1, ADC_FLAG_EOC );
-#if 1
-    adcBuffer[adcBufferWptr] = ADC_GetConversionValue( ADC1 ) & 0x0FFF;
-    if( ++adcBufferWptr >= (uint16_t)(sizeof(adcBuffer) / sizeof(adcBuffer[0])) )
+    adc1Buffer[ adc1BufferWptr ] = ADC_GetConversionValue( ADC1 ) & 0x0FFF;
+    if( ++adc1BufferWptr >= (uint16_t)(sizeof(adc1Buffer) / sizeof(adc1Buffer[0])) )
     {
-      adcBufferWptr = 0;
+      adc1BufferWptr = 0;
     }
-#else
-    adcBuffer[0] = ADC_GetConversionValue( ADC1 ) & 0x0FFF;
-    adcBuffer[1] = ADC_GetConversionValue( ADC1 ) & 0x0FFF;
-    adcBuffer[2] = ADC_GetConversionValue( ADC1 ) & 0x0FFF;
-#endif
-    adcBufferUpdate++;
+    adc1BufferUpdate++;
+  }
+
+  if( ADC_GetFlagStatus( ADC2, ADC_FLAG_EOC ) == SET )
+  {
+//    ADC_ClearFlag( ADC2, ADC_FLAG_EOC );
+    adc2Buffer[ adc2BufferWptr ] = ADC_GetConversionValue( ADC2 ) & 0x0FFF;
+    if( ++adc2BufferWptr >= (uint16_t)(sizeof(adc2Buffer) / sizeof(adc2Buffer[0])) )
+    {
+      adc2BufferWptr = 0;
+    }
+    adc2BufferUpdate++;
   }
 }
 }  /* extern "C" */

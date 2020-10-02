@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1703NTPClient.cogui
+1703NTPClient.comarker
+1703NTPClient.comemgui
+
+# not need cppGraphic folder
+1703NTPClient/
+
+# not need logs folder
+logs/
+
+

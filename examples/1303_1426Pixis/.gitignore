@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1303_1426Pixis.cogui
+1303_1426Pixis.comarker
+1303_1426Pixis.comemgui
+
+# not need cppGraphic folder
+1303_1426Pixis/
+
+# not need logs folder
+logs/
+
+

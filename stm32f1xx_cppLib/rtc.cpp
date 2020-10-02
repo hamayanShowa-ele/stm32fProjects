@@ -58,3 +58,29 @@ void STM32F_RTC::unixTime_Set( time_t unixTime )
   /* Wait until last write operation on RTC registers has finished */
   //  RTC_WaitForLastTask();
 }
+
+#if 0
+/* ----------------------------------------
+    alarm initialize
+---------------------------------------- */
+void STM32F_RTC::alarmInit()
+{
+  NVIC_InitTypeDef NVIC_InitStructure;
+  RCC_BDCR_REG *BDCR = (RCC_BDCR_REG *)&RCC_BDCR;
+
+  /*RTCのクロックとしてLSEを選択*/
+  BDCR->BIT.RTCSEL = 1;
+
+  /*RTC APB1へクロックの供給開始*/
+  RTC_LSE_Clock_Start();
+
+  /* interrupt enable */
+  nvicInit( RTCAlarm_IRQChannel, BASE_PRIORITY, BASE_SUB_PRIORITY );
+  NVIC_Init( &NVIC_InitStructure );
+}
+#endif
+
+
+extern "C"
+{
+}  /* extern "C" */

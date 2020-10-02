@@ -27,6 +27,7 @@
 #include  <stm32f10x.h>
 #include  <string.h>
 #include  <math.h>
+#include  <mul_tsk.h>
 
 /*****************************************************/
 /* defines                                           */
@@ -47,5 +48,6 @@ void dly5us( void );
 void dly10us( uint32_t dly_us );
 void dly100us( uint32_t dly_us );
 void dly1ms( uint32_t dly_ms );
+uint32_t millis( void );
 
 #endif  /* __SYSTEM_H__ */

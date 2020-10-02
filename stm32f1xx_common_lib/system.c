@@ -171,8 +171,22 @@ void dly100us( uint32_t dly_us )
 /*****************************************************/
 void dly1ms( uint32_t dly_ms )
 {
+#if 0
   for( ; dly_ms > 0; dly_ms-- )
   {
     dly100us( 10UL );
   }
+#else
+  dly_tsk( dly_ms );
+#endif
+}
+
+/*****************************************************/
+/* millis                                            */
+/*****************************************************/
+extern SYSTIM systim;
+
+uint32_t millis( void )
+{
+  return (uint32_t)systim;
 }

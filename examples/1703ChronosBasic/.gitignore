@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1703ChronosBasic.cogui
+1703ChronosBasic.comarker
+1703ChronosBasic.comemgui
+
+# not need cppGraphic folder
+1703ChronosBasic/
+
+# not need logs folder
+logs/
+
+
