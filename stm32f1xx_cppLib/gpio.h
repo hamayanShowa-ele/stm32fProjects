@@ -25,6 +25,10 @@
 #define  __GPIO_H__
 
 #include  <stm32fPeripheral.h>
+extern "C"
+{
+  #include  <peripheral.h>
+}
 
 /* ----------------------------------------
     prototypes 
@@ -104,6 +108,7 @@ public:
 
   void pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed = GPIO_SPEED_FAST );
   void pinMode( int pin, int type, int speed = GPIO_SPEED_FAST );
+  void altMode( int pin );
 
   void set( int pin );
   void reset( int pin );

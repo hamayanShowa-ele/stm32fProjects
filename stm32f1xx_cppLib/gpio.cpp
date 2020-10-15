@@ -56,6 +56,16 @@ void GPIO::pinMode( int pin, int type, int speed )
 }
 
 /* ----------------------------------------
+    alternate mode
+---------------------------------------- */
+void GPIO::altMode( int pin )
+{
+  GPIO_TypeDef *gpiox = whatGPIOType( pin );
+  uint16_t gpioPin = whatPin( pin );
+  GPIO_Alternate_Init( gpiox, gpioPin );
+}
+
+/* ----------------------------------------
     output pin set/reset
 ---------------------------------------- */
 void GPIO::set( int pin )
