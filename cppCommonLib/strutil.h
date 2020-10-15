@@ -77,6 +77,8 @@ char *localDateString( char *dst, time_t ut );
 char *localTimeString( char *dst, time_t ut );
 
 uint8_t swap( uint8_t c );
+uint16_t swap( uint16_t w );
+uint32_t swap( uint32_t dw );
 
 void dump( const uint8_t *data, uint32_t sz, Serial *s );
 void dump( const uint16_t *data, uint32_t sz, Serial *s );

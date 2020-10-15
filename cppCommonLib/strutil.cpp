@@ -753,6 +753,7 @@ void compileTime(int *hour, int *minute, int *second)
 ---------------------------------------- */
 char *localDateTimeString( char *dst, time_t ut )
 {
+  ut += TIMEZONE_JST;
   struct tm *t = localtime( (const time_t *)&ut );
   uint16_t year  = t->tm_year + 1900;
   uint8_t  month = t->tm_mon + 1;
@@ -1049,6 +1050,22 @@ uint8_t swap( uint8_t c )
   uint8_t upper = c >> 4;
   uint8_t lower = (c & 0x0F) << 4;
   return upper | lower;
+}
+
+uint16_t swap( uint16_t w )
+{
+  uint16_t upper = w >> 8;
+  uint16_t lower = (w & 0xFF) << 8;
+  return upper | lower;
+}
+
+uint32_t swap( uint32_t dw )
+{
+  uint32_t uu = (dw >> 24) & 0x000000FF;
+  uint32_t ul = (dw >> 8)  & 0x0000FF00;
+  uint32_t lu = (dw << 8)  & 0x00FF0000;
+  uint32_t ll = (dw << 24) & 0xFF000000;
+  return uu | ul | lu | ll;
 }
 
 /* ----------------------------------------
