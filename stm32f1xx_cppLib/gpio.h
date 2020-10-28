@@ -105,6 +105,7 @@ public:
   }
   uint16_t whatPin( int pin ) {return 0x0001 << pin % 16;}  /* response pin's define */
   uint8_t  whatPinSource( int pin ) {return pin % 16;}  /* response pin's source */
+  uint16_t  whatPinLine( int pin ) {return 0x0001 << whatPinSource(pin); }  /* response pin's line */
 
   void pinMode( GPIO_TypeDef *gpiox, uint16_t gpioPin, int type, int speed = GPIO_SPEED_FAST );
   void pinMode( int pin, int type, int speed = GPIO_SPEED_FAST );
