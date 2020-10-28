@@ -273,7 +273,6 @@ void unixTime_Set( time_t unixTime )
 void RTC_IRQHandler( void )
 {
   RTC->CRL &= ~RTC_CRL_SECF;  /* Clear status. */
-  sumTotalTime++;  /* Total time since startup. */
 #if 1
   unixTime = RTC_GetCounter();  /*unix time*/
 #else
