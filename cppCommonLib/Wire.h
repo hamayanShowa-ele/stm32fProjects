@@ -41,12 +41,12 @@ extern "C"
 /* ----------------------------------------
     defines
 ---------------------------------------- */
-#define I2C_SUCCESS                             (0)
-#define I2C_ERROR_WIRE_DATA_TOO_LONG            (-1)
-#define I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS (-2)
-#define I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA    (-3)
-#define I2C_ERROR_WIRE_OTHER_ERROR              (-4)
-#define I2C_BUS_BUSY                            (-5)
+#define  I2C_SUCCESS                             (0)
+#define  I2C_ERROR_WIRE_DATA_TOO_LONG            (-1)
+#define  I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS (-2)
+#define  I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA    (-3)
+#define  I2C_ERROR_WIRE_OTHER_ERROR              (-4)
+#define  I2C_BUS_BUSY                            (-5)
 
 /* ----------------------------------------
     register bit
@@ -83,10 +83,23 @@ public:
   void generalCallReset();
   void softReset();
 
+  int  isBusy();
+  int  startCondition();
+  int  sendAddressAndBehaveAsReceiver( uint8_t adr );
+  int  sendWordAddress( uint8_t wordAdr );
+  int  restartCondition();
+  int  sendAddressForRecieve( uint8_t adr );
+  int  getDataUntilSize( uint8_t *data, size_t sz );
+  void stopCondition();
+
 private:
   I2C_TypeDef *wire;
   GPIO_TypeDef *sdaPort,*sclPort;
+#if 0
   uint16_t sdaPin,sclPin;
+#else
+  int sdaPin,sclPin;
+#endif
 
   int pinsAlternate();
 };

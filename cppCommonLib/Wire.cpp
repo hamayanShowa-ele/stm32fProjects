@@ -23,7 +23,8 @@
 ---------------------------------------- */
 #include  <Wire.h>
 
-#define  TIMEOUT  5UL  /* 10ms */
+#define  TIMEOUT  5UL  /* 5ms */
+
 /* ----------------------------------------
     prototypes 
 ---------------------------------------- */
@@ -56,8 +57,8 @@ STM32F_I2C::~STM32F_I2C()
 int STM32F_I2C::pinsAlternate()
 {
   /* gpio set. */
-  pinMode( sdaPort, sdaPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
-  pinMode( sclPort, sclPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
+  pinMode( sdaPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
+  pinMode( sclPin, OUTPUT_OPEN_DRAIN, GPIO_SPEED_FAST );
 
   /* start condition. */
   digitalWrite( sdaPin, HIGH );  /* sda set 1 */
@@ -77,12 +78,7 @@ int STM32F_I2C::pinsAlternate()
 
   /* check bus busy. */
   dly10us(5UL);
-  if( !(sdaPort->IDR & sdaPin) || !(sclPort->IDR & sclPin) ) return I2C_ERROR_WIRE_OTHER_ERROR;
-
-  /* alternate function set. */
-//  GPIO_PinRemapConfig( GPIO_Remap_I2C1 , ENABLE );  // If you are using PB8 and PB9 in I2C1, then you will need a REMAP.
-  pinMode( sdaPort, sdaPin, ALTERNATE_OD, GPIO_SPEED_FAST );
-  pinMode( sclPort, sclPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+  if( digitalRead( sdaPin ) == LOW || digitalRead( sclPin ) == LOW ) return I2C_ERROR_WIRE_OTHER_ERROR;
 
   return I2C_SUCCESS;
 }
@@ -93,27 +89,30 @@ int STM32F_I2C::pinsAlternate()
 int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
 {
   /* initialize i2c bus. */
+  /* save scl and sda pin numbers. */
+  wire = i2c;
+  sdaPin = sda;
+  sclPin = scl;
+
+  /* clear i2c bus. */
+  if( pinsAlternate() < 0 ) return I2C_ERROR_WIRE_OTHER_ERROR;
+
+  /* alternate function set. */
+//  GPIO_PinRemapConfig( GPIO_Remap_I2C1 , ENABLE );  // If you are using PB8 and PB9 in I2C1, then you will need a REMAP.
+  pinMode( sdaPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+  pinMode( sclPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+
   if( i2c == I2C1 )
   {
-//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, ENABLE );
-//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C1, DISABLE );
+    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, ENABLE );
+    RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C1, DISABLE );
   }
   else if( i2c == I2C2 )
   {
-//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, ENABLE );
-//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C2, DISABLE );
+    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, ENABLE );
+    RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C2, DISABLE );
   }
   else return I2C_ERROR_WIRE_OTHER_ERROR;
-
-  /* save scl and sda pin numbers. */
-  wire = i2c;
-  sdaPin = whatPin( sda );
-  sclPin =  whatPin( scl );
-  sdaPort = whatGPIOType( sda );
-  sclPort = whatGPIOType( scl );
-
-  /* clear i2c bus. */
-//  if( pinsAlternate() < 0 ) return I2C_ERROR_WIRE_OTHER_ERROR;
 
   I2C_DeInit( wire );
   I2C_InitTypeDef I2C_InitStruct;
@@ -133,8 +132,13 @@ int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
 
 void STM32F_I2C::end()
 {
+#if 0
   pinMode( sdaPort, sdaPin, INPUT_PULLUP );
   pinMode( sclPort, sclPin, INPUT_PULLUP );
+#else
+  pinMode( sdaPin, INPUT_PULLUP );
+  pinMode( sclPin, INPUT_PULLUP );
+#endif
 }
 
 
@@ -440,6 +444,126 @@ int STM32F_I2C::read( const uint8_t *snd, size_t sndSize, uint8_t *rcv, size_t r
 
   return count;
 }
+
+/* ----------------------------------------
+    Roughly, processing for EEPROM.
+---------------------------------------- */
+/* While the bus is busy */
+int STM32F_I2C::isBusy()
+{
+  /* While the bus is busy */
+  SYSTIM baseTim = systim;
+  while( I2C_GetFlagStatus(wire, I2C_FLAG_BUSY) == SET )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* start condition */
+int STM32F_I2C::startCondition()
+{
+  I2C_GenerateSTART( wire, ENABLE );
+  //EV5 and clear it：マスターモードでstartコンディション完了後、通信を開始している事を確認している。
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_MODE_SELECT) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* Send module address and behave as receiver */
+int STM32F_I2C::sendAddressAndBehaveAsReceiver( uint8_t adr )
+{
+  I2C_Send7bitAddress( wire, adr << 1, I2C_Direction_Transmitter );
+  /* Test on EV6 and clear it */
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent(wire, I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED) == ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* Send word address for 24aa025e */
+int STM32F_I2C::sendWordAddress( uint8_t wordAdr )
+{
+  I2C_SendData( wire, wordAdr );
+  //EV8 and clear it：送信データレジスタ空き、データバイト(アドレスのR/Wbit)送信、通信中(BUS BUSY)、マスター
+  //EV8_2 and clear it：データbyte送信完了、送信データレジスタ空き、データバイト(アドレスのR/Wbit)送信、通信中(BUS BUSY)、マスター
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent( wire, I2C_EVENT_MASTER_BYTE_TRANSMITTED ) != ERROR)
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* restart condition */
+int STM32F_I2C::restartCondition()
+{
+  //restart condition
+  I2C_GenerateSTART( wire, DISABLE );
+  I2C_GenerateSTART( wire, ENABLE );
+  //EV5 and clear it：マスターモードでstartコンディション完了後、通信を開始している事を確認している。
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent( wire, I2C_EVENT_MASTER_MODE_SELECT ) == ERROR)
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_BUS_BUSY;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* Send control byte for 24aa025e */
+int STM32F_I2C::sendAddressForRecieve( uint8_t adr )
+{
+  I2C_Send7bitAddress( wire, adr << 1, I2C_Direction_Receiver);
+  //EV8 and clear it：送信データレジスタ空き、データバイト(アドレスのR/Wbit)送信、通信中(BUS BUSY)、マスター
+  //EV8_2 and clear it：データbyte送信完了、送信データレジスタ空き、データバイト(アドレスのR/Wbit)送信、通信中(BUS BUSY)、マスター
+  SYSTIM baseTim = systim;
+  while( I2C_CheckEvent( wire, I2C_EVENT_MASTER_BYTE_TRANSMITTED ) != ERROR )
+  {
+    if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_ADDRESS;
+    rot_rdq();
+  }
+  return I2C_SUCCESS;
+}
+
+/* Get data from 24aa025e until data size */
+int STM32F_I2C::getDataUntilSize( uint8_t *data, size_t sz )
+{
+  int cnt;
+  uint8_t c,*ptr;
+  for( cnt = 0, ptr = data; cnt < (int)sz; cnt++ )
+  {
+    SYSTIM baseTim = systim;
+    while( !I2C_CheckEvent( wire, I2C_EVENT_MASTER_BYTE_RECEIVED) )
+    {
+      if( (systim - baseTim) >= TIMEOUT ) return I2C_ERROR_WIRE_RECEIVED_NACK_OF_DATA;
+      rot_rdq();
+    }
+    /* Read a byte from the module */
+    c = I2C_ReceiveData( wire );
+    *ptr++ = c;
+  }
+  return cnt;
+}
+
+/* Send STOP Condition */
+void STM32F_I2C::stopCondition()
+{
+  /* Disable Acknowledgment */
+  I2C_AcknowledgeConfig( wire, DISABLE );
+  /* Send STOP Condition */
+  I2C_GenerateSTOP( wire, ENABLE );
+}
+
 
 /* ----------------------------------------
     i2c general call reset.
