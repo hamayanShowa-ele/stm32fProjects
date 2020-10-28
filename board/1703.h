@@ -49,6 +49,8 @@ public:
   ~BOARD();
 
   void gpioInit();
+  void etherGpioInit();
+  void etherReset();
 
 private:
 };

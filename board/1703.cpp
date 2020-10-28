@@ -136,6 +136,28 @@ void BOARD::gpioInit()
   /*  PD15： not used. */
 }
 
+/* ----------------------------------------
+    ethernet initialize.
+---------------------------------------- */
+void BOARD::etherGpioInit()
+{
+  pinMode( W5500_INT, INPUT );
+  pinMode( W5500_CS, OUTPUT );
+  pinMode( W5500_RESET, OUTPUT );
+  etherReset();
+}
+
+/* ----------------------------------------
+    ethernet reset.
+---------------------------------------- */
+void BOARD::etherReset()
+{
+  digitalWrite( W5500_CS, HIGH );
+  digitalWrite( W5500_RESET, LOW );  /* reset wizchip */
+  dly_tsk( 2UL );
+  digitalWrite( W5500_RESET, HIGH );
+}
+
 
 extern "C"
 {
