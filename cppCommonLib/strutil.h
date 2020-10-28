@@ -84,4 +84,6 @@ void dump( const uint8_t *data, uint32_t sz, Serial *s );
 void dump( const uint16_t *data, uint32_t sz, Serial *s );
 void dump( const uint32_t *data, uint32_t sz, Serial *s );
 
+float char2Float( const char *str );
+
 #endif  /*__STRUTIL_H__*/

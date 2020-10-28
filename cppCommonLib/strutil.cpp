@@ -1157,3 +1157,35 @@ void dump( const uint32_t *data, uint32_t sz, Serial *s )
   }
   s->puts( "\r\n" );
 }
+
+
+/* ----------------------------------------
+  characters convert to float value..
+---------------------------------------- */
+float char2Float( const char *str )
+{
+  int tempI = 0;
+  float tempF1 = 0.0F;
+  float tempF2 = 10.0F;
+  bool isLarge = true;
+  while( *str )
+  {
+    if( *str == '.' ) isLarge = false;
+    else if( !isdigit( *str ) ) break;
+    else
+    {
+      if( isLarge == true )
+      {
+        tempI *= 10;
+        tempI += *str - '0';
+      }
+      else
+      {
+        tempF1 += (float)(*str - '0') / tempF2;
+        tempF2 *= 10.0F;
+      }
+    }
+    str++;
+  }
+  return tempI + tempF1;
+}
