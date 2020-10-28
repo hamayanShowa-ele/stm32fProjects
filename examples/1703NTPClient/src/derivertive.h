@@ -18,11 +18,16 @@
 #define  BASE_SUB_PRIORITY  0
 
 /*
- defines for external cpu bus.
+  defines for w5500.
 */
-//#define  GLCD_DATA_BYTE_ADR   *((volatile uint8_t *)0x60020000)
-//#define  GLCD_DATA_WORD_ADR   *((volatile uint16_t *)0x60020000)
-//#define  GLCD_ADDRESS_SET     *((volatile uint8_t *)0x60000000)
+#define  _WIZCHIP_  5500
+#define  _WIZCHIP_IO_MODE_  _WIZCHIP_IO_MODE_SPI_VDM_
+#define  _WIZCHIP_CS_  PC7
+
+/*
+  time zone.
+*/
+#define TIMEZONE_JST    (9 * 60 * 60)
 
 /*
  defines for usart and uart.
@@ -83,12 +88,40 @@
 #define  BOARD_1703_IC3_ADR  0x21  /* PCA8574PW */
 #define  BOARD_1703_IC4_ADR  0x22  /* PCA8574PW */
 #define  BOARD_1703_U1_ADR   0x76  /* BME280 */
-#define  BOARD_1703_IC7_ADR  0x50  /* 24AA025E48 mac address i2c eeprom */
+//#define  BOARD_1703_IC7_ADR  0x50  /* 24AA025E48 mac address i2c eeprom */
 
-/* ANOTHER */
+/* ETHERNET */
+#define  ETH_SPI    SPI2
+#define  ETH_RCC    RCC_APB1Periph_SPI2
+#define  ETH_GPIO   GPIOB
+#define  ETH_SCK_PIN  GPIO_Pin_13
+#define  ETH_MOSI_PIN GPIO_Pin_15
+#define  ETH_MISO_PIN GPIO_Pin_14
+#define  ETH_CS_PORT  GPIOC
+#define  ETH_CS_PIN   GPIO_Pin_7
+
 #define  W5500_INT  PC5   /* input */
 #define  W5500_CS   PC7   /* output */
 #define  W5500_RESET PC8   /* output */
+#define  SPI2_SCK_PORT   GPIOB
+#define  SPI2_SCK_PIN    GPIO_Pin_13
+#define  SPI2_MISO_PORT  GPIOB
+#define  SPI2_MISO_PIN   GPIO_Pin_14
+#define  SPI2_MOSI_PORT  GPIOB
+#define  SPI2_MOSI_PIN   GPIO_Pin_15
+#define  SPI2_SCK        PB13
+#define  SPI2_MISO       PB14
+#define  SPI2_MOSI       PB15
+#define  W5500_CS_PORT   GPIOC
+#define  W5500_CS_PIN    GPIO_Pin_7
+#define  W5500_CS_IS_0   W5500_CS_PORT->BSRR = (W5500_CS_PIN << 16)
+#define  W5500_CS_IS_1   W5500_CS_PORT->BSRR = (W5500_CS_PIN)
+
+/* SNTP */
+#define  SNTP_CLIENT_SOCKET  1
+#define  TIME_ZONE           40  /* Korea, East Timor, Russia (Irkutsk Oblast), Japan */
+
+/* ANOTHER */
 #define  PPS        PC9   /* input/output */
 #define  GCLK_RESET PA8   /* output */
 #define  DIVCLK     PA11   /* input/output */
@@ -158,11 +191,12 @@ void cris_ex( void );  // start he interrupt.
 /*
  configures for multi tasks.
 */
-#define  MAX_TASK_NUMBER  2  //
+#define  MAX_TASK_NUMBER  3
 enum GR_SAKURA_TSK_ID
 {
   ID_stackMonitor,
-  ID_ppsGenerator,
+  ID_sntpClient,
+  ID_display,
 };
 
 #define  MAX_MBX_NUMBER    1
@@ -174,7 +208,7 @@ enum GR_SAKURA_MBX_ID
 #define  MAX_SEM_NUMBER    1
 enum GR_SAKURA_SEM_ID
 {
-  SEMID_GCLD = 1,
+  SEMID_SPI2 = 1,
 };
 
 /*
