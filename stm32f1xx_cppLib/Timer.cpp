@@ -28,7 +28,7 @@
 ---------------------------------------- */
 extern "C"
 {
-  void defaultHandler( void );
+  static void defaultHandler( void ) { while(1) ; }
 }
 
 /* ----------------------------------------
@@ -583,7 +583,6 @@ void STM32F_TIMER::slave( uint16_t parent, uint16_t prescaler, uint16_t period )
 ---------------------------------------- */
 extern "C"
 {
-void defaultHandler( void ) { while(1) ; }
 void TIM1_BRK_IRQHandler( void ){}
 void TIM1_TRG_COM_IRQHandler( void ){}
 void TIM1_UP_IRQHandler( void )
