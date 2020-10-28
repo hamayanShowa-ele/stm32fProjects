@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1703NTPServer.cogui
+1703NTPServer.comarker
+1703NTPServer.comemgui
+
+# not need cppGraphic folder
+1703NTPServer/
+
+# not need logs folder
+logs/
+
+
