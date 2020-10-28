@@ -25,35 +25,69 @@
 #define  __SPI_H__
 
 #include  <stm32fPeripheral.h>
+#include  <stdio.h>
 #include  <gpio.h>
+
+extern "C"
+{
+  #include <mul_tsk.h>
+  uint8_t spi_rw_SPI1( uint8_t out );
+  uint8_t spi_rw_SPI2( uint8_t out );
+  uint8_t spi_rw_SPI3( uint8_t out );
+  void waiSema_SPI1( void );
+  void waiSema_SPI2( void );
+  void waiSema_SPI3( void );
+  void sigSema_SPI1( void );
+  void sigSema_SPI2( void );
+  void sigSema_SPI3( void );
+}
 
 /* ----------------------------------------
     prototypes 
 ---------------------------------------- */
 
-
 /* ----------------------------------------
     defines
 ---------------------------------------- */
-
+#define  SPI_SUCCESS         (0)
+#define  SPI_BUS_BUSY        (-1)
+#define  SPI_SEMAPHORE_BUSY  (-2)
+#define  SPI_RECIEVE_TIMEOUT (-3)
 
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-
-class SPI  : public GPIO
+class SPI : public GPIO
 {
 public:
   SPI();
-  SPI( SPI_TypeDef *spi, uint8_t cs );
+  SPI( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
   ~SPI();
-  void begin( SPI_TypeDef *spi, uint8_t cs );
+  void begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
   void end();
-  int transfer( uint8_t data );
+  int  waiSema();
+  void sigSema();
+  int  isBusy();
+  int  isEmpty();
+  int  transmit( uint8_t data );
+  int  transmit( const uint8_t *data, size_t sz );
+  int  recieve( uint8_t *data );
+  int  recieve( uint8_t *data, size_t sz );
+
+  int  write( uint8_t csPin, uint8_t data );
+  int  write( uint8_t csPin, const uint8_t *data, size_t sz );
+  int  write( uint8_t csPin, uint16_t data );
+  int  read( uint8_t csPin );
+  int  read( uint8_t csPin, uint8_t *data, size_t sz );
+  uint16_t readUS( uint8_t csPin );
+
+  SPI_TypeDef *whatTypeDef() { return SPIx; }
 
 private:
   SPI_TypeDef *SPIx;
-  uint8_t csPin;
+  uint8_t sck,miso,mosi;
+  ID semaID;
+  uint32_t rcc;
 };
 
 
