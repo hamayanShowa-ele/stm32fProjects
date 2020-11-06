@@ -2,20 +2,26 @@
   ******************************************************************************
   * @file    stm32f10x_usart.c
   * @author  MCD Application Team
-  * @version V3.5.0
-  * @date    11-March-2011
+  * @version V3.6.1
+  * @date    05-March-2012
   * @brief   This file provides all the USART firmware functions.
   ******************************************************************************
   * @attention
   *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
   ******************************************************************************
   */
 
@@ -431,7 +437,7 @@ void USART_ITConfig(USART_TypeDef* USARTx, uint16_t USART_IT, FunctionalState Ne
 }
 
 /**
-  * @brief  Enables or disables the USARTç—´ DMA interface.
+  * @brief  Enables or disables the USART’s DMA interface.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -555,7 +561,7 @@ void USART_LINBreakDetectLengthConfig(USART_TypeDef* USARTx, uint16_t USART_LINB
 }
 
 /**
-  * @brief  Enables or disables the USARTç—´ LIN mode.
+  * @brief  Enables or disables the USART’s LIN mode.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -670,7 +676,7 @@ void USART_SetPrescaler(USART_TypeDef* USARTx, uint8_t USART_Prescaler)
 }
 
 /**
-  * @brief  Enables or disables the USARTç—´ Smart Card mode.
+  * @brief  Enables or disables the USART’s Smart Card mode.
   * @param  USARTx: where x can be 1, 2 or 3 to select the USART peripheral.
   * @param  NewState: new state of the Smart Card mode.
   *   This parameter can be: ENABLE or DISABLE.     
@@ -720,7 +726,7 @@ void USART_SmartCardNACKCmd(USART_TypeDef* USARTx, FunctionalState NewState)
 }
 
 /**
-  * @brief  Enables or disables the USARTç—´ Half Duplex communication.
+  * @brief  Enables or disables the USART’s Half Duplex communication.
   * @param  USARTx: Select the USART or the UART peripheral. 
   *   This parameter can be one of the following values:
   *   USART1, USART2, USART3, UART4 or UART5.
@@ -947,7 +953,8 @@ void USART_ClearFlag(USART_TypeDef* USARTx, uint16_t USART_FLAG)
   *     @arg USART_IT_TC:   Transmission complete interrupt
   *     @arg USART_IT_RXNE: Receive Data register not empty interrupt
   *     @arg USART_IT_IDLE: Idle line detection interrupt
-  *     @arg USART_IT_ORE:  OverRun Error interrupt
+  *     @arg USART_IT_ORE_RX : OverRun Error interrupt if the RXNEIE bit is set
+  *     @arg USART_IT_ORE_ER : OverRun Error interrupt if the EIE bit is set 
   *     @arg USART_IT_NE:   Noise Error interrupt
   *     @arg USART_IT_FE:   Framing Error interrupt
   *     @arg USART_IT_PE:   Parity Error interrupt
@@ -1055,4 +1062,4 @@ void USART_ClearITPendingBit(USART_TypeDef* USARTx, uint16_t USART_IT)
   * @}
   */
 
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
