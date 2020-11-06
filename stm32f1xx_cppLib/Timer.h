@@ -181,6 +181,8 @@ public:
   void callBack( int name, void(*cb)(void) );
   void rejectCallBack( int name );
 
+  void trigger( uint16_t trig );
+
 private:
   TIM_TypeDef *TIMx;
   uint32_t rcc;
@@ -188,7 +190,6 @@ private:
 
   void config( uint16_t prescaler, uint16_t period );
   int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
-  void trigger( uint16_t trig );
 
   uint8_t updateInterruptChannel();  /* timer update interrupt */
   uint8_t ccInterruptChannel();  /* timer compare capture interrupt */
