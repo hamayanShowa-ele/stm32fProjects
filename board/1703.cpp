@@ -158,8 +158,12 @@ void BOARD::etherReset()
   digitalWrite( W5500_RESET, HIGH );
 }
 
-
 extern "C"
 {
   /* If necessary, write the C code here. */
+/* ----------------------------------------
+    ethernet chip select and deselect.
+---------------------------------------- */
+void wizchip_select( void ) { W5500_CS_IS_0; }
+void wizchip_deselect( void ) { W5500_CS_IS_1; }
 }  /* extern "C" */

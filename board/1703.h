@@ -31,6 +31,8 @@ extern "C"
 {
   #include  <fsmc.h>
   #include  <system.h>
+  void wizchip_select( void );
+  void wizchip_deselect( void );
 }
 
 
