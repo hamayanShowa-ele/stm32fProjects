@@ -49,5 +49,8 @@ void dly10us( uint32_t dly_us );
 void dly100us( uint32_t dly_us );
 void dly1ms( uint32_t dly_ms );
 uint32_t millis( void );
+uint16_t getRevID( void );
+uint16_t getDevID( void );
+void getUniqueID( uint32_t id[] );
 
 #endif  /* __SYSTEM_H__ */

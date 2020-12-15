@@ -190,3 +190,34 @@ uint32_t millis( void )
 {
   return (uint32_t)systim;
 }
+
+/*****************************************************/
+/* get revision ID.  */
+/*****************************************************/
+uint16_t getRevID( void )
+{
+  DBGMCU_TypeDef dbg = *((DBGMCU_TypeDef *)DBGMCU);
+  return (uint16_t)(dbg.IDCODE >> 16);
+}
+
+/*****************************************************/
+/* get device ID.  */
+/*****************************************************/
+uint16_t getDevID( void )
+{
+  DBGMCU_TypeDef dbg = *((DBGMCU_TypeDef *)DBGMCU);
+  return (uint16_t)(dbg.IDCODE & 0x0FFF);
+}
+
+/*****************************************************/
+/* get unique ID.  */
+/*****************************************************/
+void getUniqueID( uint32_t id[] )
+{
+#if  defined(STM32F10X_HD)
+  #define  UNIQUE_ID_BASE_ADDRESS  0x1FFFF7E8
+#endif  /* defined(STM32F10X_HD) */
+  id[0] =  *((uint32_t *)UNIQUE_ID_BASE_ADDRESS + 0);
+  id[1] |= *((uint32_t *)UNIQUE_ID_BASE_ADDRESS + 4);
+  id[2] |= *((uint32_t *)UNIQUE_ID_BASE_ADDRESS + 8);
+}
