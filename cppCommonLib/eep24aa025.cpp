@@ -39,6 +39,10 @@ EEP24AA025::EEP24AA025( STM32F_I2C *_i2c, uint8_t adr )
   begin( _i2c, adr );
 }
 
+EEP24AA025::~EEP24AA025()
+{
+}
+
 
 /* ----------------------------------------
     begin and end

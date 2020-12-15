@@ -38,15 +38,17 @@ extern "C"
 }
 
 #define  I2C_ADR_24AA025E48         0x50  /* 24AA025E48 mac address i2c eeprom */
-#define  MAC_ADDRESS_IN_24AA025E48  0xFA  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
+#define  MAC_ADDRESS_IN_24AA025E48  0xFA  /* 00:1E:C0 or 80:1F:12 or 00:04:A3
+ is Microchip Technology Inc. vender code. */
 
 class EEP24AA025 //: public STM32F_I2C
 {
 public:
   EEP24AA025();
-  EEP24AA025( STM32F_I2C *_i2c, uint8_t adr );
-  void begin( STM32F_I2C *_i2c, uint8_t adr );
+  EEP24AA025( STM32F_I2C *_i2c, uint8_t adr = I2C_ADR_24AA025E48 );
+  ~EEP24AA025();
 
+  void begin( STM32F_I2C *_i2c, uint8_t adr = I2C_ADR_24AA025E48 );
   int  read( uint8_t wordAdr, uint8_t *data, size_t sz );
 
 private:
