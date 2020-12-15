@@ -94,25 +94,25 @@ int STM32F_I2C::begin( I2C_TypeDef *i2c, int sda, int scl, uint32_t speed )
   sdaPin = sda;
   sclPin = scl;
 
-  /* clear i2c bus. */
-  if( pinsAlternate() < 0 ) return I2C_ERROR_WIRE_OTHER_ERROR;
-
-  /* alternate function set. */
-//  GPIO_PinRemapConfig( GPIO_Remap_I2C1 , ENABLE );  // If you are using PB8 and PB9 in I2C1, then you will need a REMAP.
-  pinMode( sdaPin, ALTERNATE_OD, GPIO_SPEED_FAST );
-  pinMode( sclPin, ALTERNATE_OD, GPIO_SPEED_FAST );
-
-  if( i2c == I2C1 )
+  if( wire == I2C1 )
   {
     RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, ENABLE );
     RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C1, DISABLE );
   }
-  else if( i2c == I2C2 )
+  else if( wire == I2C2 )
   {
     RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, ENABLE );
     RCC_APB1PeriphResetCmd( RCC_APB1Periph_I2C2, DISABLE );
   }
   else return I2C_ERROR_WIRE_OTHER_ERROR;
+
+  /* clear i2c bus. */
+  if( pinsAlternate() < 0 ) return I2C_ERROR_WIRE_OTHER_ERROR;
+
+  /* alternate function set. */
+  if( sdaPin == PB9 ) GPIO_PinRemapConfig( GPIO_Remap_I2C1 , ENABLE );  // If you are using PB8 and PB9 in I2C1, then you will need a REMAP.
+  pinMode( sdaPin, ALTERNATE_OD, GPIO_SPEED_FAST );
+  pinMode( sclPin, ALTERNATE_OD, GPIO_SPEED_FAST );
 
   I2C_DeInit( wire );
   I2C_InitTypeDef I2C_InitStruct;
@@ -136,6 +136,16 @@ void STM32F_I2C::end()
   pinMode( sdaPort, sdaPin, INPUT_PULLUP );
   pinMode( sclPort, sclPin, INPUT_PULLUP );
 #else
+  /* stop i2c */
+  I2C_Cmd( wire, DISABLE );
+  if( wire == I2C1 )
+  {
+    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C1, DISABLE );
+  }
+  else if( wire == I2C2 )
+  {
+    RCC_APB1PeriphClockCmd( RCC_APB1Periph_I2C2, DISABLE );
+  }
   pinMode( sdaPin, INPUT_PULLUP );
   pinMode( sclPin, INPUT_PULLUP );
 #endif
