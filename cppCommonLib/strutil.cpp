@@ -753,6 +753,9 @@ void compileTime(int *hour, int *minute, int *second)
 ---------------------------------------- */
 char *localDateTimeString( char *dst, time_t ut )
 {
+#if !defined( TIMEZONE_JST )
+#define  TIMEZONE_JST  (9 * 3600UL)
+#endif
   ut += TIMEZONE_JST;
   struct tm *t = localtime( (const time_t *)&ut );
   uint16_t year  = t->tm_year + 1900;
