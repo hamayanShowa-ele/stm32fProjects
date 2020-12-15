@@ -1,5 +1,5 @@
 /* ----------------------------------------
-  gpio utilities
+  spi utilities
   for STMicroelectronics SPL library
 
   Copyright (c) 2020 hamayan (hamayan@showa-ele.jp).
@@ -53,6 +53,7 @@ SPI::~SPI()
 
 /* ----------------------------------------
     begin and end
+    w5100 is only supported in mode 0 or mode 3???.
 ---------------------------------------- */
 void SPI::begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id )
 {
@@ -67,9 +68,11 @@ void SPI::begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosi
   {
     GPIO_PinRemapConfig( GPIO_Remap_SPI1, ENABLE );
   }
+//  GPIO_PinRemapConfig( GPIO_Remap_SPI3, ENABLE );
   pinMode( sck, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( mosi, ALTERNATE_PP, GPIO_SPEED_FAST );
-  pinMode( miso, ALTERNATE_PP, GPIO_SPEED_FAST );
+//  pinMode( miso, ALTERNATE_PP, GPIO_SPEED_FAST );
+  pinMode( miso, INPUT );
 
   /* Enable spi1 clock enable. */
   if( SPIx == SPI1 )
@@ -100,13 +103,17 @@ void SPI::begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosi
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
   SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
   SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
-  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+
+//  SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
+//  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;  // mode 0
+  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
   /* APB1:36MHz PB2:72MHz */
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; // 72000kHz/4=18MHz This frequency is the limit.
 //  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // 72000kHz/8=9MHz
-//  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; // 72000kHz/4=18MHz This frequency is the limit.
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+//  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
   SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
   SPI_InitStructure.SPI_CRCPolynomial = 7;
   SPI_Init( SPIx, &SPI_InitStructure );
@@ -143,201 +150,59 @@ void SPI::end()
 ---------------------------------------- */
 int SPI::waiSema()
 {
-#if 0
-  /* Wait for the spi semaphore to be used. */
-  SYSTIM baseTim = systim;
-  while( pol_sem( semaID ) != E_OK )
+  if( semaID )
   {
-    if( (systim - baseTim) >= TIMEOUT ) return SPI_SEMAPHORE_BUSY;
-    rot_rdq();
-  }
+#if 0
+    /* Wait for the spi semaphore to be used. */
+    SYSTIM baseTim = systim;
+    while( pol_sem( semaID ) != E_OK )
+    {
+      if( (systim - baseTim) >= TIMEOUT ) return SPI_SEMAPHORE_BUSY;
+      rot_rdq();
+    }
 #else
-  wai_sem( semaID );
+    wai_sem( semaID );
 #endif
-  return SPI_SUCCESS;
+    return SPI_SUCCESS;
+  }
+  else return SPI_SUCCESS;
 }
 
 void SPI::sigSema()
 {
   /* end of process. */
-  sig_sem( semaID );
+  if( semaID ) sig_sem( semaID );
 }
 
 
 /* ----------------------------------------
-    isBusy?
+    read and write
 ---------------------------------------- */
-int SPI::isBusy()
+int SPI::readWrite( uint8_t wData )
 {
-  /* Wait for the transmit buffer to be empty. */
-  SYSTIM baseTim = systim;
-  while( SPI_I2S_GetFlagStatus( SPIx, SPI_I2S_FLAG_TXE ) == RESET )
-  {
-    if( (systim - baseTim) >= TIMEOUT ) return SPI_BUS_BUSY;
-    rot_rdq();
-  }
-  return SPI_SUCCESS;
-}
+  int ret;
+  /* Wait for the spi semaphore. */
+  if( (ret = waiSema()) != SPI_SUCCESS ) return ret;
 
-/* ----------------------------------------
-    isEmpty?
----------------------------------------- */
-int SPI::isEmpty()
-{
-  /* Wait for the recieve buffer to not empty. */
+  /* Send byte through the SPI1 peripheral */
+  SPI_I2S_SendData( SPIx, wData );
+
+  /* Wait to receive a byte */
   SYSTIM baseTim = systim;
   while( SPI_I2S_GetFlagStatus( SPIx, SPI_I2S_FLAG_RXNE ) == RESET )
   {
     if( (systim - baseTim) >= TIMEOUT ) return SPI_RECIEVE_TIMEOUT;
     rot_rdq();
   }
-  return SPI_SUCCESS;
-}
 
-/* ----------------------------------------
-    transmit
----------------------------------------- */
-int SPI::transmit( uint8_t data )
-{
-  int ret = isBusy();
-  if( ret != SPI_SUCCESS ) return ret;
-  SPI_I2S_SendData( SPIx, data );
-  return 1;
-}
-
-int SPI::transmit( const uint8_t *data, size_t sz )
-{
-  int count = 0;
-  for( ; count < (int)sz; count++ )
-  {
-    /* Wait for the transmit buffer to be empty. */
-    int ret = isBusy();
-    if( ret != SPI_SUCCESS ) return ret;
-    SPI_I2S_SendData( SPIx, *data++ );
-    rot_rdq();
-  }
-  return count;
-}
-
-/* ----------------------------------------
-    recieve
----------------------------------------- */
-int SPI::recieve( uint8_t *data )
-{
-  int ret;
-  /* transmit dummy data. */
-  if( (ret = transmit( 0xFF )) <= 0 ) return ret;
-
-  /* Wait for the recieve buffer to not empty. */
-  if( (ret = isEmpty()) != SPI_SUCCESS ) return ret;
-  *data = (uint8_t)SPI_I2S_ReceiveData( SPIx );
-  return 1;
-}
-
-int SPI::recieve( uint8_t *data, size_t sz )
-{
-  /* transmit dummy data and recieve data. */
-  int count = 0;
-  for( ; count < (int)sz; count++ )
-  {
-    int ret;
-    /* transmit dummy data. */
-    if( (ret = transmit( 0xFF )) != SPI_SUCCESS ) return ret;
-
-    /* Wait for the recieve buffer to not empty. */
-    if( (ret = isEmpty()) != SPI_SUCCESS ) return ret;
-    *data++ = (uint8_t)SPI_I2S_ReceiveData( SPIx );
-    rot_rdq();
-  }
-  return count;
-}
-
-/* ----------------------------------------
-    write
----------------------------------------- */
-int SPI::write( uint8_t csPin, uint8_t data )
-{
-  int ret;
-  /* Wait for the spi semaphore. */
-  if( (ret = waiSema()) != SPI_SUCCESS ) return ret;
-
-  /* transmit data. */
-  digitalWrite( csPin, LOW );
-  ret = transmit( data );
-  digitalWrite( csPin, HIGH );
+  /* Return the byte read from the SPI bus */
+  uint8_t rcv = SPI_I2S_ReceiveData( SPIx );
 
   /* end of process. */
   sigSema();
-  return ret;
+  return rcv & 0x00FF;
 }
 
-int SPI::write( uint8_t csPin, const uint8_t *data, size_t sz )
-{
-  int ret;
-  /* Wait for the spi semaphore. */
-  if( (ret = waiSema()) != SPI_SUCCESS ) return ret;
-
-  /* transmit data. */
-  digitalWrite( csPin, LOW );
-  ret = transmit( data, sz );
-  digitalWrite( csPin, HIGH );
-
-  /* end of process. */
-  sigSema();
-  return ret;
-}
-
-int SPI::write( uint8_t csPin, uint16_t data )
-{
-  return write( csPin, (const uint8_t *)&data, sizeof(uint16_t) );
-}
-
-/* ----------------------------------------
-    read
----------------------------------------- */
-int SPI::read( uint8_t csPin )
-{
-  int ret;
-  /* Wait for the spi semaphore. */
-  if( (ret = waiSema()) != SPI_SUCCESS ) return ret;
-  digitalWrite( csPin, LOW );
-
-  /* recieve data. */
-  uint8_t data;
-  if( (ret = recieve( &data )) <= 0 ) goto _end_of_process;
-  ret = data & 0xFF;
-
-  /* end of process. */
-_end_of_process :
-  digitalWrite( csPin, HIGH );
-  sigSema();
-  return ret;
-}
-
-int SPI::read( uint8_t csPin, uint8_t *data, size_t sz )
-{
-  int ret;
-  /* Wait for the spi semaphore. */
-  if( (ret = waiSema()) != SPI_SUCCESS ) return ret;
-  digitalWrite( csPin, LOW );
-
-  /* recieve data. */
-  if( (ret = recieve( data, sz )) <= 0 ) goto _end_of_process;
-
-  /* end of process. */
-_end_of_process :
-  digitalWrite( csPin, HIGH );
-  sigSema();
-  return ret;
-}
-
-uint16_t SPI::readUS( uint8_t csPin )
-{
-  uint16_t tempUS;
-  int ret = read( csPin, (uint8_t *)&tempUS, sizeof(uint16_t) );
-  if( ret != sizeof(uint16_t) ) return ret;
-  return tempUS;
-}
 
 extern "C"
 {
@@ -377,7 +242,8 @@ uint8_t spi_rw_SPI3( uint8_t out )
   /* Wait to receive a byte */
   while( SPI_I2S_GetFlagStatus( SPI3, SPI_I2S_FLAG_RXNE ) == RESET ) rot_rdq();
   /* Return the byte read from the SPI bus */
-  return SPI_I2S_ReceiveData( SPI3 );
+  uint8_t tempUC = SPI_I2S_ReceiveData( SPI3 );
+  return tempUC;
 }
 
 /* ----------------------------------------
@@ -471,5 +337,4 @@ void SPI3_IRQHandler( void )
     ;
   }
 }
-
 }  /* extern "C" */

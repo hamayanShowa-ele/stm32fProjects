@@ -59,35 +59,26 @@ extern "C"
 ---------------------------------------- */
 class SPI : public GPIO
 {
+private:
+  SPI_TypeDef *SPIx;
+  uint8_t sck,miso,mosi;
+  ID semaID;
+  uint32_t rcc;
+
+  int  waiSema();
+  void sigSema();
+
 public:
   SPI();
   SPI( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
   ~SPI();
   void begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
   void end();
-  int  waiSema();
-  void sigSema();
-  int  isBusy();
-  int  isEmpty();
-  int  transmit( uint8_t data );
-  int  transmit( const uint8_t *data, size_t sz );
-  int  recieve( uint8_t *data );
-  int  recieve( uint8_t *data, size_t sz );
-
-  int  write( uint8_t csPin, uint8_t data );
-  int  write( uint8_t csPin, const uint8_t *data, size_t sz );
-  int  write( uint8_t csPin, uint16_t data );
-  int  read( uint8_t csPin );
-  int  read( uint8_t csPin, uint8_t *data, size_t sz );
-  uint16_t readUS( uint8_t csPin );
+  int  readWrite( uint8_t data );
+  int  write( uint8_t data ) { return readWrite( data ); }
+  int  read() { return readWrite( 0xFF ); }
 
   SPI_TypeDef *whatTypeDef() { return SPIx; }
-
-private:
-  SPI_TypeDef *SPIx;
-  uint8_t sck,miso,mosi;
-  ID semaID;
-  uint32_t rcc;
 };
 
 
