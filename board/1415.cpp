@@ -345,13 +345,13 @@ void BOARD::extBusInit()
 
   /*読み込み側設定*/
   tcr->BIT.ACCMOD = 0;  /*access mode a*/
-  tcr->BIT.DATAST = 10;  /*original 13*/
-  tcr->BIT.ADDSET = 5;  /*original 10*/
+  tcr->BIT.DATAST = 10;  /*original 13 -> 10*/
+  tcr->BIT.ADDSET = 5;  /*original 10 -> 5 */
 
   /*書き込み側設定*/
   bwtr->BIT.ACCMOD = 0;  /**/
-  bwtr->BIT.DATAST = 10;  /*original 15*/
-  bwtr->BIT.ADDSET = 5;  /*original 10*/
+  bwtr->BIT.DATAST = 10;  /*original 15 -> 10*/
+  bwtr->BIT.ADDSET = 5;  /*original 10 -> 5*/
 }
 
 
