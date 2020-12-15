@@ -94,12 +94,16 @@ STM32F_TIMER tim1s;
 BD1702 bd1702;
 
 uint16_t reload;
-
+#if 0
 uint8_t MAC[6];      // self hardware address
-uint8_t IPVAL[4] = {192,168,100,230};  // self ip address
+//uint8_t IPVAL[4] = {192,168,100,230};  // self ip address
+uint8_t IPVAL[4] = {192,168,100,231};  // self ip address
 uint8_t GATEWAY[4] = {192,168,100,1};  // default gateway
 uint8_t SUBNET[4] = {255,255,255,0};   // sub net mask
 uint8_t DNS[4] = {192,168,100,1};      // primary dns server
+#else
+uint8_t xMAC[6];
+#endif
 
 /* ----------------------------------------
     tasks
@@ -135,6 +139,11 @@ int main(void)
   RCC_Configuration();
   NVIC_PriorityGroupConfig( NVIC_PriorityGroup_4 );
   NVIC_Configuration();
+
+  uint16_t rev = getRevID();
+  uint16_t dev = getDevID();
+  uint32_t uid[3];
+  getUniqueID( uid );
 
   /* Setup SysTick Timer for 1 millisec interrupts, also enables Systick and Systick-Interrupt */
   if( SysTick_Config(SystemCoreClock / 1000UL) )
@@ -180,21 +189,29 @@ int main(void)
   bd1702.setSecond( localTime.tm_sec );
   /* initialize 24AA025 */
   EEP24AA025 eep( &i2c2, I2C_ADR_24AA025E48 );
-  int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, MAC, sizeof(MAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
+  int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, xMAC, sizeof(xMAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
   if( cnt != 6 )
   {
     Serial1.printf( "  Mac address read from eeprom, but failed.\r\n" );
-    MAC[0] = 0xDE; MAC[1] = 0xAD; MAC[2] = 0xBE; MAC[3] = 0xEF; MAC[4] = 0x00; MAC[5] = 100;
+    xMAC[0] = 0xDE; xMAC[1] = 0xAD; xMAC[2] = 0xBE; xMAC[3] = 0xEF; xMAC[4] = 0x00; xMAC[5] = 100;
   }
 
   /* initialize w5500. */
   chronos.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );
+  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+
+  /* initialize wiznet w5500 */
+  wizchip.clearNetworkInfo();
+  wizchip.setMac( (const uint8_t *)xMAC );
+  wizchip.setIp( 192,168,100,231 );
+  wizchip.setGateway( 192,168,100,1 );
+  wizchip.setSubnet( 255,255,255,0 );
+  wizchip.setDns( 192,168,100,1 );
   /* The order of the memsize array is sending and receiving. */
   static const uint8_t memsize[2][8] = {{2,2,2,2,2,2,2,2},{2,2,2,2,2,2,2,2}};  /* txsize,rxsize */
-  wizchip.begin( &spi2, W5500_CS, (const uint8_t *)memsize );
+  wizchip.begin( &spi2, (const uint8_t *)memsize, wizchip_select, wizchip_deselect );
 
   /* start timer1 and timer8 for 1pps generator. */
   ppsGenerator();
