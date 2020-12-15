@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1314SDF7MainBasic.cogui
+1314SDF7MainBasic.comarker
+1314SDF7MainBasic.comemgui
+
+# not need cppGraphic folder
+1314SDF7MainBasic/
+
+# not need logs folder
+logs/
+
+
