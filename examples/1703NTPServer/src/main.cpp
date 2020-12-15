@@ -80,6 +80,7 @@ SEM_OBJECT sem_obj[ MAX_SEM_NUMBER ];
 
 volatile SYSTIM systim;
 volatile time_t unixTime;
+volatile time_t timeToWork;
 volatile uint32_t pps_millisecond_counter,ppsLostCount;
 uint16_t reload,reloadBase;
 time_t preGpsGmtTime,gpsGmtTime;
@@ -101,12 +102,8 @@ STM32F_TIMER tim1s;  /* second timer. */
 //STM32F_TIMER tim8;
 GPS_PPS gpsPPS;
 
-uint8_t MAC[6];      // self hardware address
-uint8_t IPVAL[4] = {192,168,100,69};  // self ip address
-//uint8_t IPVAL[4] = {192,168,100,230};  // self ip address
-uint8_t GATEWAY[4] = {192,168,100,1};  // default gateway
-uint8_t SUBNET[4] = {255,255,255,0};   // sub net mask
-uint8_t DNS[4] = {192,168,100,1};      // primary dns server
+uint8_t xMAC[6];   // self hardware address
+uint8_t IPVAL[4];  // 192,168,100,69 : self ip address
 
 /* ----------------------------------------
     tasks
@@ -187,25 +184,37 @@ int main(void)
   ic3.write( 0x40 );  /* output mode */
   /* initialize 24AA025 */
   EEP24AA025 eep( &i2c2, I2C_ADR_24AA025E48 );
-  int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, MAC, sizeof(MAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
+  int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, xMAC, sizeof(xMAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
   if( cnt != 6 )
   {
     Serial1.printf( "  Mac address read from eeprom, but failed.\r\n" );
-    MAC[0] = 0xDE; MAC[1] = 0xAD; MAC[2] = 0xBE; MAC[3] = 0xEF; MAC[4] = 0x00; MAC[5] = 100;
+    xMAC[0] = 0xDE; xMAC[1] = 0xAD; xMAC[2] = 0xBE; xMAC[3] = 0xEF; xMAC[4] = 0x00; xMAC[5] = 100;
   }
 
   /* initialize w5500. */
   chronos.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );
+  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+
+  /* initialize wiznet w5500 */
+  wizchip.setMac( (const uint8_t *)xMAC );
+  wizchip.setIp( 192,168,100,69 );
+  wizchip.setGateway( 192,168,100,1 );
+  wizchip.setSubnet( 255,255,255,0 );
+  wizchip.setDns( 192,168,100,1 );
   /* The order of the memsize array is sending and receiving. */
   static const uint8_t memsize[2][8] = {{2,2,2,2,2,2,2,2},{2,2,2,2,2,2,2,2}};  /* txsize,rxsize */
-  wizchip.begin( &spi2, W5500_CS, (const uint8_t *)memsize );
+  wizchip.begin( &spi2, (const uint8_t *)memsize, wizchip_select, wizchip_deselect );
+  wizchip.getIp( IPVAL );  // ip address
 
   /* regist gps 1pps interrupt. */
   extiCallBack( PPS_IRQ_NUMBER, gpsPPSInterrupt );
+#if  defined(  __GPS_TYPE_FURUNO__ )
+  extiConfig( PPS, EXTI_Trigger_Rising, 3, 0 );
+#elif  defined(  __GPS_TYPE_MT3339__ )
   extiConfig( PPS, EXTI_Trigger_Falling, 3, 0 );
+#endif  /*__GPS_TYPE_FURUNO__ or __GPS_TYPE_MT3339__ */
 
   /* start timer1 and timer8 for 1pps generator. */
   ppsGenerator();
@@ -237,7 +246,7 @@ void stackMonitor( void )
       Serial1.printf( "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
       Serial1.printf( "  TASK4:%d/%d\r\n", RemainStack( tsk4_stk, sizeof(tsk4_stk) ), sizeof(tsk4_stk) );
       char buffer[32];
-      Serial1.printf( "    %s\r\n", localDateTimeString( buffer, unixTime ) );
+      Serial1.printf( "    %s %lus\r\n", localDateTimeString( buffer, unixTime ), timeToWork );
     }
     if( (unixTime % 10) < 5 ) actLed.On();
     else actLed.Off();
@@ -299,7 +308,11 @@ void sntpServer( void )
 void gpsReciever( void )
 {
   /* initialize serial 5 */
+#if  defined(  __GPS_TYPE_FURUNO__ )
+  Serial5.begin( SCI_5, 38400UL, SCI_5_SND_BUFFER_SIZE, SCI_5_RCV_BUFFER_SIZE );
+#elif  defined(  __GPS_TYPE_MT3339__ )
   Serial5.begin( SCI_5, 9600UL, SCI_5_SND_BUFFER_SIZE, SCI_5_RCV_BUFFER_SIZE );
+#endif  /*__GPS_TYPE_FURUNO__ or __GPS_TYPE_MT3339__ */
   GNSS gnss( &Serial5 );
   GPS_GPZDA zda;
 
@@ -313,7 +326,11 @@ void gpsReciever( void )
     {
       struct tm gpsT;
       gnss.gpsGMTtime( (const GPS_GPZDA *)&zda, &gpsT );
+#if  defined(  __GPS_TYPE_FURUNO__ )
+      preGpsGmtTime = mktime( &gpsT );
+#elif  defined(  __GPS_TYPE_MT3339__ )
       preGpsGmtTime = mktime( &gpsT ) + 1;
+#endif  /*__GPS_TYPE_FURUNO__ or __GPS_TYPE_MT3339__ */
     }
     rot_rdq();
   }
@@ -333,7 +350,7 @@ void correctingTime( void )
     SYSTIM systimBase = systim;
     while( gpsPPS.update == gpsPPSupdateBase )
     {
-      if( (systim - systimBase) > 1 * 1000UL )
+      if( (systim - systimBase) >= 1100UL )
       {
         systimBase = systim;
         ppsLostCount++;
@@ -354,7 +371,7 @@ void correctingTime( void )
     else if( run == true )
     {
       /* microsecond */
-      double a = ((double)gpsPPS.us / (double)gpsPPS.ar) / 1000.0;
+      double a = ((double)gpsPPS.us / (double)(gpsPPS.ar + 1)) / 1000.0;
       /* millisecond */
       a += (double)gpsPPS.ms / 1000.0;
 #if 1
@@ -538,9 +555,9 @@ static void ppsGenerator( void )
   tim1s.pwm1( TIMx_CH4, DIVCLK, 500 );
 
   tim1ms.callBack( TIM5_INT_UP, msecInterrupt );
-//  tim1s.callBack( TIM1_INT_UP, secInterrupt );
+  tim1s.callBack( TIM1_INT_UP, secInterrupt );
   tim1ms.startInterrupt();
-//  tim1s.startInterrupt();
+  tim1s.startInterrupt();
 
   tim1ms.start();
   tim1s.start();
@@ -564,7 +581,7 @@ static void msecInterrupt( void )
 ---------------------------------------- */
 static void secInterrupt( void )
 {
-//  unixTime++;
+  timeToWork++;
 }
 
 /* ----------------------------------------
@@ -573,9 +590,9 @@ static void secInterrupt( void )
 static void gpsPPSInterrupt( void )
 {
   gpsPPS.us = tim1ms.getCounter();
+  gpsPPS.ar = tim1ms.getAutoReload();
 //  gpsPPS.ms = tim1s.getCounter();
   gpsPPS.ms = pps_millisecond_counter;
-  gpsPPS.ar = tim1ms.getAutoReload();
   gpsPPS.sec = (uint32_t)unixTime;
   gpsGmtTime = preGpsGmtTime;
   gpsPPS.update++;

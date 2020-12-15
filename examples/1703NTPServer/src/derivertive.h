@@ -10,6 +10,8 @@
 //#define  __BOARD_1303_1304_USE__
 //#define  __BOARD_0900_USE__
 //#define  __KANJI_USE__
+#define  __GPS_TYPE_FURUNO__
+//#define  __GPS_TYPE_MT3339__
 
 /*
   defines for interrupt

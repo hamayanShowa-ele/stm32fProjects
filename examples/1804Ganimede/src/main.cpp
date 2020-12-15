@@ -30,12 +30,15 @@
 #include  <time.h>
 #include  <gpioInit.h>
 #include  <HardwareSerial.h>
+#include  <strutil.h>
+#include  <boardUtility.h>
+#include  <led.h>
 
 extern "C"
 {
   #include  <peripheral.h>
   #include  <mul_tsk.h>
-  #include  <strutil.h>
+//  #include  <strutil.h>
 }
 
 /* ----------------------------------------
@@ -57,6 +60,7 @@ static unsigned int RemainStack( void *stk, unsigned int sz );
 SYSTIM systim;
 time_t unixTime;
 time_t startUpTime;
+LED actled;
 
 /* ----------------------------------------
   multi task.
@@ -127,6 +131,13 @@ int main(void)
   /*setup sci 5*/
   Serial Serial5( SCI_5, 115200UL, 64, 64 );
 
+  actled.begin( ACT_LED );
+//  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
+  while( 1 )
+  {
+    dly_tsk( 250UL );
+    actled.toggle();
+  }
   while( 1 )
   {
     if( Serial1.available() > 0 )
