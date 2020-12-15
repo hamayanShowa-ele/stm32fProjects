@@ -79,6 +79,11 @@
 #define WRP3_Mask                ((uint32_t)0xFF000000)
 #define OB_USER_BFB2             ((uint16_t)0x0008)
 
+/* FLASH Keys */
+#define RDP_Key                  ((uint16_t)0x00A5)
+#define FLASH_KEY1               ((uint32_t)0x45670123)
+#define FLASH_KEY2               ((uint32_t)0xCDEF89AB)
+
 /* FLASH BANK address */
 #define FLASH_BANK1_END_ADDRESS   ((uint32_t)0x807FFFF)
 
@@ -1432,8 +1437,8 @@ FlagStatus FLASH_GetFlagStatus(uint32_t FLASH_FLAG)
 /**
   * @brief  Clears the FLASH's pending flags.
   * @note   This function can be used for all STM32F10x devices.
-  *         - For STM32F10X_XL devices, this function clears Bank1 or Bank2’s pending flags
-  *         - For other devices, it clears Bank1’s pending flags.
+  *         - For STM32F10X_XL devices, this function clears Bank1 or Bank2ï¿½s pending flags
+  *         - For other devices, it clears Bank1ï¿½s pending flags.
   * @param  FLASH_FLAG: specifies the FLASH flags to clear.
   *   This parameter can be any combination of the following values:         
   *     @arg FLASH_FLAG_PGERR: FLASH Program error flag       
