@@ -28,26 +28,38 @@
 /* ----------------------------------------
   defines.
 ---------------------------------------- */
-#define  SYS_CLK            (168000000UL)
-#define  APB1_CLOCK         (42000000UL)
-#define  APB2_CLOCK         (84000000UL)
-#define  CK_INT_TIM1        (168000000UL)
-#define  CK_INT_TIM2        (84000000UL)
-#define  CK_INT_TIM3        (84000000UL)
-#define  CK_INT_TIM4        (84000000UL)
-#define  CK_INT_TIM5        (84000000UL)
-#define  CK_INT_TIM6        (84000000UL)
-#define  CK_INT_TIM7        (84000000UL)
-#define  CK_INT_TIM8        (168000000UL)
-#define  CK_INT_TIM9        (168000000UL)
-#define  CK_INT_TIM10       (168000000UL)
-#define  CK_INT_TIM11       (168000000UL)
-#define  CK_INT_TIM12       (84000000UL)
-#define  CK_INT_TIM13       (84000000UL)
-#define  CK_INT_TIM14       (84000000UL)
 
 //typedef  unsigned char   bool;
 //enum BOOL { FALSE = 0, TRUE = ~FALSE };
+
+#define  DPRAM_BASE_ADDRESS  (0x60000000UL)
+#define  DPRAM_SIZE          (8192)  // 4k * 16bit
+#define  DPRAM_INTR_ADDRESS  (DPRAM_BASE_ADDRESS + (0x0FFF * 2))
+
+#define  ADC1_BASE_ADDRESS  (0x64000000UL)
+#define  ADC2_BASE_ADDRESS  (0x68000000UL)
+
+/* ----------------------------------------
+ defines for usart and uart.
+---------------------------------------- */
+#define  SCI_1_SND_BUFFER_SIZE  256
+#define  SCI_1_RCV_BUFFER_SIZE  256
+#define  SCI_2_SND_BUFFER_SIZE  0
+#define  SCI_2_RCV_BUFFER_SIZE  0
+#define  SCI_3_SND_BUFFER_SIZE  0
+#define  SCI_3_RCV_BUFFER_SIZE  0
+#define  SCI_4_SND_BUFFER_SIZE  0
+#define  SCI_4_RCV_BUFFER_SIZE  0
+#define  SCI_5_SND_BUFFER_SIZE  0
+#define  SCI_5_RCV_BUFFER_SIZE  0
+#define  SCI_6_SND_BUFFER_SIZE  0
+#define  SCI_6_RCV_BUFFER_SIZE  0
+/*
+#define  SCI_7_SND_BUFFER_SIZE  0
+#define  SCI_7_RCV_BUFFER_SIZE  0
+#define  SCI_8_SND_BUFFER_SIZE  0
+#define  SCI_8_RCV_BUFFER_SIZE  0
+*/
 
 /* ----------------------------------------
   gpio port defines.
@@ -72,7 +84,9 @@
 #define  I2C1_SDA_SOURCE GPIO_PinSource7
 
 /*  PA9: TXD1 */
+#define  TXD1_PIN  PA9
 /*  PA10: RXD1 */
+#define  RXD1_PIN  PA10
 #define  USART1_TXD_PORT GPIOA
 #define  USART1_RXD_PORT GPIOA
 #define  USART1_TXD_PIN  GPIO_Pin_9
@@ -107,6 +121,7 @@
 #define  UART5_TXD_SOURCE  GPIO_PinSource12
 #define  UART5_RXD_SOURCE  GPIO_PinSource2
 
+#define  INTDP  PG3
 #define  EOLC1  PG5
 #define  EOLC2  PG4
 

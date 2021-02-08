@@ -28,11 +28,14 @@
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <time.h>
-#include  <gpioInit.h>
-#include  <HardwareSerial.h>
+#include  <USART_UART.h>
+#include  <EXTI.h>
 #include  <strutil.h>
 #include  <boardUtility.h>
 #include  <led.h>
+
+#include  <1804.h>
+#include  <1411.h>
 
 extern "C"
 {
@@ -48,11 +51,11 @@ extern "C"
 /* ----------------------------------------
   prototypes.
 ---------------------------------------- */
-void gpioInit( void );
-
 void RCC_Configuration( void );
 void NVIC_Configuration( void );
 static unsigned int RemainStack( void *stk, unsigned int sz );
+
+extern void cbINTDP( void );
 
 /* ----------------------------------------
   global variables and instance.
@@ -61,6 +64,9 @@ SYSTIM systim;
 time_t unixTime;
 time_t startUpTime;
 LED actled;
+USART_UART Serial1;
+BOARD_1804 bd1804;
+BOARD_1411 bd1411;
 
 /* ----------------------------------------
   multi task.
@@ -98,13 +104,7 @@ int main(void)
   compileDate( &year, &month, &day );
   int hour,minute,second;
   compileTime( &hour, &minute, &second );
-  localTime.tm_year = year - 1900;
-  localTime.tm_mon = month - 1;
-  localTime.tm_mday = day;
-  localTime.tm_hour = hour;
-  localTime.tm_min = minute;
-  localTime.tm_sec = second;
-  unixTime = mktime( &localTime );
+  unixTime = localDateTimeToUnixtime( year, month, day, hour, minute, second );
   startUpTime = unixTime;
 
   RCC_Configuration();
@@ -118,55 +118,31 @@ int main(void)
   }
 
   /* initialize board gpio */
-  GPIO_INIT board;
-  board.extBus();
-  board.exti( EOLC1, EXTI_Trigger_Falling );
-  board.exti( EOLC2, EXTI_Trigger_Falling );
+//  GPIO_INIT board;
+  bd1804.gpioInit();
+  bd1804.extBus();
+  /* initialize leds. */
+  actled.begin( ACT_LED );
 
   /*setup sci 1*/
-  Serial Serial1( SCI_1, 115200UL, 64, 64 );
-  Serial1.puts( "1804 GANYMEDE test program from SCI_1.\r\n    designed by hamayan.\r\n" );
-  /*setup sci 4*/
-  Serial Serial4( SCI_4, 115200UL, 64, 64 );
-  /*setup sci 5*/
-  Serial Serial5( SCI_5, 115200UL, 64, 64 );
+  Serial1.begin( USART1, 115200UL, TXD1_PIN, RXD1_PIN );
+  Serial1.print( "1804 GANYMEDE test program from USART1.\r\n    designed by hamayan.\r\n" );
+//  Serial1.loopBack();
 
-  actled.begin( ACT_LED );
+  dly_tsk( 5 *1000UL );
+  /* configure exti. */
+  extiConfig( INTDP, EXTI_Trigger_Falling );
+  extiCallBack( 3, cbINTDP );
+//  extiConfig( EOLC1, EXTI_Trigger_Falling );
+//  extiConfig( EOLC2, EXTI_Trigger_Falling );
+
 //  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
-  while( 1 )
-  {
-    dly_tsk( 250UL );
-    actled.toggle();
-  }
-  while( 1 )
-  {
-    if( Serial1.available() > 0 )
-    {
-      char buffer[10 + 1];
-      char c = Serial1.read();
-      for( int i = 0; i < 10; i++ )
-      {
-        buffer[i] = c;
-      }
-      buffer[10] = '\0';
-      Serial4.printf( buffer );
-    }
-    if( Serial4.available() > 0 )
-    {
-      char buffer[2];
-      buffer[0] = Serial4.read();
-      buffer[1] = '\0';
-      Serial5.printf( buffer );
-    }
-    if( Serial5.available() > 0 )
-    {
-      char buffer[2];
-      buffer[0] = Serial5.read();
-      buffer[1] = '\0';
-      Serial1.printf( buffer );
-    }
-  }
+//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
+//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, (uint16_t)0xA5A5, &actled ); /* fixed */
+  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
 
+  /* configure 1411 board. */
+//  bd1411.begin( PF11, PF10, PF9, PF8 );
 
   tsk_ini();  /* initialize tasks. */
   sta_rdq( ID_stackMonitor );
@@ -219,7 +195,7 @@ void RCC_Configuration( void )
      initialize the PLL and update the SystemFrequency variable. */
   SystemInit();
 
-  /*stm32f407zetなので、ポートの最大はPGまでとなる*/
+  /* clock enable for gpio. */
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
@@ -233,8 +209,8 @@ void RCC_Configuration( void )
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
 
   /* FSMC clock enable */
-  RCC_AHB3PeriphResetCmd( RCC_AHB3Periph_FSMC, DISABLE );
-  RCC_AHB3PeriphClockCmd( RCC_AHB3Periph_FSMC, ENABLE );
+//  RCC_AHB3PeriphResetCmd( RCC_AHB3Periph_FSMC, DISABLE );
+//  RCC_AHB3PeriphClockCmd( RCC_AHB3Periph_FSMC, ENABLE );
 
   /* Enable clock for SYSCFG. When using an EXTI interrupt. */
   RCC_APB2PeriphClockCmd( RCC_APB2Periph_SYSCFG, ENABLE );
@@ -267,28 +243,6 @@ void SysTick_Handler(void)
   if( !(systim % 1000UL) )  /* 1sec update */
   {
     unixTime++;
-  }
-}
-
-/* ----------------------------------------
-    exti4 interrupt handler.
----------------------------------------- */
-void EXTI4_IRQHandler( void )
-{
-  if( EXTI_GetITStatus( EXTI_Line4 ) == SET )  /*XOVR*/
-  {
-    EXTI_ClearITPendingBit( EXTI_Line4 );  /*割込み要求要因の解除*/
-  }
-}
-
-/* ----------------------------------------
-    exti5,6,7,8,9 interrupt handler.
----------------------------------------- */
-void EXTI9_5_IRQHandler( void )
-{
-  if( EXTI_GetITStatus( EXTI_Line5 ) == SET )  /*XOVR*/
-  {
-    EXTI_ClearITPendingBit( EXTI_Line5 );  /*割込み要求要因の解除*/
   }
 }
 
