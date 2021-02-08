@@ -23,6 +23,14 @@
 #define  CBUS_IO_ADR     (CBUS_BASE_ADR + 0x00000000)
 #define  CBUS_MEM_ADR    (CBUS_BASE_ADR + 0x00800000)
 
+//#define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x074000)
+#define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x080000)
+//#define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x072000)  // semaphore address
+
+#define  GANYMEDE_MEM_ADR    (CBUS_MEM_ADR + 0x070000)
+#define  GANYMEDE_MEM_SIZE   (8192)  // 4k * 16bit
+#define  DPRAM_INTR_ADDRESS  (GANYMEDE_MEM_ADR + (0x0FFF * 2))
+
 /*
   time zone.
 */
@@ -75,6 +83,13 @@
 #define  UART5_TXD_PIN       GPIO_Pin_12
 #define  UART5_RXD_PIN       GPIO_Pin_2
 
+/* c-bus enable. */
+//#define  BUS_ENB     PF11
+#define  BUS_ENB_PORT  GPIOF
+#define  BUS_ENB_PIN   GPIO_Pin_11
+#define  BUS_ENB_IS_0  BUS_ENB_PORT->BSRR = (BUS_ENB_PIN << 16)
+#define  BUS_ENB_IS_1  BUS_ENB_PORT->BSRR = (BUS_ENB_PIN << 0)
+
 /* I2C1,I2C2 */
 #define  SCL1       PB7
 #define  SDA1       PB6
@@ -126,6 +141,7 @@
 #define  EXT_BUS_NE4  PG12
 #define  EXT_BUS_BLE  PE0
 #define  EXT_BUS_BHE  PE1
+#define  EXT_BUS_WAIT PD6
 
 /* ETHERNET */
 
@@ -190,6 +206,7 @@ void Dly100us( int delay );
 void cris_en( void );  // stop he interrupt.
 void cris_ex( void );  // start he interrupt.
 #endif
+
 
 /*
  configures for multi tasks.

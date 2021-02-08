@@ -35,6 +35,7 @@
     graphic controller TE interrupt handler
     60Hz(17ms period)
 ---------------------------------------- */
+#if 0
 void EXTI3_IRQHandler( void )
 {
 //  EXTI->PR = 0x00000008;  /* release pending interrupt request. */
@@ -53,4 +54,5 @@ void EXTI3_IRQHandler( void )
   if( ++wptr >= ave_xy_tbl_size ) wptr = 0;
 #endif
 }
+#endif
 

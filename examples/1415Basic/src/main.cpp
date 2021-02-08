@@ -29,6 +29,8 @@
 #include  <gpio.h>
 #include  <HardwareSerial.h>
 #include  <Timer.h>
+#include  <EXTI.h>
+//#include  <FSMC.h>
 #include  <led.h>
 #include  <1415.h>
 #include  <2007.h>
@@ -56,6 +58,14 @@ void NVIC_Configuration( void );
 void tim1Interrupt( void );
 void tim8Interrupt( void );
 
+static uint16_t dpRamDividRead( const uint16_t *ram );
+static void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led );
+static void dpRamRead( const void *ram, size_t size, uint16_t fixed, LED *led );
+static void dpRamRead( const void *ram, size_t size, LED *led );
+
+void cbGANYMEDE_CALL( void );
+volatile uint8_t ganymedeUpdate;
+
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
@@ -66,8 +76,10 @@ volatile time_t unixTime;
 
 GPIO gpio;
 Serial Serial1;  /* hardware serial 1 */
-BOARD  cbus;
+BOARD_1415 cbus;
 LED actLed;
+
+volatile static uint16_t dummy;
 
 /* ----------------------------------------
     tasks
@@ -108,10 +120,8 @@ int main(void)
   actLed.begin( ACTLED );
   cbus.cbusEnable( true );
   cbus.cbusReset();
-  SRAM_8M sram( 0x00080000, 0x0200 );
-  int ret = sram.sram8m();
-  if( ret == 0 ) { while( 1 ) {dly_tsk( 5000UL ); actLed.toggle();} }
-  else { while( 1 ) {dly_tsk( 250UL ); actLed.toggle();} }
+  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+//  while( 1 ) rot_rdq();
 
   if( RTC_Init() != 0 )
   {
@@ -130,6 +140,19 @@ int main(void)
   Serial1.printf( "    1415 ARM CBUS LONG\r\n" );
   Serial1.printf( "    designed by hamayan.\r\n" );
 //  serialLoopBack( &Serial1 );
+
+  extiConfig( PF10, EXTI_Trigger_Falling );
+  extiCallBack( 10, cbGANYMEDE_CALL );
+//  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
+//  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
+  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+//  ramCheck( (void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+/*
+  SRAM_8M sram( 0x00080000, 0x0200 );
+  int ret = sram.sram8m();
+  if( ret == 0 ) { while( 1 ) {dly_tsk( 5000UL ); actLed.toggle();} }
+  else { while( 1 ) {dly_tsk( 250UL ); actLed.toggle();} }
+*/
 
   /* initialize tasks and start dispatch. */
   tsk_ini();  //
@@ -234,3 +257,182 @@ void NVIC_Configuration( void )
   /* Set the Vector Table base location at 0x08000000+_isr_vectorsflash_offs */
   NVIC_SetVectorTable( NVIC_VectTab_FLASH, 0 );  // VECT_TAB_OFFSET = 0
 }
+
+
+/* ----------------------------------------
+  dpram read and check.
+---------------------------------------- */
+/* ----------------------------------------
+  dpram divid read.
+---------------------------------------- */
+static uint16_t dpRamDividRead( volatile const uint16_t *ram )
+{
+  volatile uint16_t h,l;
+
+  h = *ram++;
+  l = *ram;
+  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+  h &= 0x00FF;
+  l &= 0x00FF;
+
+  return (h << 8 | l);
+}
+
+/* ----------------------------------------
+  random pattern read and check.
+---------------------------------------- */
+static void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led )
+{
+  uint16_t loop = 0;
+  uint32_t baseTim = millis();
+  srand( seed );
+  size /= sizeof(uint16_t);
+  while( true )
+  {
+    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
+
+    volatile uint8_t ganymedeUpdateBase = ganymedeUpdate;
+    while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+
+    for( int i = 0; i < (int)size; i++ )
+    {
+      uint16_t rnd = (uint16_t)rand() & 0x00FF;
+      uint16_t dat = *ptr++ & 0x00FF;
+      if( i < 4096 && dat != rnd )
+      {
+        while( true )
+        {
+          dly_tsk( 50UL );
+          led->toggle();
+          break;
+        }
+      }
+    }
+    volatile uint16_t *intr = (volatile uint16_t *)DPRAM_INTR_ADDRESS;
+    *intr = loop++;
+    if( (millis() - baseTim) >= 500UL )
+    {
+      baseTim = millis();
+      led->toggle();
+    }
+  }
+}
+
+/* ----------------------------------------
+  fixed pattern read and check.
+---------------------------------------- */
+static void dpRamRead( const void *ram, size_t size, uint16_t fixed, LED *led )
+{
+  uint16_t loop = 0;
+  uint32_t baseTim = millis();
+  size /= sizeof(uint16_t);
+  while( true )
+  {
+    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
+
+    volatile uint8_t ganymedeUpdateBase = ganymedeUpdate;
+    while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+
+    for( int i = 0; i < (int)size; i++ )
+    {
+      uint16_t rnd = fixed & 0x00FF;
+      uint16_t dat = *ptr++ & 0x00FF;
+      if( i < 4096 && dat != rnd )
+      {
+        while( true )
+        {
+          dly_tsk( 50UL );
+          led->toggle();
+          break;
+        }
+      }
+    }
+    volatile uint16_t *intr = (volatile uint16_t *)DPRAM_INTR_ADDRESS;
+    *intr = loop++;
+    if( (millis() - baseTim) >= 500UL )
+    {
+      baseTim = millis();
+      led->toggle();
+    }
+  }
+}
+
+/* ----------------------------------------
+  increment pattern read and check.
+---------------------------------------- */
+static void dpRamRead( const void *ram, size_t size, LED *led )
+{
+  uint16_t loop = 1234;
+  uint16_t data = 0;
+  uint32_t baseTim = millis();
+  uint8_t ganymedeUpdateBase = ganymedeUpdate;
+  while( true )
+  {
+    while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+    ganymedeUpdateBase = ganymedeUpdate;
+
+    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
+#if 0
+    int sz = size / (sizeof(uint16_t) * 2);
+    for( int i = 0; i < sz; i++ )
+    {
+      uint16_t rnd;
+      if( i & 1 ) rnd = data ^ 0xFFFF;
+      else rnd = data;
+      data++;
+      uint16_t rcv = dpRamDividRead( ptr );
+      if( i < 2048 && rcv != rnd )
+      {
+        dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+        while( true )
+        {
+          dly_tsk( 50UL );
+          led->toggle();
+//          break;
+        }
+      }
+      ptr += 2;
+    }
+#else
+    int sz = size / (sizeof(uint16_t) * 1);
+    for( int i = 0; i < sz; i++ )
+    {
+      uint16_t rnd;
+      if( i & 1 ) rnd = data ^ 0xFFFF;
+      else rnd = data;
+      uint16_t rcv = *ptr;
+      if( i < 4096 && rcv != rnd )
+      {
+        dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+        while( true )
+        {
+          dly_tsk( 50UL );
+          led->toggle();
+//          break;
+        }
+      }
+      data++;
+      ptr++;
+    }
+#endif
+    *((volatile uint16_t *)DPRAM_INTR_ADDRESS) = loop++;
+    dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+
+    if( (millis() - baseTim) >= 500UL )
+    {
+      baseTim = millis();
+      led->toggle();
+    }
+  }
+}
+
+
+
+/* ----------------------------------------
+  dpram int call back routine.
+---------------------------------------- */
+void cbGANYMEDE_CALL( void )
+{
+  ganymedeUpdate++;
+}
+
