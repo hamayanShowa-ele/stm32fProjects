@@ -42,9 +42,9 @@ SPI::SPI()
 {
 }
 
-SPI::SPI( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id )
+SPI::SPI( SPI_TypeDef *spi, ID id, bool _remap )
 {
-  begin( spi, sckPin, misoPin, mosiPin, id );
+  begin( spi, id, _remap );
 }
 
 SPI::~SPI()
@@ -55,60 +55,62 @@ SPI::~SPI()
     begin and end
     w5100 is only supported in mode 0 or mode 3???.
 ---------------------------------------- */
-void SPI::begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id )
+int SPI::begin( SPI_TypeDef *spi, ID id, bool _remap )
 {
   SPIx = spi;
   semaID = id;
-  sck = sckPin;
-  miso = misoPin;
-  mosi = mosiPin;
 
-  /* alternate function. */
-  if( spi == SPI1 && (sck == PB3 || miso == PB4 || mosi == PB5) )
-  {
-    GPIO_PinRemapConfig( GPIO_Remap_SPI1, ENABLE );
-  }
-//  GPIO_PinRemapConfig( GPIO_Remap_SPI3, ENABLE );
-  pinMode( sck, ALTERNATE_PP, GPIO_SPEED_FAST );
-  pinMode( mosi, ALTERNATE_PP, GPIO_SPEED_FAST );
-//  pinMode( miso, ALTERNATE_PP, GPIO_SPEED_FAST );
-  pinMode( miso, INPUT );
-
-  /* Enable spi1 clock enable. */
+  /* spi interface case by case. */
   if( SPIx == SPI1 )
   {
-    rcc = RCC_APB2Periph_SPI1;
-    RCC_APB2PeriphClockCmd( rcc, ENABLE );
-    RCC_APB2PeriphResetCmd( rcc, DISABLE );
-    semaIDv[0] = semaID;
+    rccClockEnable( RCC_SPI1 );
+    if( _remap )
+    {
+      rccClockEnable( RCC_GPIOB );
+      remap( REMAP_SPI1 );
+      sck = PB3;
+      mosi = PB5;
+      miso = PB4;
+    }
+    else
+    {
+      rccClockEnable( RCC_GPIOA );
+      sck = PA5;
+      mosi = PA7;
+      miso = PA6;
+    }
   }
   else if( SPIx == SPI2 )
   {
-    rcc = RCC_APB1Periph_SPI2;
-    RCC_APB1PeriphClockCmd( rcc, ENABLE );
-    RCC_APB1PeriphResetCmd( rcc, DISABLE );
-    semaIDv[1] = semaID;
+    rccClockEnable( RCC_SPI2 );
+    rccClockEnable( RCC_GPIOB );
+    sck = PB13;
+    mosi = PB15;
+    miso = PB14;
   }
   else if( SPIx == SPI3 )
   {
-    rcc = RCC_APB1Periph_SPI3;
-    RCC_APB1PeriphClockCmd( rcc, ENABLE );
-    RCC_APB1PeriphResetCmd( rcc, DISABLE );
-    semaIDv[2] = semaID;
+    rccClockEnable( RCC_SPI3 );
+    rccClockEnable( RCC_GPIOB );
+    sck = PB3;
+    mosi = PB5;
+    miso = PB4;
   }
-  else return;
+  else return SPI_IF_ERROR;
 
-  /* initialize spi. */
-  SPI_InitTypeDef SPI_InitStructure;
-  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+  /* spi gpio configuration. */
+  /* alternate functions. */
+  pinMode( sck, ALTERNATE_PP, GPIO_SPEED_FAST );
+  pinMode( mosi, ALTERNATE_PP, GPIO_SPEED_FAST );
+  pinMode( miso, INPUT, GPIO_SPEED_FAST );
 
-//  SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
-//  SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;  // mode 0
+  /* spi configuration. */
+  SPI_InitTypeDef   SPI_InitStructure;
+  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex; // full duplex
+  SPI_InitStructure.SPI_Mode = SPI_Mode_Master; // mode is master.
+  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b; // data length
+  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;  /* mode 0 */
   SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-
   SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
   /* APB1:36MHz PB2:72MHz */
   SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4; // 72000kHz/4=18MHz This frequency is the limit.
@@ -121,8 +123,10 @@ void SPI::begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosi
   SPI_Cmd( SPIx, ENABLE );
 
   /* drain SPI */
-  while( SPI_I2S_GetFlagStatus( SPIx, SPI_I2S_FLAG_TXE ) == RESET ) { rot_rdq(); }
-  uint8_t dummyread = SPI_I2S_ReceiveData( SPIx );
+  while( SPI_I2S_GetFlagStatus( SPIx, SPI_I2S_FLAG_TXE ) == RESET ) {}
+  volatile uint8_t dummyread = SPI_I2S_ReceiveData( SPIx );
+
+  return SPI_SUCCESS;
 }
 
 void SPI::end()
@@ -191,7 +195,7 @@ int SPI::readWrite( uint8_t wData )
   SYSTIM baseTim = systim;
   while( SPI_I2S_GetFlagStatus( SPIx, SPI_I2S_FLAG_RXNE ) == RESET )
   {
-    if( (systim - baseTim) >= TIMEOUT ) return SPI_RECIEVE_TIMEOUT;
+    if( (systim - baseTim) >= TIMEOUT ) { sigSema(); return SPI_RECIEVE_TIMEOUT; }
     rot_rdq();
   }
 
