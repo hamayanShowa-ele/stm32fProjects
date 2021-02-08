@@ -53,4 +53,8 @@ uint16_t getRevID( void );
 uint16_t getDevID( void );
 void getUniqueID( uint32_t id[] );
 
+#define  CYCLE_COUNTER()  (DWT->CYCCNT)
+#define  CPU_CLOCK()      (SystemCoreClock)
+
+
 #endif  /* __SYSTEM_H__ */
