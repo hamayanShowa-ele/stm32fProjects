@@ -68,10 +68,13 @@ public:
 
   void begin( SPI *_spi, uint8_t cs, uint32_t sz = SRAM_23LCxxx_SIZE );
   int  mode( uint8_t mode, uint8_t reg );
+  uint8_t mode();
   int  write( uint32_t addr, uint8_t data );
   int  write( uint32_t addr, const uint8_t *data, int size );
-  int  read( uint32_t addr, uint8_t *data );
-  int  read( uint32_t addr, uint8_t *data, int size );
+  int  byteRead( uint32_t addr, uint8_t *data );
+  int  byteRead( uint32_t addr, uint8_t *data, int size );
+  int  sequRead( uint32_t addr, uint8_t *data, int size );
+  int  sequWrite( uint32_t addr, const uint8_t *data, int size );
   int  fill( uint32_t addr, uint8_t data, int size );
 };
 

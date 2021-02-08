@@ -1,5 +1,5 @@
 /* ----------------------------------------
-  EEPROM 24aa025 utilities
+  ERIAL SRAM 23LC1024 or 23LC512 utilities
   for STMicroelectronics SPL library
 
   THE SOURCE CODE OF THE FOLLOWING url WAS MODIFIED FOR STM32F.
@@ -109,7 +109,7 @@ int SRAM_23LC1024::fill( uint32_t addr, uint8_t data, int size )
 /* ----------------------------------------
    sram read
 ---------------------------------------- */
-int SRAM_23LC1024::read( uint32_t addr, uint8_t *data )
+int SRAM_23LC1024::byteRead( uint32_t addr, uint8_t *data )
 {
   int ret;
   uint8_t snd[4];
@@ -132,17 +132,72 @@ int SRAM_23LC1024::read( uint32_t addr, uint8_t *data )
   return SPI_SUCCESS;
 }
 
-int SRAM_23LC1024::read( uint32_t addr, uint8_t *data, int size )
+int SRAM_23LC1024::byteRead( uint32_t addr, uint8_t *data, int size )
 {
   int ret;
   for( int i = 0; i < size; i++ )
   {
-    ret = read( addr, data );
+    ret = byteRead( addr, data );
     if( ret < SPI_SUCCESS ) return ret;
     addr++;
     data++;
   }
   return ret;
+}
+
+/* ----------------------------------------
+   sram  sequential read
+---------------------------------------- */
+int SRAM_23LC1024::sequRead( uint32_t addr, uint8_t *data, int size )
+{
+  int ret;
+  uint8_t snd[4];
+  snd[0] = SRAM_23LCxxx_MODE_READ;
+  snd[1] = (uint8_t)(addr >> 16);
+  snd[2] = (uint8_t)(addr >> 8);
+  snd[3] = (uint8_t)(addr >> 0);
+
+  CS_IS_LOW_0;
+  for( int i = 0; i < (int)sizeof(snd); i++ )
+  {
+    ret = spi->readWrite( snd[i] );
+    if( ret < SPI_SUCCESS ) { CS_IS_LOW_1; return ret; }
+  }
+  for( int i = 0; i < size; i++ )
+  {
+    ret = spi->readWrite( 0xFF );
+    if( ret < SPI_SUCCESS ) { CS_IS_LOW_1; return ret; }
+    *data++ = (uint8_t)ret;
+  }
+  CS_IS_LOW_1;
+  return size;
+}
+
+/* ----------------------------------------
+   sram  sequential write
+---------------------------------------- */
+int SRAM_23LC1024::sequWrite( uint32_t addr, const uint8_t *data, int size )
+{
+  int ret;
+  uint8_t snd[4];
+  snd[0] = SRAM_23LCxxx_MODE_WRITE;
+  snd[1] = (uint8_t)(addr >> 16);
+  snd[2] = (uint8_t)(addr >> 8);
+  snd[3] = (uint8_t)(addr >> 0);
+
+  CS_IS_LOW_0;
+  for( int i = 0; i < (int)sizeof(snd); i++ )
+  {
+    ret = spi->readWrite( snd[i] );
+    if( ret < SPI_SUCCESS ) { CS_IS_LOW_1; return ret; }
+  }
+  for( int i = 0; i < size; i++ )
+  {
+    ret = spi->readWrite( *data++ );
+    if( ret < SPI_SUCCESS ) { CS_IS_LOW_1; return ret; }
+  }
+  CS_IS_LOW_1;
+  return size;
 }
 
 /* ----------------------------------------
@@ -162,5 +217,15 @@ int SRAM_23LC1024::mode( uint8_t mode, uint8_t reg )
   }
   CS_IS_LOW_1;
   return SPI_SUCCESS;
+}
+
+uint8_t SRAM_23LC1024::mode()
+{
+  uint8_t reg;
+  CS_IS_LOW_0;
+  spi->readWrite( SRAM_23LCxxx_MODE_RDMR );
+  reg = spi->readWrite( 0xFF );
+  CS_IS_LOW_1;
+  return reg;
 }
 
