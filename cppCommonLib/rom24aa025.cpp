@@ -24,25 +24,16 @@
 
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
-#include "eep24aa025.h"
+#include  "rom24aa025.h"
 
 
 /* ----------------------------------------
     constructor destructor
 ---------------------------------------- */
-EEP24AA025::EEP24AA025()
-{
-}
-
 EEP24AA025::EEP24AA025( STM32F_I2C *_i2c, uint8_t adr )
 {
   begin( _i2c, adr );
 }
-
-EEP24AA025::~EEP24AA025()
-{
-}
-
 
 /* ----------------------------------------
     begin and end
