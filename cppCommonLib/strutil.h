@@ -23,7 +23,8 @@
 #ifndef  __STRUTIL_H__
 #define  __STRUTIL_H__
 
-#include  <HardwareSerial.h>
+//#include  <HardwareSerial.h>
+#include  <USART_UART.h>
 
 extern "C" 
 {
@@ -67,23 +68,32 @@ void double2byteLittle( char *dst, double d );
 void double2byteBig( char *dst, double d );
 
 unsigned short utf8to16( const unsigned char utf8[], int sz );
+
 void compileDate(int *year, int *month, int *day);
 void compileTime(int *hour, int *minute, int *second);
-time_t iso8601ToUnixtime( const char *iso8601 );
-int patternMatch( const char *compA, const char *compB );
 char *dtostrf(double number, signed char width, unsigned char prec, char *s);
 char *localDateTimeString( char *dst, time_t ut );
 char *localDateString( char *dst, time_t ut );
 char *localTimeString( char *dst, time_t ut );
+time_t localDateTimeToUnixtime(
+  uint16_t y, uint8_t mo, uint8_t d, uint8_t h, uint8_t mi, uint8_t s );
+time_t iso8601ToUnixtime( const char *iso8601 );
+
+int patternMatch( const char *compA, const char *compB );
 
 uint8_t swap( uint8_t c );
 uint16_t swap( uint16_t w );
 uint32_t swap( uint32_t dw );
 
+#if 0
 void dump( const uint8_t *data, uint32_t sz, Serial *s );
 void dump( const uint16_t *data, uint32_t sz, Serial *s );
 void dump( const uint32_t *data, uint32_t sz, Serial *s );
-
+#else
+void dump( const uint8_t *data, uint32_t sz, USART_UART *s );
+void dump( const uint16_t *data, uint32_t sz, USART_UART *s );
+void dump( const uint32_t *data, uint32_t sz, USART_UART *s );
+#endif
 float char2Float( const char *str );
 
 #endif  /*__STRUTIL_H__*/

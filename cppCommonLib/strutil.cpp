@@ -748,6 +748,30 @@ void compileTime(int *hour, int *minute, int *second)
 }
 
 /* ----------------------------------------
+  dateTimeToUnixtime
+  convert to local date and time to unix time
+  Returns the local date and time string from unix time.
+---------------------------------------- */
+time_t localDateTimeToUnixtime( uint16_t y, uint8_t mo, uint8_t d,
+  uint8_t h, uint8_t mi, uint8_t s )
+{
+#if !defined( TIMEZONE_JST )
+#define  TIMEZONE_JST  (9 * 3600UL)
+#endif
+  struct tm localTime;
+  localTime.tm_year = y - 1900;
+  localTime.tm_mon = mo - 1;
+  localTime.tm_mday = d;
+  localTime.tm_hour = h;
+  localTime.tm_min = mi;
+  localTime.tm_sec = s;
+  time_t t = mktime( &localTime );
+  return t - TIMEZONE_JST;
+}
+
+
+
+/* ----------------------------------------
   local date and time string
   Returns the local date and time string from unix time.
 ---------------------------------------- */
@@ -810,7 +834,7 @@ char *localTimeString( char *dst, time_t ut )
   There are two types of notation as defined by ISO 8601.
   One is the basic notation (standard notation) and the other is the extended notation.
 
-  ●Basic notation
+  Basic notation
   The basic notation format is as follows
     YYYYMMDDThhmmssZ
     YYYYMMDDThhmmss+0900
@@ -829,7 +853,7 @@ char *localTimeString( char *dst, time_t ut )
     For example, Japan Standard Time (JST) is 9 hours ahead of UTC in Japan,
      so exactly 12:00 pm on June 21, 2014 would be 20140621T120000+0900.
 
-  ●Extended notation
+  Extended notation
   The extended notation has the following format.
     YYYY-MM-DDThh:mm:ssZ
     YYYY-MM-DDThh:mm:ss+09:00
@@ -1074,44 +1098,86 @@ uint32_t swap( uint32_t dw )
 /* ----------------------------------------
   byte dump.
 ---------------------------------------- */
+static char *dumpByteLine( char *dst, const uint8_t *data )
+{
+  int2Hex08( dst, (uint32_t)data );
+  strcat( dst, " : " );
+  const uint8_t *ptr = data;
+  for( int col = 0; col < 16; col++ )
+  {
+    char asc[4];
+    strcat( dst, int2Hex02( asc, *ptr++ ) );
+    if( col == 7 ) { strcat( dst, ", " ); }
+    else { strcat( dst, "," ); }
+  }
+
+  strcat( dst, "  // " );
+  int len = strlen( dst );
+  for( int col = 0; col < 16; col++ )
+  {
+    dst[ len++ ] = ( isprint(*data) ) ? *data : '.';
+    if( col == 15 )
+    {
+      dst[ len ] = '\0';
+      strcat( dst, "\r\n" );
+    }
+    data++;
+  }
+
+  return dst;
+}
+
+#if 0
 void dump( const uint8_t *data, uint32_t sz, Serial *s )
 {
   int rawLimit = ((sz - 1) / 16) + 1;
   for( int raw = 0; raw < rawLimit; raw++ )
   {
     char buffer[128];
-    int2Hex08( buffer, (uint32_t)data );
-    strcat( buffer, " : " );
-    const uint8_t *ptr = data;
-    for( int col = 0; col < 16; col++ )
-    {
-      char asc[4];
-      strcat( buffer, int2Hex02( asc, *ptr++ ) );
-      if( col == 7 ) { strcat( buffer, ", " ); }
-      else { strcat( buffer, "," ); }
-    }
-
-    strcat( buffer, "  // " );
-    int len = strlen( buffer );
-    for( int col = 0; col < 16; col++ )
-    {
-      buffer[ len++ ] = ( isprint(*data) ) ? *data : '.';
-      if( col == 15 )
-      {
-        buffer[ len ] = '\0';
-        strcat( buffer, "\r\n" );
-      }
-      data++;
-    }
-
+    dumpByteLine( buffer, data );
     s->puts( (const char *)buffer );
+    data += 16;
+    dly_tsk( 20UL );
   }
   s->puts( "\r\n" );
 }
+#else
+void dump( const uint8_t *data, uint32_t sz, USART_UART *s )
+{
+  int rawLimit = ((sz - 1) / 16) + 1;
+  for( int raw = 0; raw < rawLimit; raw++ )
+  {
+    char buffer[128];
+    dumpByteLine( buffer, data );
+    s->print( (const char *)buffer );
+    data += 16;
+    dly_tsk( 20UL );
+  }
+  s->print( "\r\n" );
+}
+#endif
 
 /* ----------------------------------------
   word dump.
 ---------------------------------------- */
+static char *dumpWordLine( char *dst, const uint16_t *data )
+{
+  int2Hex08( dst, (uint32_t)data );
+  strcat( dst, " : " );
+  const uint16_t *ptr = data;
+  for( int col = 0; col < 8; col++ )
+  {
+    char asc[8];
+    strcat( dst, int2Hex04( asc, *ptr++ ) );
+    if( col == 3 ) { strcat( dst, ", " ); }
+    else { strcat( dst, "," ); }
+  }
+  strcat( dst, "\r\n" );
+
+  return dst;
+}
+
+#if 0
 void dump( const uint16_t *data, uint32_t sz, Serial *s )
 {
   sz /= sizeof(uint16_t);
@@ -1119,25 +1185,51 @@ void dump( const uint16_t *data, uint32_t sz, Serial *s )
   for( int raw = 0; raw < rawLimit; raw++ )
   {
     char buffer[128];
-    int2Hex08( buffer, (uint32_t)data );
-    strcat( buffer, " : " );
-    for( int col = 0; col < 8; col++ )
-    {
-      char asc[6];
-      strcat( buffer, int2Hex04( asc, *data++ ) );
-      if( col == 3 ) { strcat( buffer, ", " ); }
-      else { strcat( buffer, "," ); }
-    }
-    strcat( buffer, "\r\n" );
-
+    dumpWordLine( buffer, data );
     s->puts( (const char *)buffer );
+    data += 8;
+    dly_tsk( 20UL );
   }
   s->puts( "\r\n" );
 }
+#else
+void dump( const uint16_t *data, uint32_t sz, USART_UART *s )
+{
+  sz /= sizeof(uint16_t);
+  int rawLimit = ((sz - 1) / 8) + 1;
+  for( int raw = 0; raw < rawLimit; raw++ )
+  {
+    char buffer[128];
+    dumpWordLine( buffer, data );
+    s->print( (const char *)buffer );
+    data += 8;
+    dly_tsk( 20UL );
+  }
+  s->print( "\r\n" );
+}
+#endif
 
 /* ----------------------------------------
   double word dump.
 ---------------------------------------- */
+static char *dumpDWordLine( char *dst, const uint32_t *data )
+{
+  int2Hex08( dst, (uint32_t)data );
+  strcat( dst, " : " );
+  const uint32_t *ptr = data;
+  for( int col = 0; col < 4; col++ )
+  {
+    char asc[12];
+    strcat( dst, int2Hex08( asc, *ptr++ ) );
+    if( col == 1 ) { strcat( dst, ", " ); }
+    else { strcat( dst, "," ); }
+  }
+  strcat( dst, "\r\n" );
+
+  return dst;
+}
+
+#if 0
 void dump( const uint32_t *data, uint32_t sz, Serial *s )
 {
   sz /= sizeof(uint32_t);
@@ -1145,21 +1237,29 @@ void dump( const uint32_t *data, uint32_t sz, Serial *s )
   for( int raw = 0; raw < rawLimit; raw++ )
   {
     char buffer[128];
-    int2Hex08( buffer, (uint32_t)data );
-    strcat( buffer, " : " );
-    for( int col = 0; col < 4; col++ )
-    {
-      char asc[10];
-      strcat( buffer, int2Hex08( asc, *data++ ) );
-      if( col == 1 ) { strcat( buffer, ", " ); }
-      else { strcat( buffer, "," ); }
-    }
-    strcat( buffer, "\r\n" );
-
+    dumpDWordLine( buffer, data );
     s->puts( (const char *)buffer );
+    data += 4;
+    dly_tsk( 20UL );
   }
   s->puts( "\r\n" );
 }
+#else
+void dump( const uint32_t *data, uint32_t sz, USART_UART *s )
+{
+  sz /= sizeof(uint32_t);
+  int rawLimit = ((sz - 1) / 4) + 1;
+  for( int raw = 0; raw < rawLimit; raw++ )
+  {
+    char buffer[128];
+    dumpDWordLine( buffer, data );
+    s->print( (const char *)buffer );
+    data += 4;
+    dly_tsk( 20UL );
+  }
+  s->print( "\r\n" );
+}
+#endif
 
 
 /* ----------------------------------------
