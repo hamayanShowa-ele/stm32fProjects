@@ -26,10 +26,10 @@
 
 #include  <led.h>
 #include  <strutil.h>
-#include  <HardwareSerial.h>
 
 extern "C"
 {
+  #include  <stdlib.h>
   #include  <system.h>
 }
 
@@ -43,7 +43,7 @@ extern "C"
 void blinkLED( LED *led, RELTIM dly );
 void ramCheck( void *ram, size_t size, LED *led );
 uint32_t RemainStack( const void *stk, uint32_t sz );
-void serialLoopBack( Serial *s1 );
-void serialLoopBack( Serial *s1, Serial *s2 );
+
+int randomRamCheck( uint16_t *ram, size_t size, uint32_t seed );
 
 #endif  /*_BOARD_UTILITY_H_*/
