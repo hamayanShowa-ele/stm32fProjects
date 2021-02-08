@@ -25,7 +25,7 @@
 #ifndef  __PCA8574_H__
 #define  __PCA8574_H__
 
-#include  <Wire.h>
+#include  <I2C.h>
 #include  <softWire.h>
 extern "C"
 {
