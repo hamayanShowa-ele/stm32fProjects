@@ -27,10 +27,11 @@
 
 #include  <gpio.h>
 #include  <derivertive.h>
+#include  <FSMC.h>
 #include  <boardUtility.h>
 extern "C"
 {
-  #include  <fsmc.h>
+//  #include  <fsmc.h>
   #include  <system.h>
 }
 
@@ -43,16 +44,17 @@ extern "C"
     instances or global variables
 ---------------------------------------- */
 
-class BOARD : public GPIO
+class BOARD_1415 : public GPIO
 {
 public:
-  BOARD();
-  ~BOARD();
+  BOARD_1415() {}
+  ~BOARD_1415() {}
 
   void gpioInit();
   void extBusInit();
   void cbusEnable( bool onOff );
   void cbusReset();
+  volatile uint16_t dummyRead();
 
 private:
   void busPortInitialize();

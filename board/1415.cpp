@@ -24,6 +24,10 @@
 
 #include  "1415.h"
 
+extern "C"
+{
+}
+
 /* ----------------------------------------
     prototypes 
 ---------------------------------------- */
@@ -35,13 +39,6 @@
 /* ----------------------------------------
     constructor destructor
 ---------------------------------------- */
-BOARD::BOARD()
-{
-}
-
-BOARD::~BOARD()
-{
-}
 
 /* ----------------------------------------
     begin and end
@@ -50,7 +47,7 @@ BOARD::~BOARD()
 /* ----------------------------------------
     gpio initialize
 ---------------------------------------- */
-void BOARD::gpioInit()
+void BOARD_1415::gpioInit()
 {
   swdEnable();
   allPulldownOnSWD();
@@ -202,7 +199,7 @@ void BOARD::gpioInit()
 /* ----------------------------------------
     external cpu bus initialize
 ---------------------------------------- */
-void BOARD::busPortInitialize()
+void BOARD_1415::busPortInitialize()
 {
   pinMode( EXT_BUS_D0, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_D1, ALTERNATE_PP, GPIO_SPEED_FAST );
@@ -250,46 +247,56 @@ void BOARD::busPortInitialize()
   pinMode( EXT_BUS_NE4, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_BLE, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_BHE, ALTERNATE_PP, GPIO_SPEED_FAST );
+  pinMode( EXT_BUS_WAIT, ALTERNATE_PP, GPIO_SPEED_FAST );  // wait input ,if you need.
 }
 
-void BOARD::extBusInit()
+void BOARD_1415::extBusInit()
 {
   busPortInitialize();
 
+#if 1
+  STM32F1_FSMC *fsmc = new STM32F1_FSMC;
+  fsmc->sram( FSMC_Bank1_NORSRAM1,FSMC_MemoryDataWidth_16b, 1,4, 1,4 );  /* NE1 0x60000000 sram bank1 */
+  fsmc->sram( FSMC_Bank1_NORSRAM2,FSMC_MemoryDataWidth_16b, 1,4, 1,4 );  /* NE2 0x64000000 w5300 */
+  fsmc->sram( FSMC_Bank1_NORSRAM3,FSMC_MemoryDataWidth_16b, 1,2, 4,2 );  /* NE3 0x68000000 arcnet */
+//  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 10,13, 10,15, true );  /* NE4 0x6C000000 c-bus */
+  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 5,5, 5,5, true );  /* NE4 0x6C000000 c-bus */
+  delete fsmc;
+#else
   /* FSMC clock enable */
   RCC_AHBPeriphClockCmd( RCC_AHBPeriph_FSMC, ENABLE );
 
-  /*sram bank1のsram領域を有効化*/
+  /* Enable the sram area of sram bank1. */
   FSMC_BCRx *bcr = (FSMC_BCRx *)(FSMC_Bank1_R_BASE + (8 * 0));
   FSMC_TCRx *tcr = (FSMC_TCRx *)(FSMC_Bank1_R_BASE + 4 + (8 * 0));
   FSMC_BWTRx *bwtr = (FSMC_BWTRx *)(FSMC_Bank1E_R_BASE + (8 * 0));
 
-  /*NE1 SRAMの設定 0x60000000*/
-  bcr->BIT.ASYNCWAIT = 0;  /*外部waitは使用しない*/
+  /* Enable the sram area of sram bank1. : 0x60000000 */
+  bcr->BIT.ASYNCWAIT = 0;  /* 1: Use an external wait */
   bcr->BIT.EXTMOD = 1;  /**/
   bcr->BIT.MWID = 1;  /*16bit bus*/
   bcr->BIT.MTYP = 0;  /*sram select*/
   bcr->BIT.MUXEN = 0;  /*non multiplexed bus*/
   bcr->BIT.MBKEN = 1;  /**/
 
-  /*読み込み側設定*/
+  /* Read side settings */
   tcr->BIT.ACCMOD = 0;  /*access mode a*/
+  tcr->BIT.ADDSET = 1;  /**/
 //  tcr->BIT.DATAST = 2;  /*for sram*/
   tcr->BIT.DATAST = 4;  /*for mram*/
-  tcr->BIT.ADDSET = 1;  /**/
 
-  /*書き込み側設定*/
+  /* Write side settings */
   bwtr->BIT.ACCMOD = 0;  /**/
+  bwtr->BIT.ADDSET = 1;  /**/
 //  bwtr->BIT.DATAST = 2;  /*???ns for sram*/
   bwtr->BIT.DATAST = 4;  /*35ns for mram*/
-  bwtr->BIT.ADDSET = 1;  /**/
 
-  /*sram bank2のw5300領域を有効化 0x64000000*/
+  /* Enable the w5300 area of sram bank2. : 0x64000000*/
   bcr = (FSMC_BCRx *)(FSMC_Bank1_R_BASE + (8 * 1));
   tcr = (FSMC_TCRx *)(FSMC_Bank1_R_BASE + 4 + (8 * 1));
   bwtr = (FSMC_BWTRx *)(FSMC_Bank1E_R_BASE + (8 * 1));
 
-  bcr->BIT.ASYNCWAIT = 0;  /*外部waitは使用しない*/
+  bcr->BIT.ASYNCWAIT = 0;  /* 1: Use an external wait */
   bcr->BIT.EXTMOD = 1;  /**/
   bcr->BIT.MWID = 1;  /*16bit bus*/
   bcr->BIT.MTYP = 0;  /*sram select*/
@@ -297,22 +304,22 @@ void BOARD::extBusInit()
   bcr->BIT.MBKEN = 1;  /**/
   bcr->BIT.WREN = 1;  /**/
 
-  /*読み込み側設定*/
+  /* Read side settings */
   tcr->BIT.ACCMOD = 0;  /*access mode a*/
-  tcr->BIT.DATAST = 4;  /*4*/
   tcr->BIT.ADDSET = 1;  /*1*/
+  tcr->BIT.DATAST = 4;  /*4*/
 
-  /*書き込み側設定*/
+  /* Write side settings */
   bwtr->BIT.ACCMOD = 0;  /**/
-  bwtr->BIT.DATAST = 4;  /*4*/
   bwtr->BIT.ADDSET = 1;  /*1*/
+  bwtr->BIT.DATAST = 4;  /*4*/
 
-  /*arcnet bank3を有効化 0x68000000*/
+  /* Enable the arcnet area of sram bank3. : 0x68000000 */
   bcr = (FSMC_BCRx *)(FSMC_Bank1_R_BASE + (8 * 2));
   tcr = (FSMC_TCRx *)(FSMC_Bank1_R_BASE + 4 + (8 * 2));
   bwtr = (FSMC_BWTRx *)(FSMC_Bank1E_R_BASE + (8 * 2));
 
-  bcr->BIT.ASYNCWAIT = 0;  /*外部waitは使用しない*/
+  bcr->BIT.ASYNCWAIT = 0;  /* 1: Use an external wait */
   bcr->BIT.EXTMOD = 1;  /**/
   bcr->BIT.MWID = 1;  /*16bit bus*/
   bcr->BIT.MTYP = 0;  /*sram select*/
@@ -320,22 +327,22 @@ void BOARD::extBusInit()
   bcr->BIT.MBKEN = 1;  /**/
   bcr->BIT.WREN = 1;  /**/
 
-  /*読み込み側設定*/
+  /* Read side settings */
   tcr->BIT.ACCMOD = 0;  /*access mode a*/
-  tcr->BIT.DATAST = 2;  /**/
   tcr->BIT.ADDSET = 1;  /**/
+  tcr->BIT.DATAST = 2;  /**/
 
-  /*書き込み側設定*/
+  /* Write side settings */
   bwtr->BIT.ACCMOD = 0;  /**/
-  bwtr->BIT.DATAST = 2;  /**/
   bwtr->BIT.ADDSET = 4;  /**/
+  bwtr->BIT.DATAST = 2;  /**/
 
-  /*c-bus bank4を有効化 0x6C000000*/
+  /*Enable the c-bus area of sram bank4. : 0x6C000000 */
   bcr = (FSMC_BCRx *)(FSMC_Bank1_R_BASE + (8 * 3));
   tcr = (FSMC_TCRx *)(FSMC_Bank1_R_BASE + 4 + (8 * 3));
   bwtr = (FSMC_BWTRx *)(FSMC_Bank1E_R_BASE + (8 * 3));
 
-  bcr->BIT.ASYNCWAIT = 0;  /*1:外部waitを使用*/
+  bcr->BIT.ASYNCWAIT = 0;  /* 1: Use an external wait */
   bcr->BIT.EXTMOD = 1;  /**/
   bcr->BIT.MWID = 1;  /*16bit bus*/
   bcr->BIT.MTYP = 0;  /*sram select*/
@@ -343,22 +350,32 @@ void BOARD::extBusInit()
   bcr->BIT.MBKEN = 1;  /**/
   bcr->BIT.WREN = 1;  /**/
 
-  /*読み込み側設定*/
-  tcr->BIT.ACCMOD = 0;  /*access mode a*/
-  tcr->BIT.DATAST = 10;  /*original 13 -> 10*/
-  tcr->BIT.ADDSET = 5;  /*original 10 -> 5 */
+  /* Read side settings */
+  tcr->DWORD = 0x0FFFFFFF;
+  tcr->BIT.ACCMOD = 0;  /* 2bit long : access mode A */
+//  tcr->BIT.DATLAT = 0;  /* 4bit long */
+//  tcr->BIT.CLKDIV = 0;  /* 4bit long */
+//  tcr->BIT.BUSTURN = 10;  /* 4bit long */
+//  tcr->BIT.ADDHLD = 15;  /* 4bit long */
+  tcr->BIT.ADDSET = 10;  /* 4bit long : original 10 ->  */
+  tcr->BIT.DATAST = 10;  /* 8bit long : original 13 -> */
 
-  /*書き込み側設定*/
-  bwtr->BIT.ACCMOD = 0;  /**/
-  bwtr->BIT.DATAST = 10;  /*original 15 -> 10*/
-  bwtr->BIT.ADDSET = 5;  /*original 10 -> 5*/
+  /* Write side settings */
+  bwtr->DWORD = 0x0FFFFFFF;
+  bwtr->BIT.ACCMOD = 0;  /* 2bit long : access mode A */
+//  bwtr->BIT.DATLAT = 0;  /* 4bit long */
+//  bwtr->BIT.CLKDIV = 0;  /* 4bit long */
+//  bwtr->BIT.BUSTURN = 0;  /* 4bit long */
+//  bwtr->BIT.ADDHLD = 15;  /* 4bit long */
+  bwtr->BIT.ADDSET = 10;  /* 4bit long : original 10 -> */
+  bwtr->BIT.DATAST = 15;  /* 8bit long : original 15 -> */
+#endif
 }
-
 
 /* ----------------------------------------
     cbus enable
 ---------------------------------------- */
-void BOARD::cbusEnable( bool onOff )
+void BOARD_1415::cbusEnable( bool onOff )
 {
   pinMode( PF11, OUTPUT );
   digitalWrite( PF11, (onOff == true) ? HIGH : LOW );
@@ -367,7 +384,7 @@ void BOARD::cbusEnable( bool onOff )
 /* ----------------------------------------
     cbus reset
 ---------------------------------------- */
-void BOARD::cbusReset()
+void BOARD_1415::cbusReset()
 {
   pinMode( PD3, OUTPUT );
   digitalWrite( PD3, LOW );
@@ -375,6 +392,18 @@ void BOARD::cbusReset()
   digitalWrite( PD3, HIGH );
   dly_tsk( 100UL );
 }
+
+/* ----------------------------------------
+    cbus dummy read.
+---------------------------------------- */
+volatile uint16_t BOARD_1415::dummyRead()
+{
+  volatile uint16_t *dummy = (volatile uint16_t *)CBUS_DUMMY_MEM_ADR;
+  uint16_t dum = *dummy;
+  return dum;
+}
+
+
 
 extern "C"
 {
