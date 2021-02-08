@@ -81,6 +81,10 @@ enum GPIO_PIN_SPEED
 
 class GPIO  // : public hoge_class
 {
+private:
+//  void allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb );
+  void allPullupPulldown( int type = INPUT_PULLDOWN );
+
 public:
   GPIO_TypeDef* whatGPIOType( int pin )
   {
@@ -137,12 +141,8 @@ public:
   void allPulldownOnJTAG();
   void swdEnable();
   void jtagEnable();
-
-  void exti( int pin, EXTITrigger_TypeDef trig = EXTI_Trigger_Falling );
-
-private:
-//  void allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb );
-  void allPullupPulldown( int type = INPUT_PULLDOWN );
+  void exti( int pin, EXTITrigger_TypeDef trig = EXTI_Trigger_Falling,
+    uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
 };
 
 

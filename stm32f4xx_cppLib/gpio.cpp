@@ -310,7 +310,7 @@ void GPIO::jtagEnable()
 /* ----------------------------------------
     configure EXTI interrupt.
 ---------------------------------------- */
-void GPIO::exti( int pin, EXTITrigger_TypeDef trig )
+void GPIO::exti( int pin, EXTITrigger_TypeDef trig, uint8_t pri, uint8_t sub )
 {
   uint8_t portSource = whatExtiPortSource( pin );
   uint8_t pinSource = whatExtiPinSource( pin );
@@ -331,8 +331,8 @@ void GPIO::exti( int pin, EXTITrigger_TypeDef trig )
   int irqNum = whatExtiIntNumber( pin );
   NVIC_InitTypeDef NVIC_InitStructure;
   NVIC_InitStructure.NVIC_IRQChannel = irqNum;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = BASE_PRIORITY;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = BASE_SUB_PRIORITY;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = pri;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = sub;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init( &NVIC_InitStructure );
 }
