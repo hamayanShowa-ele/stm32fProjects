@@ -35,13 +35,6 @@
 /* ----------------------------------------
     constructor destructor
 ---------------------------------------- */
-BOARD::BOARD()
-{
-}
-
-BOARD::~BOARD()
-{
-}
 
 /* ----------------------------------------
     begin and end
@@ -50,7 +43,7 @@ BOARD::~BOARD()
 /* ----------------------------------------
     gpio initialize
 ---------------------------------------- */
-void BOARD::gpioInit()
+void BOARD_1303::gpioInit()
 {
   swdEnable();
   allPulldownOnSWD();
@@ -162,7 +155,7 @@ void BOARD::gpioInit()
 /* ----------------------------------------
     external cpu bus initialize
 ---------------------------------------- */
-void BOARD::busPortInitialize()
+void BOARD_1303::busPortInitialize()
 {
   pinMode( EXT_BUS_D0, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_D1, ALTERNATE_PP, GPIO_SPEED_FAST );
@@ -187,7 +180,7 @@ void BOARD::busPortInitialize()
   pinMode( EXT_BUS_NE1, ALTERNATE_PP, GPIO_SPEED_FAST );
 }
 
-void BOARD::extBusInit()
+void BOARD_1303::extBusInit()
 {
   busPortInitialize();
 

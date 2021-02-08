@@ -42,11 +42,11 @@ extern "C"
     instances or global variables
 ---------------------------------------- */
 
-class BOARD : public GPIO
+class BOARD_1303 : public GPIO
 {
 public:
-  BOARD();
-  ~BOARD();
+  BOARD_1303() {}
+  ~BOARD_1303() {}
 
   void gpioInit();
   void extBusInit();
