@@ -183,3 +183,45 @@ void GPIO::jtagEnable()
   /* The GPIOB pins 3 and 4 are used in JTAG. However, in the case of SWD, these pins are not used. */
   GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE );
 }
+
+
+/* ----------------------------------------
+    RCC clock enable and disable
+---------------------------------------- */
+void GPIO::rccClockEnable( int rcc )
+{
+  uint32_t shift;
+  if( rcc < 32 )  /* APB2_peripheral */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB2PeriphClockCmd( shift, ENABLE );
+    RCC_APB2PeriphResetCmd( shift, DISABLE );
+  }
+  else if( rcc < 64 )  /* APB1_peripheral */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB1PeriphClockCmd( shift, ENABLE );
+    RCC_APB1PeriphResetCmd( shift, DISABLE );
+  }
+  else {}
+}
+
+void GPIO::rccClockDisable( int rcc )
+{
+  uint32_t shift;
+  if( rcc < 32 )  /* APB2_peripheral */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB2PeriphClockCmd( shift, DISABLE );
+    RCC_APB2PeriphResetCmd( shift, ENABLE );
+  }
+  else if( rcc < 64 )  /* APB1_peripheral */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB1PeriphClockCmd( shift, DISABLE );
+    RCC_APB1PeriphResetCmd( shift, ENABLE );
+  }
+  else {}
+}
+
+

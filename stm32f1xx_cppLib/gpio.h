@@ -41,6 +41,7 @@ extern "C"
 #define  LOW   0
 #define  HIGH  !LOW
 
+
 /* ----------------------------------------
   type
   GPIO_Mode_AIN or GPIO_Mode_IN_FLOATING
@@ -80,6 +81,9 @@ enum GPIO_PIN_SPEED
 
 class GPIO  // : public hoge_class
 {
+private:
+  void allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb );
+
 public:
   GPIO_TypeDef* whatGPIOType( int pin )
   {
@@ -124,8 +128,9 @@ public:
   void swdEnable();
   void jtagEnable();
 
-private:
-  void allPullupPulldown( GPIOMode_TypeDef mode, uint16_t pa, uint16_t pb );
+  void rccClockEnable( int rcc );
+  void rccClockDisable( int rcc );
+  void remap( uint32_t map ) { GPIO_PinRemapConfig( map, ENABLE ); }
 };
 
 
