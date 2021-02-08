@@ -198,7 +198,7 @@ void STM32F_TIMER::setAutoReload( uint16_t reload )
 /* ----------------------------------------
     get auto reload register.
 ---------------------------------------- */
-uint16_t STM32F_TIMER::getAutoReload()
+volatile uint16_t STM32F_TIMER::getAutoReload()
 {
   return TIMx->ARR;
 }
@@ -221,8 +221,9 @@ void STM32F_TIMER::config( uint16_t prescaler, uint16_t period )
   TIM_TimeBaseStructInit( &TIM_TimeBaseStructure );
 
   TIM_TimeBaseStructure.TIM_Prescaler = prescaler - 1;  /* prescaler */
-  TIM_TimeBaseStructure.TIM_Period = period - 1;  /* 周期設定 */
-  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /* クロック分周比=1 内部クロックを使う限り関係しない？ */
+  TIM_TimeBaseStructure.TIM_Period = period - 1;  /* Period setting */
+  /* Clock division ratio = 1 Does it matter as long as the internal clock is used? */
+  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
   TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
   TIM_TimeBaseInit( TIMx, &TIM_TimeBaseStructure );
@@ -251,7 +252,7 @@ int STM32F_TIMER::prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period 
   if( presc == 65536UL ) return (-1);
 
   *prescaler = presc;
-  *period = ck_int / presc / freq;  /* 周期設定 */
+  *period = ck_int / presc / freq;  /* Period setting */
   return 0;
 }
 
@@ -259,31 +260,15 @@ int STM32F_TIMER::prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period 
 
 /* ----------------------------------------
     time base set for frequency.
-    プリスケーラが1なら72MHz÷65536で1099Hzから36MHz程度が限界
+   If the prescaler is 1, the limit is 72 MHz divided by 65536,
+    which is about 1099 Hz to 36 MHz.
 ---------------------------------------- */
 int STM32F_TIMER::frequency( uint32_t freq )
 {
-  /* Time base configuration */
-  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
-  TIM_TimeBaseStructInit( &TIM_TimeBaseStructure );
-
   /* get prescaler and period */
   uint32_t prescaler,period;
   if( prePeri( freq, &prescaler, &period ) < 0 ) return (-1);
-#if 1
   config( (uint16_t)prescaler, (uint16_t)period );
-#else
-  TIM_TimeBaseStructure.TIM_Prescaler = (uint16_t)(prescaler - 1);  /* prescaler */
-  /* set period */
-//  TIM_TimeBaseStructure.TIM_Period = (uint16_t)((ck_int / freq) - 1);  /* 周期設定 */
-  TIM_TimeBaseStructure.TIM_Period = (uint16_t)(period - 1);  /* 周期設定 */
-  TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;  /* クロック分周比=1 内部クロックを使う限り関係しない？ */
-  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-  TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
-  TIM_TimeBaseInit( TIMx, &TIM_TimeBaseStructure );
-
-  TIM_ARRPreloadConfig( TIMx, ENABLE );
-#endif
 
   return 0;
 }
@@ -301,7 +286,7 @@ int STM32F_TIMER::OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t
   TIM_OCInitStructure.TIM_OutputState = (pin >= PA0 && pin < PORT_END) ? TIM_OutputState_Enable : TIM_OutputState_Disable;
 
   //  TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
-  TIM_OCInitStructure.TIM_Pulse = pulse;  /*PWM */
+  TIM_OCInitStructure.TIM_Pulse = pulse;  /* compare match value. */
   TIM_OCInitStructure.TIM_OCPolarity = pol;  // TIM_OCPolarity_High
 //  TIM_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_High;
   TIM_OCInitStructure.TIM_OCIdleState = rst;  // TIM_OCIdleState_Reset
@@ -374,22 +359,10 @@ int STM32F_TIMER::adcTrigger( int ch, int pin, uint16_t pulse )
 void STM32F_TIMER::setPulse( int ch, uint16_t pulse )
 {
   /* Set the Capture Compare Register value */
-  if( ch == TIMx_CH1 )
-  {
-    TIMx->CCR1 = pulse;
-  }
-  else if( ch == TIMx_CH2 )
-  {
-    TIMx->CCR2 = pulse;
-  }
-  else if( ch == TIMx_CH3 )
-  {
-    TIMx->CCR3 = pulse;
-  }
-  else if( ch == TIMx_CH4 )
-  {
-    TIMx->CCR4 = pulse;
-  }
+  if( ch == TIMx_CH1 ) TIMx->CCR1 = pulse;
+  else if( ch == TIMx_CH2 ) TIMx->CCR2 = pulse;
+  else if( ch == TIMx_CH3 ) TIMx->CCR3 = pulse;
+  else if( ch == TIMx_CH4 ) TIMx->CCR4 = pulse;
 }
 
 
@@ -397,29 +370,17 @@ uint16_t STM32F_TIMER::getPulse( int ch )
 {
   uint16_t pulse;
   /* Set the Capture Compare Register value */
-  if( ch == TIMx_CH1 )
-  {
-    pulse = TIMx->CCR1;
-  }
-  else if( ch == TIMx_CH2 )
-  {
-    pulse = TIMx->CCR2;
-  }
-  else if( ch == TIMx_CH3 )
-  {
-    pulse = TIMx->CCR3;
-  }
-  else if( ch == TIMx_CH4 )
-  {
-    pulse = TIMx->CCR4;
-  }
-  return pulse;
+  if( ch == TIMx_CH1 ) return TIMx->CCR1;
+  else if( ch == TIMx_CH2 ) return TIMx->CCR2;
+  else if( ch == TIMx_CH3 ) return TIMx->CCR3;
+  else if( ch == TIMx_CH4 ) return TIMx->CCR4;
+  return 0;
 }
 
 
 /* ----------------------------------------
-    configure the encoder
-    and read the encoder counter.
+    configure the rotary encoder
+    and read the rotary encoder counter.
 ---------------------------------------- */
 void STM32F_TIMER::encoderEnable()
 {
@@ -507,22 +468,10 @@ void STM32F_TIMER::startInterrupt( uint8_t pri, uint8_t sub )
 void STM32F_TIMER::startInterrupt( int ch, uint8_t pri, uint8_t sub )
 {
   uint16_t it_cc;
-  if( ch == TIMx_CH1 )
-  {
-    it_cc = TIM_IT_CC1;
-  }
-  else if( ch == TIMx_CH2 )
-  {
-    it_cc = TIM_IT_CC2;
-  }
-  else if( ch == TIMx_CH3 )
-  {
-    it_cc = TIM_IT_CC3;
-  }
-  else if( ch == TIMx_CH4 )
-  {
-    it_cc = TIM_IT_CC4;
-  }
+  if( ch == TIMx_CH1 ) it_cc = TIM_IT_CC1;
+  else if( ch == TIMx_CH2 ) it_cc = TIM_IT_CC2;
+  else if( ch == TIMx_CH3 ) it_cc = TIM_IT_CC3;
+  else if( ch == TIMx_CH4 ) it_cc = TIM_IT_CC4;
 
   /* timerX channelX compare or capture interrupt initialize. */
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -590,7 +539,7 @@ void TIM1_UP_IRQHandler( void )
 #if 0
   if( TIM1->SR & TIM_SR_UIF )
   {
-    TIM1->SR &= ~TIM_SR_UIF;  /*ステータスフラグのクリア*/
+    TIM1->SR &= ~TIM_SR_UIF;  /* Clear status flags */
     (*cbList[ TIM1_INT_UP ])();
   }
 #else
@@ -606,22 +555,22 @@ void TIM1_CC_IRQHandler( void )
 #if 0
   if( TIM1->SR & TIM_SR_CC1IF )
   {
-    TIM1->SR &= ~TIM_SR_CC1IF;  /*ステータスフラグのクリア*/
+    TIM1->SR &= ~TIM_SR_CC1IF;  /* Clear status flags */
     (*cb_TIM1_CC1_IRQ)();
   }
   if( TIM1->SR & TIM_SR_CC2IF )
   {
-    TIM1->SR &= ~TIM_SR_CC2IF;  /*ステータスフラグのクリア*/
+    TIM1->SR &= ~TIM_SR_CC2IF;  /* Clear status flags */
     (*cb_TIM1_CC2_IRQ)();
   }
   if( TIM1->SR & TIM_SR_CC3IF )
   {
-    TIM1->SR &= ~TIM_SR_CC3IF;  /*ステータスフラグのクリア*/
+    TIM1->SR &= ~TIM_SR_CC3IF;  /* Clear status flags */
     (*cb_TIM1_CC3_IRQ)();
   }
   if( TIM1->SR & TIM_SR_CC4IF )
   {
-    TIM1->SR &= ~TIM_SR_CC4IF;  /*ステータスフラグのクリア*/
+    TIM1->SR &= ~TIM_SR_CC4IF;  /* Clear status flags */
     (*cb_TIM1_CC4_IRQ)();
   }
 #else

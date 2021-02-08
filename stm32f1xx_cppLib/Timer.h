@@ -94,9 +94,10 @@ enum TIMER_INTERRUPT_NAME
   TIM8_INT_TRIGGER,
   TIM8_INT_BREAK,
 
-  TIM_INT_END,  /* 必ず配列の最後に記述する */
+  TIM_INT_END,  /* Always put it at the end of the array. */
 };
 
+/* timers cascade connection. */
 #define  SRC_TIM5_DST_TIM1  TIM_TS_ITR0
 #define  SRC_TIM2_DST_TIM1  TIM_TS_ITR1
 #define  SRC_TIM3_DST_TIM1  TIM_TS_ITR2
@@ -149,6 +150,19 @@ enum TIMER_INTERRUPT_NAME
 
 class STM32F_TIMER : public GPIO
 {
+private:
+  TIM_TypeDef *TIMx;
+  uint32_t rcc;
+  int timerType;
+
+  void config( uint16_t prescaler, uint16_t period );
+  int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
+
+  uint8_t updateInterruptChannel();  /* timer update interrupt */
+  uint8_t ccInterruptChannel();  /* timer compare capture interrupt */
+
+  int  OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst );
+
 public:
   STM32F_TIMER();
   STM32F_TIMER( TIM_TypeDef *tim );
@@ -161,7 +175,7 @@ public:
   int  frequency( uint32_t freq );
   volatile uint16_t getCounter();
   void setAutoReload( uint16_t reload );
-  uint16_t getAutoReload();
+  volatile uint16_t getAutoReload();
   void master();
   void slave( uint16_t parent, uint16_t prescaler, uint16_t period );
 
@@ -182,19 +196,6 @@ public:
   void rejectCallBack( int name );
 
   void trigger( uint16_t trig );
-
-private:
-  TIM_TypeDef *TIMx;
-  uint32_t rcc;
-  int timerType;
-
-  void config( uint16_t prescaler, uint16_t period );
-  int  prePeri( uint32_t freq, uint32_t *prescaler, uint32_t *period );
-
-  uint8_t updateInterruptChannel();  /* timer update interrupt */
-  uint8_t ccInterruptChannel();  /* timer compare capture interrupt */
-
-  int  OC( int ch, uint16_t ocMode, int pin, uint16_t pulse, uint16_t pol, uint16_t rst );
 };
 
 
