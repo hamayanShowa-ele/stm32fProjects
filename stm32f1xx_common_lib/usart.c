@@ -514,32 +514,32 @@ void SCI_ISR( int ch )
   /*各種エラーのチェック*/
   if( USART_GetFlagStatus( SCI, USART_FLAG_FE ) == SET )
   {
-	data = (char)USART_ReceiveData( SCI );
-	USART_ClearITPendingBit( SCI, USART_IT_FE );
+    data = (char)USART_ReceiveData( SCI );
+    USART_ClearITPendingBit( SCI, USART_IT_FE );
     if( (err = sci_err[ ch ]) != 0 )
       err->FE_cnt++;  /*フレーミングエラー数の累積*/
   }
 
   if( USART_GetFlagStatus( SCI, USART_FLAG_PE ) == SET )
   {
-	data = (char)USART_ReceiveData( SCI );
-	USART_ClearITPendingBit( SCI, USART_FLAG_PE );
+    data = (char)USART_ReceiveData( SCI );
+    USART_ClearITPendingBit( SCI, USART_FLAG_PE );
     if( (err = sci_err[ ch ]) != 0 )
       err->PE_cnt++;  /*パリティエラー数の累積*/
   }
 
   if( USART_GetFlagStatus( SCI, USART_FLAG_NE ) == SET )
   {
-	data = (char)USART_ReceiveData( SCI );
-	USART_ClearITPendingBit( SCI, USART_FLAG_NE );
+    data = (char)USART_ReceiveData( SCI );
+    USART_ClearITPendingBit( SCI, USART_FLAG_NE );
     if( (err = sci_err[ ch ]) != 0 )
       err->NE_cnt++;  /*ノイズエラー数の累積*/
   }
 
   if( USART_GetFlagStatus( SCI, USART_FLAG_ORE ) == SET )
   {
-	data = (char)USART_ReceiveData( SCI );
-	USART_ClearITPendingBit( SCI, USART_FLAG_ORE );
+    data = (char)USART_ReceiveData( SCI );
+    USART_ClearITPendingBit( SCI, USART_FLAG_ORE );
     if( (err = sci_err[ ch ]) != 0 )
       err->ORE_cnt++;  /*オーバーランエラー数の累積*/
   }
@@ -548,6 +548,7 @@ void SCI_ISR( int ch )
   if( USART_GetFlagStatus( SCI, USART_FLAG_RXNE ) == SET )
   {
     data = (char)USART_ReceiveData( SCI );
+    USART_SendData( SCI, data );  // echo back.
     rcv = sci_rcv[ ch ];  /*バッファの選択*/
     ptr = (char *)rcv->buf;
     next = rcv->wptr + 1;
@@ -576,10 +577,13 @@ void SCI_ISR( int ch )
   }
 }
 
+//#define WEAK __attribute__ ((weak))
+#define WEAK
+
 /********************************************************************/
 /*	USART1割り込みハンドラ                                          */
 /********************************************************************/
-void USART1_IRQHandler( void )
+void WEAK USART1_IRQHandler( void )
 {
   SCI_ISR( SCI_1 );
 }
@@ -587,7 +591,7 @@ void USART1_IRQHandler( void )
 /********************************************************************/
 /*	USART2割り込みハンドラ                                          */
 /********************************************************************/
-void USART2_IRQHandler( void )
+void WEAK USART2_IRQHandler( void )
 {
   SCI_ISR( SCI_2 );
 }
@@ -595,7 +599,7 @@ void USART2_IRQHandler( void )
 /********************************************************************/
 /*	USART3割り込みハンドラ                                          */
 /********************************************************************/
-void USART3_IRQHandler( void )
+void WEAK USART3_IRQHandler( void )
 {
   SCI_ISR( SCI_3 );
 }
@@ -604,7 +608,7 @@ void USART3_IRQHandler( void )
 /********************************************************************/
 /*	UART4割り込みハンドラ                                           */
 /********************************************************************/
-void UART4_IRQHandler( void )
+void WEAK UART4_IRQHandler( void )
 {
   SCI_ISR( SCI_4 );
 }
@@ -612,7 +616,7 @@ void UART4_IRQHandler( void )
 /********************************************************************/
 /*	UART5割り込みハンドラ                                           */
 /********************************************************************/
-void UART5_IRQHandler( void )
+void WEAK UART5_IRQHandler( void )
 {
   SCI_ISR( SCI_5 );
 }
