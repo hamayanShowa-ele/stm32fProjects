@@ -74,22 +74,23 @@ int Ethernet::wizInit()
 /* ----------------------------------------
     discover
 ---------------------------------------- */
-extern Serial Serial1;
+extern USART_UART Serial1;
+
 void my_ip_assign(void)
 {
-  Serial1.puts( "my_ip_assign\r\n" );
+  Serial1.print( "my_ip_assign\r\n" );
 }
 void my_ip_conflict(void)
 {
-  Serial1.puts( "my_ip_conflict\r\n" );
+  Serial1.print( "my_ip_conflict\r\n" );
 }
 
 void Ethernet::discover()
 {
   #define DATA_BUF_SIZE   1024
   uint8_t gDATABUF[ DATA_BUF_SIZE ];
-  IPAddress *server = new IPAddress( 192,168,100,1 );
-  delete server;
+//  IPAddress *server = new IPAddress( 192,168,100,1 );
+//  delete server;
 
   // if you want different action instead default ip assign, update, conflict.
   // if cbfunc == 0, act as default.
@@ -117,24 +118,24 @@ void Ethernet::discover()
     switch( ret )
     {
       case DHCP_FAILED :
-        Serial1.puts( "dhcp failed.\r\n" );
+        Serial1.print( "dhcp failed.\r\n" );
         loop = false;
         break;
       case DHCP_RUNNING :
-        Serial1.puts( "dhcp running.\r\n" );
+        Serial1.print( "dhcp running.\r\n" );
         break;
       case DHCP_IP_ASSIGN :
-        Serial1.puts( "dhcp assigned.\r\n" );
+        Serial1.print( "dhcp assigned.\r\n" );
         break;
       case DHCP_IP_CHANGED :
-        Serial1.puts( "dhcp changed.\r\n" );
+        Serial1.print( "dhcp changed.\r\n" );
         break;
       case DHCP_IP_LEASED :
-        Serial1.puts( "dhcp leased.\r\n" );
+        Serial1.print( "dhcp leased.\r\n" );
         break;
       case DHCP_STOPPED :
       default :
-        Serial1.puts( "dhcp stopped.\r\n" );
+        Serial1.print( "dhcp stopped.\r\n" );
         loop = false;
         break;
     }

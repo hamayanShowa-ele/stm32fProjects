@@ -25,7 +25,7 @@
 #define  __ETHERNET_H__
 
 #include  <derivertive.h>
-#include  <HardwareSerial.h>
+#include  <USART_UART.h>
 extern "C"
 {
   #include  <stdio.h>
