@@ -48,6 +48,7 @@ extern "C"
 #define  DPRAM_BASE_ADDRESS  (0x60000000UL)
 #define  DPRAM_SIZE          (8192)  // 4k * 16bit
 #define  DPRAM_INTR_ADDRESS  (DPRAM_BASE_ADDRESS + (0x0FFF * 2))
+#define  GANYMEDE_DUMMY_ADDRESS  (0x6C000000UL)
 
 /* ----------------------------------------
     instances or global variables
@@ -55,8 +56,6 @@ extern "C"
 class BOARD_1804 : public GPIO
 {
 private:
-  volatile uint16_t dummy;
-
   void busPort();
   void dpRamDividWrite( uint16_t *ram, uint16_t data );
   uint16_t dpRamDividRead( const uint16_t *ram );

@@ -32,6 +32,7 @@
     instances or global variables
 ---------------------------------------- */
 volatile static uint16_t v50Ack;
+volatile static uint16_t dummy;
 
 /* ----------------------------------------
     constructor destructor
@@ -322,6 +323,8 @@ void BOARD_1804::extBus()
   /* read cycle time = min 60ns and data access time = max 30ns. */
   /* write cycle time = min 60ns and data setup time = min 10ns and data hold time = min 20ns. */
   fsmc->sram( FSMC_Bank1_NORSRAM3,FSMC_MemoryDataWidth_16b, 4,8, 4,8 );
+  /* dummy access. */
+  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 1,1, 1,1 );
   delete fsmc;
 }
 
@@ -334,6 +337,7 @@ volatile uint8_t intdpUpdate;
 void cbINTDP( void )
 {
   v50Ack = *((volatile uint16_t *)DPRAM_INTR_ADDRESS);
+  dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
   intdpUpdate++;
 }
 
@@ -391,22 +395,49 @@ uint16_t BOARD_1804::dpRamDividRead( const uint16_t *ram )
 ---------------------------------------- */
 void BOARD_1804::dpRamWrite( void *ram, size_t size, uint32_t seed, LED *led )
 {
-  led->On();
-  size /= sizeof(uint16_t);
+  led->Off();
   srand( seed );
   while( true )
   {
     volatile uint16_t *ptr = (volatile uint16_t *)ram;
-    for( int i = 0; i < (int)size; i++ )
+#if 1
+    int sz = size / (sizeof(uint16_t) * 2);
+    for( int i = 0; i < sz; )
     {
       uint16_t rnd = (uint16_t)rand();
-//      *ptr++ = rnd & 0x00FF;
-      *ptr++ = rnd | 0xFF00;
+      dpRamDividWrite( (uint16_t *)ptr, rnd );
+      uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
+      if( rnd != rcv )
+      {
+        led->toggle();
+        dly_tsk( 50UL );
+        continue;
+      }
+      ptr += 2;
+      i++;
     }
-    volatile uint8_t intdpUpdateBase = intdpUpdate;
+#else
+    int sz = size / sizeof(uint16_t);
+    for( int i = 0; i < sz; )
+    {
+      uint16_t rnd = (uint16_t)rand();
+      *ptr = rnd;
+      uint16_t ret = *ptr;
+      if( rnd != ret )
+      {
+        led->toggle();
+        dly_tsk( 50UL );
+        continue;
+      }
+      ptr++;
+      i++;
+    }
+#endif
+    dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
+    uint8_t intdpUpdateBase = intdpUpdate;
     v50INT();
     while( intdpUpdate == intdpUpdateBase ) rot_rdq();
-    led->toggle();
+//    led->toggle();
   }
 }
 
@@ -458,6 +489,7 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, LED *led )
       if( ret != dat )
       {
         led->toggle();
+        dly_tsk( 50UL );
         continue;
       }
       ptr += 2;
@@ -474,6 +506,7 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, LED *led )
       if( ret != dat )
       {
         led->toggle();
+        dly_tsk( 50UL );
         continue;
       }
       ptr++;
@@ -482,13 +515,12 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, LED *led )
       data++;
       i++;
     }
-    dummy = *((volatile uint16_t *)ADC1_BASE_ADDRESS);
+    dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
 
     uint8_t intdpUpdateBase = intdpUpdate;
     v50INT();
     while( intdpUpdate == intdpUpdateBase ) rot_rdq();
 //    led->toggle();
-    dummy = *((volatile uint16_t *)ADC1_BASE_ADDRESS);
   }
 }
 
