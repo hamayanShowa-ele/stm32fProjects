@@ -58,10 +58,10 @@ void NVIC_Configuration( void );
 void tim1Interrupt( void );
 void tim8Interrupt( void );
 
-static uint16_t dpRamDividRead( const uint16_t *ram );
-static void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led );
-static void dpRamRead( const void *ram, size_t size, uint16_t fixed, LED *led );
-static void dpRamRead( const void *ram, size_t size, LED *led );
+static uint16_t dpRamDividRead( volatile const uint16_t *ram );
+static void dpRamRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led );
+static void dpRamRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led );
+static void dpRamRead( volatile const uint16_t *ram, size_t size, LED *led );
 
 void cbGANYMEDE_CALL( void );
 volatile uint8_t ganymedeUpdate;
@@ -141,11 +141,11 @@ int main(void)
   Serial1.printf( "    designed by hamayan.\r\n" );
 //  serialLoopBack( &Serial1 );
 
-  extiConfig( PF10, EXTI_Trigger_Falling );
-  extiCallBack( 10, cbGANYMEDE_CALL );
-//  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
-//  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
-  dpRamRead( (const void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+  extiConfig( PF10, EXTI_Trigger_Falling );  // INT0:PC4 INT6:PF10
+  extiCallBack( 10, cbGANYMEDE_CALL );  // INT0:4 INT6:10
+  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
+//  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
+//  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
 //  ramCheck( (void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
 /*
   SRAM_8M sram( 0x00080000, 0x0200 );
@@ -270,6 +270,7 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
   volatile uint16_t h,l;
 
   h = *ram++;
+  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
   l = *ram;
   dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
   h &= 0x00FF;
@@ -281,35 +282,55 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
 /* ----------------------------------------
   random pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led )
+static void dpRamRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led )
 {
   uint16_t loop = 0;
   uint32_t baseTim = millis();
   srand( seed );
-  size /= sizeof(uint16_t);
+  uint8_t ganymedeUpdateBase = ganymedeUpdate;
   while( true )
   {
-    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
-
-    volatile uint8_t ganymedeUpdateBase = ganymedeUpdate;
     while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+    ganymedeUpdateBase = ganymedeUpdate;
 
-    for( int i = 0; i < (int)size; i++ )
+    volatile const uint16_t *ptr = ram;
+#if 1
+    int sz = size / (sizeof(uint16_t) * 2);
+    for( int i = 0; i < sz; i++ )
     {
-      uint16_t rnd = (uint16_t)rand() & 0x00FF;
-      uint16_t dat = *ptr++ & 0x00FF;
-      if( i < 4096 && dat != rnd )
+      uint16_t rnd = (uint16_t)rand();
+      uint16_t rcv = dpRamDividRead( ptr );
+      if( rcv != rnd )
       {
         while( true )
         {
           dly_tsk( 50UL );
           led->toggle();
-          break;
+//          break;
+        }
+      }
+      ptr += 2;
+    }
+#else
+    int sz = size / sizeof(uint16_t);
+    for( int i = 0; i < sz; i++ )
+    {
+      uint16_t rnd = (uint16_t)rand();
+      uint16_t rcv = *ptr++;
+      dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+      if( rcv != rnd )
+      {
+        while( true )
+        {
+          dly_tsk( 50UL );
+          led->toggle();
+//          break;
         }
       }
     }
-    volatile uint16_t *intr = (volatile uint16_t *)DPRAM_INTR_ADDRESS;
-    *intr = loop++;
+#endif
+    *((volatile uint16_t *)DPRAM_INTR_ADDRESS) = loop++;
+    dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
     if( (millis() - baseTim) >= 500UL )
     {
       baseTim = millis();
@@ -321,15 +342,14 @@ static void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led )
 /* ----------------------------------------
   fixed pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( const void *ram, size_t size, uint16_t fixed, LED *led )
+static void dpRamRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led )
 {
   uint16_t loop = 0;
   uint32_t baseTim = millis();
   size /= sizeof(uint16_t);
   while( true )
   {
-    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
-
+    volatile const uint16_t *ptr = ram;
     volatile uint8_t ganymedeUpdateBase = ganymedeUpdate;
     while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
 
@@ -360,7 +380,7 @@ static void dpRamRead( const void *ram, size_t size, uint16_t fixed, LED *led )
 /* ----------------------------------------
   increment pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( const void *ram, size_t size, LED *led )
+static void dpRamRead( volatile const uint16_t *ram, size_t size, LED *led )
 {
   uint16_t loop = 1234;
   uint16_t data = 0;
@@ -371,7 +391,7 @@ static void dpRamRead( const void *ram, size_t size, LED *led )
     while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
     ganymedeUpdateBase = ganymedeUpdate;
 
-    const volatile uint16_t *ptr = (const volatile uint16_t *)ram;
+    volatile const uint16_t *ptr = ram;
 #if 0
     int sz = size / (sizeof(uint16_t) * 2);
     for( int i = 0; i < sz; i++ )
