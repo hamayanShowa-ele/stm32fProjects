@@ -62,10 +62,6 @@ void FSMC::sram(
 
   /* Enable sram area in sram bank1 */
   /* Configuring the NE1 SRAM 0x60000000 */
-  /* is62wv51216ebll Read Cycle Time is min 45ns or min 55ns. */
-  /* is62wv51216ebll Address Access Time is max 45ns or max 55ns. */
-  /* mr2a16ays35 Read Cycle Time is min 35ns. */
-  /* mr2a16ays35 Address Access Time is max 35ns. */
   rTiming.FSMC_AddressSetupTime = rAS;  // Define the number of HCLK cycles to configure the setup time of the address.
   rTiming.FSMC_AddressHoldTime = rAH;  // Define the number of HCLK cycles to configure the address's hold time.
   rTiming.FSMC_DataSetupTime = rDS;  // Define the number of HCLK cycles to configure the data setup time.
@@ -74,16 +70,6 @@ void FSMC::sram(
   rTiming.FSMC_DataLatency = 15;  // This parameter is not used for asynchronous NOR Flash, SRAM or ROM access.
   rTiming.FSMC_AccessMode = FSMC_AccessMode_A;
 
-  /* is62wv51216ebll Write Cycle Time is min 45ns or min 55ns. */
-  /* is62wv51216ebll Address Setup Time to Write End is min 35ns or min 40ns. */
-  /* is62wv51216ebll Data Setup to Write End is min 28ns or min 28ns. */
-  /* is62wv51216ebll Data Hold from Write End is min 0ns or min 0ns. */
-  /* is62wv51216ebll Write pulse width is min 35ns or min 40ns. */
-  /* mr2a16ays35 Write Cycle Time is min 35ns. */
-  /* mr2a16ays35 Address Setup Time to Write End is min 18ns. */
-  /* mr2a16ays35 Data Setup to Write End is min 10ns. */
-  /* mr2a16ays35 Data Hold from Write End is min 0ns. */
-  /* mr2a16ays35 Write pulse width is min 15ns. */
   wTiming.FSMC_AddressSetupTime = wAS;  // Define the number of HCLK cycles to configure the setup time of the address.
   wTiming.FSMC_AddressHoldTime = wAH;  // Define the number of HCLK cycles to configure the address's hold time.
   wTiming.FSMC_DataSetupTime = wDS;  // Define the number of HCLK cycles to configure the data setup time.
