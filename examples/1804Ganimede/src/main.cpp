@@ -99,7 +99,6 @@ int main(void)
 {
 //  struct tm localTime =
 //    {0,23,14,25,8-1,2014-1900,0,0,0};
-  struct tm localTime;
   int year,month,day;
   compileDate( &year, &month, &day );
   int hour,minute,second;
@@ -137,9 +136,9 @@ int main(void)
 //  extiConfig( EOLC2, EXTI_Trigger_Falling );
 
 //  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
-//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
+  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
 //  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, (uint16_t)0xA5A5, &actled ); /* fixed */
-  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
+//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
 
   /* configure 1411 board. */
 //  bd1411.begin( PF11, PF10, PF9, PF8 );
