@@ -368,7 +368,6 @@ void STM32F_TIMER::setPulse( int ch, uint16_t pulse )
 
 uint16_t STM32F_TIMER::getPulse( int ch )
 {
-  uint16_t pulse;
   /* Set the Capture Compare Register value */
   if( ch == TIMx_CH1 ) return TIMx->CCR1;
   else if( ch == TIMx_CH2 ) return TIMx->CCR2;
