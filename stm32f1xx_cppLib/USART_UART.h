@@ -46,6 +46,7 @@ extern "C"
 ---------------------------------------- */
 #define  USART_SUCCESS         (0)
 #define  USART_IF_ERROR        (-1)
+#define  USART_DEFINITION_ERROR (-2)
 
 #define  BAUD_921600  (0x00000270UL / 8)
 #define  BAUD_460800  (0x00000270UL / 4)
@@ -89,12 +90,13 @@ enum SCI_IF_NUMBERS
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-class USART_UART // : public GPIO
+class USART_UART : public GPIO
 {
 private:
   int ifNumber;
   USART_TypeDef *USARTx;
   uint32_t brr;
+  uint8_t tx,rx;
 
   uint16_t txAvailable();
   uint16_t rxAvailable();
@@ -102,12 +104,20 @@ private:
   void isrCallBack( void );
 
 public:
-  USART_UART();
-  ~USART_UART();
+  USART_UART() {}
+  USART_UART(
+    USART_TypeDef *_usart, uint32_t _brr,
+    uint8_t _tx, uint8_t _rx,
+    uint8_t basePri, uint8_t subPri )
+  {
+    begin( _usart, _brr, _tx, _rx, basePri, subPri );
+  }
+  ~USART_UART() {}
 
   int begin(
     USART_TypeDef *_usart, uint32_t brr,
-    bool remap = false, uint8_t basePri = BASE_PRIORITY, uint8_t subPri = BASE_SUB_PRIORITY );
+    uint8_t _tx, uint8_t _rx,
+    uint8_t basePri = BASE_PRIORITY, uint8_t subPri = BASE_SUB_PRIORITY );
   void end();
 
   int write( uint8_t c );

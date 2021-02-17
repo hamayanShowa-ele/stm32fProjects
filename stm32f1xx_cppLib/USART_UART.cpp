@@ -61,107 +61,139 @@ T_SCI_BUFFER t_sci[] =
 /* ----------------------------------------
     constructor destructor
 ---------------------------------------- */
-USART_UART::USART_UART()
-{
-}
-
-USART_UART::~USART_UART()
-{
-}
 
 /* ----------------------------------------
     begin and end
 ---------------------------------------- */
 int USART_UART::begin(
   USART_TypeDef *_usart, uint32_t _brr,
-  bool remap, uint8_t basePri, uint8_t subPri )
+  uint8_t _tx, uint8_t _rx,
+  uint8_t basePri, uint8_t subPri )
 {
   USARTx = _usart;
   brr = _brr;
-  GPIO_TypeDef *txGPIOx,*rxGPIOx;
-  uint16_t txPin,rxPin;
+  tx = _tx; rx = _rx;
+//  GPIO_TypeDef *txGPIOx,*rxGPIOx;
+//  uint16_t txPin,rxPin;
   uint8_t irq;
   ifNumber = USART1_IF_NUMBER;
 
   if( USARTx == USART1 )
   {
+//    RCC_APB2PeriphClockCmd( RCC_APB2Periph_USART1, ENABLE );  /* usart clock enable. */
+//    RCC_APB2PeriphResetCmd( RCC_APB2Periph_USART1, DISABLE );
+    if( tx == PB6 && rx == PB7 )  // need remap.
+    {
+      rccClockEnable( RCC_GPIOB );
+      remap( REMAP_USART1 );
+//      GPIO_PinRemapConfig( GPIO_Remap_USART1, ENABLE );
+//      txGPIOx = GPIOB; txPin = GPIO_Pin_6;
+//      rxGPIOx = GPIOB; rxPin = GPIO_Pin_7;
+    }
+    else if( tx == PA9 && rx == PA10 )  // not need remap.
+    {
+      rccClockEnable( RCC_GPIOA );
+//      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
+//      txGPIOx = GPIOA; txPin = GPIO_Pin_9;
+//      rxGPIOx = GPIOA; rxPin = GPIO_Pin_10;
+    }
+    else return USART_DEFINITION_ERROR;
+
     ifNumber = USART1_IF_NUMBER;
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_USART1, ENABLE );  /* usart clock enable. */
-    RCC_APB2PeriphResetCmd( RCC_APB2Periph_USART1, DISABLE );
-    if( remap )  /* PB6 : tx, PB7 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE );
-      GPIO_PinRemapConfig( GPIO_Remap_USART1, ENABLE );
-      txGPIOx = GPIOB; txPin = GPIO_Pin_6;
-      rxGPIOx = GPIOB; rxPin = GPIO_Pin_7;
-    }
-    else  /* PA9 : tx, PA10 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
-      txGPIOx = GPIOA; txPin = GPIO_Pin_9;
-      rxGPIOx = GPIOA; rxPin = GPIO_Pin_10;
-    }
+    rccClockEnable( RCC_USART1 );
     irq = USART1_IRQn;
   }
   else if( USARTx == USART2 )
   {
+//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_USART2, ENABLE );  /* usart clock enable. */
+//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_USART2, DISABLE );
+    if( tx == PD5 && rx == PD6 )  // need remap.
+    {
+      rccClockEnable( RCC_GPIOD );
+      remap( REMAP_USART2 );
+//      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
+//      GPIO_PinRemapConfig( GPIO_Remap_USART2, ENABLE );
+//      txGPIOx = GPIOD; txPin = GPIO_Pin_5;
+//      rxGPIOx = GPIOD; rxPin = GPIO_Pin_7;
+    }
+    else if( tx == PA2 && rx == PA3 )  // not need remap.
+    {
+      rccClockEnable( RCC_GPIOA );
+//      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
+//      txGPIOx = GPIOA; txPin = GPIO_Pin_2;
+//      rxGPIOx = GPIOA; rxPin = GPIO_Pin_3;
+    }
+    else return USART_DEFINITION_ERROR;
+
     ifNumber = USART2_IF_NUMBER;
-    RCC_APB1PeriphClockCmd( RCC_APB1Periph_USART2, ENABLE );  /* usart clock enable. */
-    RCC_APB1PeriphResetCmd( RCC_APB1Periph_USART2, DISABLE );
-    if( remap )  /* PD5 : tx, PD7 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
-      GPIO_PinRemapConfig( GPIO_Remap_USART2, ENABLE );
-      txGPIOx = GPIOD; txPin = GPIO_Pin_5;
-      rxGPIOx = GPIOD; rxPin = GPIO_Pin_7;
-    }
-    else  /* PA2 : tx, PA3 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
-      txGPIOx = GPIOA; txPin = GPIO_Pin_2;
-      rxGPIOx = GPIOA; rxPin = GPIO_Pin_3;
-    }
+    rccClockEnable( RCC_USART2 );
     irq = USART2_IRQn;
   }
   else if( USARTx == USART3 )
   {
+//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_USART3, ENABLE );  /* usart clock enable. */
+//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_USART3, DISABLE );
+    if( tx == PD8 && rx == PD9 )  // need full remap.
+    {
+      rccClockEnable( RCC_GPIOD );
+      remap( REMAP_Full_USART3 );
+//      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
+//      GPIO_PinRemapConfig( GPIO_FullRemap_USART3, ENABLE );  // or GPIO_PartialRemap_USART3
+//      txGPIOx = GPIOD; txPin = GPIO_Pin_8;
+//      rxGPIOx = GPIOD; rxPin = GPIO_Pin_9;
+    }
+    else if( tx == PC10 && rx == PC11 )  // need partial remap.
+    {
+      rccClockEnable( RCC_GPIOC );
+      remap( REMAP_Partial_USART3 );
+    }
+    else if( tx == PB10 && rx == PB11 )  // not need remap.
+    {
+      rccClockEnable( RCC_GPIOB );
+//      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE );
+//      txGPIOx = GPIOB; txPin = GPIO_Pin_10;
+//      rxGPIOx = GPIOB; rxPin = GPIO_Pin_11;
+    }
+    else return USART_DEFINITION_ERROR;
+
     ifNumber = USART3_IF_NUMBER;
-    RCC_APB1PeriphClockCmd( RCC_APB1Periph_USART3, ENABLE );  /* usart clock enable. */
-    RCC_APB1PeriphResetCmd( RCC_APB1Periph_USART3, DISABLE );
-    if( remap )  /* PD8 : tx, PD9 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
-      GPIO_PinRemapConfig( GPIO_FullRemap_USART3, ENABLE );  // or GPIO_PartialRemap_USART3
-      txGPIOx = GPIOD; txPin = GPIO_Pin_8;
-      rxGPIOx = GPIOD; rxPin = GPIO_Pin_9;
-    }
-    else  /* PB10 : tx, PB11 : rx */
-    {
-      RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE );
-      txGPIOx = GPIOB; txPin = GPIO_Pin_10;
-      rxGPIOx = GPIOB; rxPin = GPIO_Pin_11;
-    }
+    rccClockEnable( RCC_USART3 );
     irq = USART3_IRQn;
   }
   else if( USARTx == UART4 )  /* PC10 : tx, PC11 : rx */
   {
+    if( tx == PC10 && rx == PC11 )  // not need remap.
+    {
+      rccClockEnable( RCC_GPIOC );
+    }
+    else return USART_DEFINITION_ERROR;
+//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_UART4, ENABLE );  /* usart clock enable. */
+//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_UART4, DISABLE );
+//    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
+//    txGPIOx = GPIOC; txPin = GPIO_Pin_10;
+//    rxGPIOx = GPIOC; rxPin = GPIO_Pin_11;
+
     ifNumber = UART4_IF_NUMBER;
-    RCC_APB1PeriphClockCmd( RCC_APB1Periph_UART4, ENABLE );  /* usart clock enable. */
-    RCC_APB1PeriphResetCmd( RCC_APB1Periph_UART4, DISABLE );
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-    txGPIOx = GPIOC; txPin = GPIO_Pin_10;
-    rxGPIOx = GPIOC; rxPin = GPIO_Pin_11;
+    rccClockEnable( RCC_UART4 );
     irq = UART4_IRQn;
   }
   else if( USARTx == UART5 )  /* PC12 : tx, PD2 : rx */
   {
+    if( tx == PC12 && rx == PD2 )  // not need remap.
+    {
+      rccClockEnable( RCC_GPIOC );
+      rccClockEnable( RCC_GPIOD );
+    }
+    else return USART_DEFINITION_ERROR;
+//    RCC_APB1PeriphClockCmd( RCC_APB1Periph_UART5, ENABLE );  /* usart clock enable. */
+//    RCC_APB1PeriphResetCmd( RCC_APB1Periph_UART5, DISABLE );
+//    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
+//    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
+//    txGPIOx = GPIOC; txPin = GPIO_Pin_12;
+//    rxGPIOx = GPIOD; rxPin = GPIO_Pin_2;
+
     ifNumber = UART5_IF_NUMBER;
-    RCC_APB1PeriphClockCmd( RCC_APB1Periph_UART5, ENABLE );  /* usart clock enable. */
-    RCC_APB1PeriphResetCmd( RCC_APB1Periph_UART5, DISABLE );
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-    RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
-    txGPIOx = GPIOC; txPin = GPIO_Pin_12;
-    rxGPIOx = GPIOD; rxPin = GPIO_Pin_2;
+    rccClockEnable( RCC_UART5 );
     irq = UART5_IRQn;
   }
   else { return USART_IF_ERROR; }
@@ -174,17 +206,21 @@ int USART_UART::begin(
   t_sci[ifNumber].echo = false;
 
   /* usart gpio configuration. */
-   /* tx alternate functions. */
-  GPIO_InitTypeDef GPIO_InitStructure;
-  GPIO_InitStructure.GPIO_Pin = txPin;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_Init( txGPIOx, &GPIO_InitStructure );
-   /* rx alternate functions. */
-  GPIO_InitStructure.GPIO_Pin = rxPin;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  GPIO_Init( rxGPIOx, &GPIO_InitStructure );
+  /* tx alternate functions. */
+  pinMode( tx, ALTERNATE_PP, GPIO_SPEED_FAST );
+  /* rx alternate functions. */
+  pinMode( rx, INPUT, GPIO_SPEED_FAST );
+//  /* tx alternate functions. */
+//  GPIO_InitTypeDef GPIO_InitStructure;
+//  GPIO_InitStructure.GPIO_Pin = txPin;
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//  GPIO_Init( txGPIOx, &GPIO_InitStructure );
+//   /* rx alternate functions. */
+//  GPIO_InitStructure.GPIO_Pin = rxPin;
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//  GPIO_Init( rxGPIOx, &GPIO_InitStructure );
 
   /* usart and uart configuraton. */
   USART_InitTypeDef USART_InitStruct;
