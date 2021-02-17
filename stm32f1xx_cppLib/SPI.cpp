@@ -38,63 +38,52 @@ static ID semaIDv[3];
 /* ----------------------------------------
     constructor destructor
 ---------------------------------------- */
-SPI::SPI()
-{
-}
-
-SPI::SPI( SPI_TypeDef *spi, ID id, bool _remap )
-{
-  begin( spi, id, _remap );
-}
-
-SPI::~SPI()
-{
-}
 
 /* ----------------------------------------
     begin and end
     w5100 is only supported in mode 0 or mode 3???.
 ---------------------------------------- */
-int SPI::begin( SPI_TypeDef *spi, ID id, bool _remap )
+int SPI::begin( SPI_TypeDef *spi, ID id,
+  uint8_t _sck, uint8_t _mosi, uint8_t _miso )
 {
   SPIx = spi;
   semaID = id;
+  sck = _sck;
+  mosi = _mosi;
+  miso = _miso;
 
   /* spi interface case by case. */
   if( SPIx == SPI1 )
   {
     rccClockEnable( RCC_SPI1 );
-    if( _remap )
+    if( sck == PB3 && mosi == PB5 && miso == PB4 )  // need remap.
     {
       rccClockEnable( RCC_GPIOB );
       remap( REMAP_SPI1 );
-      sck = PB3;
-      mosi = PB5;
-      miso = PB4;
     }
-    else
+    else if( sck == PA5 && mosi == PA7 && miso == PA6 )  // not need remap.
     {
       rccClockEnable( RCC_GPIOA );
-      sck = PA5;
-      mosi = PA7;
-      miso = PA6;
     }
+    else return SPI_DEFINITION_ERROR;
   }
   else if( SPIx == SPI2 )
   {
-    rccClockEnable( RCC_SPI2 );
-    rccClockEnable( RCC_GPIOB );
-    sck = PB13;
-    mosi = PB15;
-    miso = PB14;
+    if( sck == PB13 && mosi == PB15 && miso == PB14 )  // not need remap.
+    {
+      rccClockEnable( RCC_SPI2 );
+      rccClockEnable( RCC_GPIOB );
+    }
+    else return SPI_DEFINITION_ERROR;
   }
   else if( SPIx == SPI3 )
   {
-    rccClockEnable( RCC_SPI3 );
-    rccClockEnable( RCC_GPIOB );
-    sck = PB3;
-    mosi = PB5;
-    miso = PB4;
+    if( sck == PB3 && mosi == PB5 && miso == PB4 )  // not need remap.
+    {
+      rccClockEnable( RCC_SPI3 );
+      rccClockEnable( RCC_GPIOB );
+    }
+    else return SPI_DEFINITION_ERROR;
   }
   else return SPI_IF_ERROR;
 

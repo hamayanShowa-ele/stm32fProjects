@@ -53,6 +53,8 @@ extern "C"
 #define  SPI_BUS_BUSY        (-1)
 #define  SPI_SEMAPHORE_BUSY  (-2)
 #define  SPI_RECIEVE_TIMEOUT (-3)
+#define  SPI_IF_ERROR        (-4)
+#define  SPI_DEFINITION_ERROR (-5)
 
 /* ----------------------------------------
     instances or global variables
@@ -69,10 +71,13 @@ private:
   void sigSema();
 
 public:
-  SPI();
-  SPI( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
-  ~SPI();
-  void begin( SPI_TypeDef *spi, uint8_t sckPin, uint8_t misoPin, uint8_t mosiPin, ID id = 0 );
+  SPI() {}
+  SPI( SPI_TypeDef *spi, ID id, uint8_t _sck, uint8_t _mosi, uint8_t _miso )
+    { begin( spi, id, _sck, _mosi, _miso ); }
+  ~SPI() {}
+
+  int begin( SPI_TypeDef *spi, ID id,
+    uint8_t _sck, uint8_t _mosi, uint8_t _miso );
   void end();
   int  readWrite( uint8_t data );
   int  write( uint8_t data ) { return readWrite( data ); }
