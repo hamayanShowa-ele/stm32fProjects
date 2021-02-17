@@ -84,7 +84,7 @@ USART_UART::~USART_UART()
 int USART_UART::begin(
   USART_TypeDef *_usart, uint32_t _brr,
   uint8_t _tx, uint8_t _rx,
-  bool remap, uint8_t basePri, uint8_t subPri )
+  uint8_t basePri, uint8_t subPri )
 {
   USARTx = _usart;
   txPin = _tx; rxPin = _rx;

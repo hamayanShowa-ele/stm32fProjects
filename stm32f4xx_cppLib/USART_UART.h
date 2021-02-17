@@ -108,7 +108,7 @@ public:
   int begin(
     USART_TypeDef *_usart, uint32_t brr,
     uint8_t _tx, uint8_t _rx,
-    bool remap = false, uint8_t basePri = BASE_PRIORITY, uint8_t subPri = BASE_SUB_PRIORITY );
+    uint8_t basePri = BASE_PRIORITY, uint8_t subPri = BASE_SUB_PRIORITY );
   void end();
 
   int write( uint8_t c );
