@@ -27,15 +27,15 @@
 #include  <stm32f10x.h>
 #include  <time.h>
 #include  <math.h>
-#include  <HardwareSerial.h>
 #include  <Timer.h>
-#include  <Wire.h>
+#include  <USART_UART.h>
+#include  <I2C.h>
 #include  <SPI.h>
 #include  <led.h>
 #include  <strutil.h>
 #include  <pca8574.h>
-#include  <eep24aa025.h>
-#include  "boardUtility.h"
+#include  <rom24aa025.h>
+#include  <boardUtility.h>
 #include  <wiznet.h>
 #include  <gpio.h>
 #include  <1703.h>
@@ -80,7 +80,7 @@ volatile time_t unixTime;
 volatile uint32_t pps_millisecond_counter;
 
 GPIO gpio;
-Serial Serial1;  /* hardware serial 1 */
+USART_UART usart1;
 SPI spi2;
 STM32F_I2C i2c2;
 BOARD  chronos;
@@ -171,10 +171,17 @@ int main(void)
   }
 
   /* initialize serial */
-  Serial1.begin( SCI_1, 115200UL );
-  Serial1.printf( "    1703 CHRONOS ntp client\r\n" );
-  Serial1.printf( "    designed by hamayan.\r\n" );
-//  serialLoopBack( &Serial1 );
+  usart1.begin( USART1, 115200UL, USART1_TXD, USART1_RXD );
+  usart1.print( "    1703 CHRONOS ntp client\r\n" );
+  usart1.print( "    designed by hamayan.\r\n" );
+  usart1.printf( "    DEVICE ID:0x%04X REVISION:0x%04X UNIQUE ID:%02X:02X:02X.\r\n",
+    dev, rev, uid[0], uid[1], uid[2] );
+//  usart1.echo();  /* echo back is on. */
+//  dump( (const uint8_t *)0x08000000, 256UL, &usart1 );
+//  dump( (const uint16_t *)0x08000000, 256UL, &usart1 );
+  dump( (const uint32_t *)0x08000000, 256UL, &usart1 );
+
+  while( true ) {}
 
   /* initialize i2c2 */
   i2c2.begin( I2C2, SDA2, SCL2 );
@@ -192,7 +199,7 @@ int main(void)
   int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, xMAC, sizeof(xMAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
   if( cnt != 6 )
   {
-    Serial1.printf( "  Mac address read from eeprom, but failed.\r\n" );
+    usart1.printf( "  Mac address read from eeprom, but failed.\r\n" );
     xMAC[0] = 0xDE; xMAC[1] = 0xAD; xMAC[2] = 0xBE; xMAC[3] = 0xEF; xMAC[4] = 0x00; xMAC[5] = 100;
   }
 
@@ -200,7 +207,7 @@ int main(void)
   chronos.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+  spi2.begin( SPI2, SEMID_SPI2, SPI2_SCK, SPI2_MOSI, SPI2_MISO );  /* SPI?,SEMAPHORE,SCK,MOSI,MISO */
 
   /* initialize wiznet w5500 */
   wizchip.clearNetworkInfo();
@@ -232,18 +239,18 @@ static unsigned int RemainStack( void *stk, unsigned int sz );
 void stackMonitor( void )
 {
   SYSTIM baseTim = systim;
-  time_t unxTimeBase = unixTime;
+//  time_t unxTimeBase = unixTime;
   while( 1 )
   {
     /*stack report.*/
     if( (systim - baseTim) >= 10 * 1000UL )
     {
       baseTim = systim;
-      Serial1.printf( "  TASK1:%d/%d\r\n", RemainStack( tsk1_stk, sizeof(tsk1_stk) ), sizeof(tsk1_stk) );
-      Serial1.printf( "  TASK2:%d/%d\r\n", RemainStack( tsk2_stk, sizeof(tsk2_stk) ), sizeof(tsk2_stk) );
-      Serial1.printf( "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
+      usart1.printf( "  TASK1:%d/%d\r\n", RemainStack( tsk1_stk, sizeof(tsk1_stk) ), sizeof(tsk1_stk) );
+      usart1.printf( "  TASK2:%d/%d\r\n", RemainStack( tsk2_stk, sizeof(tsk2_stk) ), sizeof(tsk2_stk) );
+      usart1.printf( "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
       char buffer[32];
-      Serial1.printf( "    %s\r\n", localDateTimeString( buffer, unixTime ) );
+      usart1.printf( "    %s\r\n", localDateTimeString( buffer, unixTime ) );
     }
     if( (unixTime % 10) < 5 ) actLed.On();
     else actLed.Off();
@@ -333,7 +340,7 @@ void sntpClient( void )
   while( true )
   {
     dly_tsk( 10 * 1000UL );
-    Serial1.printf( "ntp transmit\r\n" );
+    usart1.printf( "ntp transmit\r\n" );
     uint32_t t1H,t1L;
     uint32_t t2H,t2L;
     uint32_t t3H,t3L;
@@ -357,7 +364,7 @@ void sntpClient( void )
         {
           unixTime = (time_t)(t3H - UTC_EPOCH_DIFF);
           sprintf( buffer, "ntp recieve from %d.%d.%d.%d:%d\r\n", dip[0],dip[1],dip[2],dip[3],port );
-          Serial1.printf( buffer );
+          usart1.printf( buffer );
           int32_t a; int32_t b = 0x40000000;
           a = t1L >> 2;  /* 0x3FFFFFFF */
           double t1D = ((double)a / (double)b) + (double)t1H;
@@ -369,24 +376,24 @@ void sntpClient( void )
           double t4D = ((double)a / (double)b) + (double)t4H;
 
           dtostrf( t1D, 20, 8, buffer );
-          Serial1.printf( "    T1=%s\r\n", buffer );
+          usart1.printf( "    T1=%s\r\n", buffer );
 
           dtostrf( t2D, 20, 8, buffer );
-          Serial1.printf( "    T2=%s\r\n", buffer );
+          usart1.printf( "    T2=%s\r\n", buffer );
 
           dtostrf( t3D, 20, 8, buffer );
-          Serial1.printf( "    T3=%s\r\n", buffer );
+          usart1.printf( "    T3=%s\r\n", buffer );
 
           dtostrf( t4D, 20, 8, buffer );
-          Serial1.printf( "    T4=%s\r\n", buffer );
+          usart1.printf( "    T4=%s\r\n", buffer );
 
           double tOFFSET = ((t2D - t1D) - (t4D - t3D)) / 2.0;  // ((t3D + t2D) - (t4D + t1D)) / 2.0
           dtostrf( tOFFSET, 20, 8, buffer );
-          Serial1.printf( "    OFFSET : %s(s) ", buffer );
+          usart1.printf( "    OFFSET : %s(s) ", buffer );
 
           double tRTT = (t2D - t1D) + (t4D - t3D);  // (t4D - t1D) - (t3D - t2D)
           dtostrf( tRTT, 20, 8, buffer );
-          Serial1.printf( "ROUND TRIP : %s(s)\r\n", buffer );
+          usart1.printf( "ROUND TRIP : %s(s)\r\n", buffer );
 
           if( run == true )
           {
@@ -417,9 +424,9 @@ void sntpClient( void )
             bd1702.lockLED( lock );
             sprintf( buffer, "    RELOAD=%d GAP=%d COUNT=%d UNLOCK=%d",
               (int)reload, gap, count, unLockCount );
-            Serial1.printf( buffer );
+            usart1.printf( buffer );
             dly_tsk( 2UL );
-            Serial1.printf( (lock) ? " LOCKED\r\n" : " NOT LOCKED\r\n" );
+            usart1.printf( (lock) ? " LOCKED\r\n" : " NOT LOCKED\r\n" );
           }
 
           run = true;
@@ -459,19 +466,12 @@ void RCC_Configuration( void )
   SystemInit();
 
   /* Enable GPIO clock */
-//  RCC_APB2PeriphClockCmd( RCC_APB2Periph_TIM1, ENABLE );
-  RCC_APB2PeriphClockCmd( RCC_APB2Periph_AFIO, ENABLE );
-  RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA, ENABLE );
-  RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB, ENABLE );
-  RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-  RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
-
-//  RCC_APB2PeriphResetCmd( RCC_APB2Periph_TIM1, DISABLE );
-  RCC_APB2PeriphResetCmd( RCC_APB2Periph_AFIO, DISABLE );
-  RCC_APB2PeriphResetCmd( RCC_APB2Periph_GPIOA, DISABLE );
-  RCC_APB2PeriphResetCmd( RCC_APB2Periph_GPIOB, DISABLE );
-  RCC_APB2PeriphResetCmd( RCC_APB2Periph_GPIOC, DISABLE );
-  RCC_APB2PeriphResetCmd( RCC_APB2Periph_GPIOD, DISABLE );
+  GPIO gpio;
+  gpio.rccClockEnable( RCC_AFIO );
+  gpio.rccClockEnable( RCC_GPIOA );
+  gpio.rccClockEnable( RCC_GPIOB );
+  gpio.rccClockEnable( RCC_GPIOC );
+  gpio.rccClockEnable( RCC_GPIOD );
 
   /* DMA1,2 clock enable */
   RCC_AHBPeriphClockCmd( RCC_AHBPeriph_DMA1 | RCC_AHBPeriph_DMA2, ENABLE);
