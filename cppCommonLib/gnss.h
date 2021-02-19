@@ -25,7 +25,7 @@
 #ifndef  __GNSS_H__
 #define  __GNSS_H__
 
-#include  <HardwareSerial.h>
+#include  <USART_UART.h>
 #include  <strutil.h>
 
 extern "C"
@@ -165,11 +165,16 @@ enum SATELLITE_TYPE { TYPE_GPS, TYPE_QZSS, TYPE_GLONASS, TYPE_GALILEO, TYPE_BEID
 
 class GNSS // : public hoge
 {
+private:
+  USART_UART *gpsSerial;
+  float latitude( const char *str );
+  float longitude( const char *str );
+
 public:
   GNSS();
-  GNSS( Serial *seri );
+  GNSS( USART_UART *seri );
   ~GNSS();
-  void begin( Serial *seri );
+  void begin( USART_UART *seri );
   int  line( char *rcv, int size );
 
   int  gpzda( const char *sentence, GPS_GPZDA *zda );
@@ -181,12 +186,6 @@ public:
   int  gpvtg( const char *sentence, GPS_GPVTG *vtg );
   int  gpgns( const char *sentence, GPS_GPGNS *gns );
   int  gpsGMTtime( const GPS_GPZDA *zda, struct tm *t );
-
-private:
-  Serial *gpsSerial;
-
-  float latitude( const char *str );
-  float longitude( const char *str );
 };
 
 

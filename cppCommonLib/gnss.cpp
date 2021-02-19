@@ -39,7 +39,7 @@ GNSS::GNSS()
 {
 }
 
-GNSS::GNSS( Serial *seri )
+GNSS::GNSS( USART_UART *seri )
 {
   begin( seri );
 }
@@ -51,7 +51,7 @@ GNSS::~GNSS()
 /* ----------------------------------------
     begin and end
 ---------------------------------------- */
-void GNSS::begin( Serial *seri )
+void GNSS::begin( USART_UART *seri )
 {
   gpsSerial = seri;
 }
