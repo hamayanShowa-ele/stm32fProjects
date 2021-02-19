@@ -25,9 +25,10 @@
 //#include  "stm32f10x_conf.h"
 #include  <time.h>
 #include  <math.h>
-#include  <HardwareSerial.h>
+#include  <USART_UART.h>
 #include  <Timer.h>
-#include  <Wire.h>
+//#include  <Wire.h>
+#include  <I2C.h>
 //#include  <SPI.h>
 #include  <led.h>
 #include  <1314.h>
@@ -44,6 +45,7 @@ extern "C"
   #include  <system.h>
   #include  <mul_tsk.h>
   #include  <stm32f_rtc.h>
+  #include  <sram23lcXXX.h>
 }
 
 
@@ -66,7 +68,7 @@ volatile SYSTIM systim;
 volatile time_t unixTime;
 volatile time_t sumTotalTime;  /* Total time since startup */
 
-Serial Serial1;  /* hardware serial 1 */
+USART_UART Serial1;  /* hardware serial 1 */
 BOARD  board;
 STM32F_I2C i2c1;
 SPI spi2;
@@ -121,10 +123,9 @@ int main(void)
   LED actled( ACTLED );
 
   /* initialize serial */
-  Serial1.begin( SCI_1, 115200UL );
-  Serial1.printf( "    1314 SDF7 Main\r\n" );
-  Serial1.printf( "    designed by hamayan.\r\n" );
-//  serialLoopBack( &Serial1 );
+  Serial1.begin( USART1, 115200UL );
+  Serial1.print( "    1314 SDF7 Main\r\n" );
+  Serial1.print( "    designed by hamayan.\r\n" );
 
   if( RTC_Init() != 0 )
   {
@@ -136,6 +137,7 @@ int main(void)
 
   /* initialize I2C1. */
   i2c1.begin( I2C1, SDA1, SCL1 );
+
   /* initialize eeprom1. */
   uint8_t mac[6];
   EEP24AA025 eeprom1( &i2c1, 0x50 );
@@ -154,15 +156,23 @@ int main(void)
   board.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+  spi2.begin( SPI2, SEMID_SPI2, false );  /* SPI?,SEMAPHORE,REMAP */
 
   /* initialize 23LCV1024 */
   sSRAM.begin( &spi2, RAM_CS );
-  sSRAM.mode( SRAM_23LCxxx_MODE_RDMR, SRAM_BYTE_MODE );
-  sSRAM.mode( SRAM_23LCxxx_MODE_WRMR, SRAM_BYTE_MODE );
+#if 0
+  uint8_t mode = sSRAM.mode();
+  if( mode != SRAM_SEQUENTIAL_MODE )
+  {
+    sSRAM.mode( SRAM_23LCxxx_MODE_WRMR, SRAM_SEQUENTIAL_MODE );
+//    blinkLED( &actled, 50UL );
+  }
+  else blinkLED( &actled, 500UL );
+#endif
 
   uint32_t sramAddress = 0UL;
-  srand( 1234 + 1 );
+#if  0  /* ramdom data check. */
+  srand( 1234 + 2 );
   for( int i = 0; i < (int)SRAM_23LCxxx_SIZE; i++ )
   {
     uint8_t rcv,r;
@@ -170,19 +180,75 @@ int main(void)
     r = rand();
     if( rcv != r )
     {
-   	  srand( 1234 + 1 );
-   	  sramAddress = 0UL;
-   	  for( int i = 0; i < (int)SRAM_23LCxxx_SIZE; i++ )
-   	  {
-   	    sSRAM.write( sramAddress++, (uint8_t)rand() );
-   	  }
-   	  blinkLED( &actled, 50UL );
+      srand( 1234 + 2 );
+      sramAddress = 0UL;
+      for( int i = 0; i < (int)SRAM_23LCxxx_SIZE; i++ )
+      {
+        sSRAM.write( sramAddress++, (uint8_t)rand() );
+      }
+      blinkLED( &actled, 50UL );
     }
   }
+#else
+//  #define  _SERIAL_SRAM_IS_BYTE_MODE_
+  #define  _SERIAL_SRAM_IS_SEQUENTIAL_MODE_
+  #if  defined( _SERIAL_SRAM_IS_BYTE_MODE_ )
+  sSRAM.mode( SRAM_23LCxxx_MODE_WRMR, SRAM_BYTE_MODE );
+  #endif
+  for( int i = 0; i < (int)SRAM_23LCxxx_SIZE; )
+  {
+    uint8_t buffer[256];
+    #if  defined( _SERIAL_SRAM_IS_BYTE_MODE_ )
+    sSRAM.byteRead( sramAddress, (uint8_t *)buffer, sizeof(buffer) );
+    sramAddress += sizeof(buffer);
+    #elif defined( _SERIAL_SRAM_IS_SEQUENTIAL_MODE_ )
+    sSRAM.sequRead( sramAddress, (uint8_t *)buffer, sizeof(buffer) );
+    sramAddress += sizeof(buffer);
+    #endif
+
+    i += sizeof(buffer);
+//    dump( (const uint8_t *)buffer, sizeof(buffer), &Serial1 );
+    if( i >= 256 ) break;
+  }
+#endif
+  while( 1 )
+  {
+    uint8_t buffer[256];
+    /* write by byte. */
+    sramAddress = 0UL;
+    for( int i = 0; i < (int)sizeof(buffer); i++ )
+    {
+      sSRAM.write( sramAddress++, (uint8_t)i );
+    }
+
+    /* read by sequential mode. */
+    Serial1.print( "read by sequential mode.\r\n" );
+    sSRAM.mode( SRAM_23LCxxx_MODE_WRMR, SRAM_SEQUENTIAL_MODE );
+    sSRAM.sequRead( 0UL, buffer, sizeof(buffer) );
+    dump( (const uint8_t *)buffer, sizeof(buffer), &Serial1 );
+
+    /* change to byte mode and read by byte mode. */
+    uint8_t byteBuffer[256];
+    Serial1.print( "change to byte mode and read by byte mode.\r\n" );
+    sSRAM.mode( SRAM_23LCxxx_MODE_WRMR, SRAM_BYTE_MODE );
+    sSRAM.byteRead( 0UL, byteBuffer, sizeof(byteBuffer) );
+    dump( (const uint8_t *)byteBuffer, sizeof(byteBuffer), &Serial1 );
+
+    if( memcmp( byteBuffer, buffer, sizeof(buffer)) != 0 )
+    {
+      Serial1.print( "there is difference from byte mode data and sequential mode data.\r\n" );
+    }
+    else
+    {
+      Serial1.print( "there is no difference from byte mode data and sequential mode data.\r\n" );
+    }
+    break;
+  }
+  sSRAM.write( 0UL, (const uint8_t *)"designed by hamayan", sizeof("designed by hamayan") );
   blinkLED( &actled, 500UL );
 
   /* initialize SPI3 */
-  spi3.begin( SPI3, PB3, PB4, PB5, SEMID_SPI3 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+  spi3.begin( SPI3, SEMID_SPI3, false );  /* SPI?,SEMAPHORE,REMAP */
 
   /* initialize wiznet w5500 */
   wizchip1.clearNetworkInfo();
@@ -194,12 +260,6 @@ int main(void)
   /* The order of the memsize array is sending and receiving. */
   static const uint8_t memsize[2][4] = {{2,2,2,2},{2,2,2,2}};  /* txsize,rxsize */
   wizchip1.begin( &spi3, (const uint8_t *)memsize, wizchip1_select, wizchip1_deselect );
-
-  while( 0 )
-  {
-    dly_tsk( 100UL );
-    actled.toggle();
-  }
 
   /* initialize tasks and start dispatch. */
   tsk_ini();  //

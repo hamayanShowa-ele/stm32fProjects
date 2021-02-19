@@ -125,6 +125,8 @@
 #define  ACTLED     PE0   /* output */
 #define  USBON      PE1   /* output */
 #define  RAM_CS     PB12  /* output */
+#define  RAM_CS_PORT GPIOB  /* output */
+#define  RAM_CS_PIN  GPIO_Pin_12  /* output */
 
 
 /*
