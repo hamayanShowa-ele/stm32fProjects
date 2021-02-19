@@ -53,30 +53,40 @@
 #define  USART1_RXD_PORT      GPIOA
 #define  USART1_TXD_PIN       GPIO_Pin_9
 #define  USART1_RXD_PIN       GPIO_Pin_10
+#define  USART1_TXD           PA9
+#define  USART1_RXD           PA10
 
 /* USART2 TXD RXD */
 #define  USART2_TXD_PORT      GPIOA
 #define  USART2_RXD_PORT      GPIOA
 #define  USART2_TXD_PIN       GPIO_Pin_2
 #define  USART2_RXD_PIN       GPIO_Pin_3
+#define  USART2_TXD           PA2
+#define  USART2_RXD           PA3
 
 /* USART3 TXD RXD */
 #define  USART3_TXD_PORT      GPIOB
 #define  USART3_RXD_PORT      GPIOB
 #define  USART3_TXD_PIN       GPIO_Pin_10
 #define  USART3_RXD_PIN       GPIO_Pin_11
+#define  USART3_TXD           PB10
+#define  USART3_RXD           PB11
 
 /* UART4 TXD RXD */
 #define  UART4_TXD_PORT      GPIOC
 #define  UART4_RXD_PORT      GPIOC
 #define  UART4_TXD_PIN       GPIO_Pin_10
 #define  UART4_RXD_PIN       GPIO_Pin_11
+#define  UART4_TXD           PC10
+#define  UART4_RXD           PC11
 
 /* UART5 TXD RXD */
 #define  UART5_TXD_PORT      GPIOC
 #define  UART5_RXD_PORT      GPIOD
 #define  UART5_TXD_PIN       GPIO_Pin_12
 #define  UART5_RXD_PIN       GPIO_Pin_2
+#define  UART5_TXD           PC12
+#define  UART5_RXD           PD2
 
 /* SD CARD */
 #define  SD_CD      PC6  /* input */

@@ -27,16 +27,16 @@
 #include  <stm32f10x.h>
 #include  <time.h>
 #include  <math.h>
-#include  <HardwareSerial.h>
+#include  <USART_UART.h>
 #include  <Timer.h>
-#include  <Wire.h>
+#include  <I2C.h>
 #include  <SPI.h>
 #include  <EXTI.h>
 #include  <led.h>
 #include  <1703.h>
 #include  <strutil.h>
 #include  <pca8574.h>
-#include  <eep24aa025.h>
+#include  <rom24aa025.h>
 #include  "boardUtility.h"
 #include  <wiznet.h>
 #include  <gpio.h>
@@ -88,8 +88,8 @@ volatile bool gpsLock = false;
 
 GPIO gpio;
 LED actLed;
-Serial Serial1;  /* hardware serial 1 */
-Serial Serial5;  /* hardware serial 5 for gps */
+USART_UART Serial1;  /* hardware serial 1 */
+USART_UART Serial5;  /* hardware serial 5 for gps */
 SPI spi2;
 STM32F_I2C i2c2;
 BOARD  chronos;
@@ -168,10 +168,9 @@ int main(void)
   }
 
   /* initialize serial 1 */
-  Serial1.begin( SCI_1, 115200UL );
-  Serial1.printf( "    1703 CHRONOS NTP server\r\n" );
-  Serial1.printf( "    designed by hamayan.\r\n" );
-//  serialLoopBack( &Serial1 );
+  Serial1.begin( USART1, 115200UL, USART1_TXD, USART1_RXD );
+  Serial1.print( "    1703 CHRONOS NTP server\r\n" );
+  Serial1.print( "    designed by hamayan.\r\n" );
 
   /* initialize i2c2 */
   i2c2.begin( I2C2, SDA2, SCL2 );
@@ -182,6 +181,7 @@ int main(void)
   ic2.write( 0xFF );  /* input mode */
   ic4.write( 0xFF );  /* input mode */
   ic3.write( 0x40 );  /* output mode */
+
   /* initialize 24AA025 */
   EEP24AA025 eep( &i2c2, I2C_ADR_24AA025E48 );
   int cnt = eep.read( MAC_ADDRESS_IN_24AA025E48, xMAC, sizeof(xMAC) );  /* 00:1E:C0 is Microchip Technology Inc. vender code. */
@@ -195,7 +195,7 @@ int main(void)
   chronos.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, PB13, PB14, PB15, SEMID_SPI2 );  /* SPI?,SCK,MISO,MOSI,SEMAPHORE */
+  spi2.begin( SPI2, SEMID_SPI2, SPI2_SCK, SPI2_MOSI, SPI2_MISO );  /* SPI?,SEMAPHORE,SCK,MOSI,MISO */
 
   /* initialize wiznet w5500 */
   wizchip.setMac( (const uint8_t *)xMAC );
@@ -309,9 +309,9 @@ void gpsReciever( void )
 {
   /* initialize serial 5 */
 #if  defined(  __GPS_TYPE_FURUNO__ )
-  Serial5.begin( SCI_5, 38400UL, SCI_5_SND_BUFFER_SIZE, SCI_5_RCV_BUFFER_SIZE );
+  Serial5.begin( UART5, 38400UL, UART5_TXD, UART5_RXD );
 #elif  defined(  __GPS_TYPE_MT3339__ )
-  Serial5.begin( SCI_5, 9600UL, SCI_5_SND_BUFFER_SIZE, SCI_5_RCV_BUFFER_SIZE );
+  Serial5.begin( UART5, 9600UL, UART5_TXD, UART5_RXD );
 #endif  /*__GPS_TYPE_FURUNO__ or __GPS_TYPE_MT3339__ */
   GNSS gnss( &Serial5 );
   GPS_GPZDA zda;
