@@ -100,7 +100,6 @@ private:
 
   uint16_t txAvailable();
   uint16_t rxAvailable();
-//  #define  available()  rxAvailable()
   void isrCallBack( void );
 
 public:
@@ -131,6 +130,8 @@ public:
   void purge();
   void echo( bool onOff = true );
   void loopBack();
+
+  uint16_t available() { return rxAvailable(); }
 };
 
 
