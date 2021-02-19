@@ -400,18 +400,19 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, uint32_t seed, LED *led )
   while( true )
   {
     volatile uint16_t *ptr = (volatile uint16_t *)ram;
-#if 1
+#if 0
     int sz = size / (sizeof(uint16_t) * 2);
     for( int i = 0; i < sz; )
     {
       uint16_t rnd = (uint16_t)rand();
+__retry001 :
       dpRamDividWrite( (uint16_t *)ptr, rnd );
       uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
       if( rnd != rcv )
       {
         led->toggle();
         dly_tsk( 50UL );
-        continue;
+        goto __retry001;
       }
       ptr += 2;
       i++;
@@ -421,13 +422,14 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, uint32_t seed, LED *led )
     for( int i = 0; i < sz; )
     {
       uint16_t rnd = (uint16_t)rand();
+__retry002 :
       *ptr = rnd;
       uint16_t ret = *ptr;
       if( rnd != ret )
       {
         led->toggle();
         dly_tsk( 50UL );
-        continue;
+        goto __retry002;
       }
       ptr++;
       i++;
