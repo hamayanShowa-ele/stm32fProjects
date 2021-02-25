@@ -56,6 +56,8 @@ void NVIC_Configuration( void );
 static unsigned int RemainStack( void *stk, unsigned int sz );
 
 extern void cbINTDP( void );
+void cbINTEOLC1( void );
+void cbINTEOLC2( void );
 
 /* ----------------------------------------
   global variables and instance.
@@ -68,6 +70,11 @@ USART_UART Serial1;
 BOARD_1804 bd1804;
 BOARD_1411 bd1411;
 
+ADC_1804 adc1;
+ADC_1804 adc2;
+volatile uint16_t adc1Buffer[8],adc2Buffer[8];
+volatile uint8_t adc1Update,adc2Update;
+
 /* ----------------------------------------
   multi task.
 ---------------------------------------- */
@@ -75,12 +82,14 @@ BOARD_1411 bd1411;
   task prototypes.
 ---------------------------------------- */
 void stackMonitor( void );
+void adcTask( void );
 void tsk_ini( void );
 
 /* ----------------------------------------
   task stacks.
 ---------------------------------------- */
 char tsk1_stk[256 * 8];
+char tsk2_stk[256 * 8];
 
 /* ----------------------------------------
   task initialize.
@@ -88,8 +97,10 @@ char tsk1_stk[256 * 8];
 void tsk_ini( void )
 {
   reg_tsk( ID_stackMonitor,(void *)stackMonitor, tsk1_stk, sizeof(tsk1_stk), 0,0,0,0 );
+  reg_tsk( ID_adcTask,(void *)adcTask, tsk2_stk, sizeof(tsk2_stk), 0,0,0,0 );
 
   sta_tsk( ID_stackMonitor );
+  sta_tsk( ID_adcTask );
 }
 
 /* ----------------------------------------
@@ -126,19 +137,6 @@ int main(void)
   /*setup sci 1*/
   Serial1.begin( USART1, 115200UL, TXD1_PIN, RXD1_PIN );
   Serial1.print( "1804 GANYMEDE test program from USART1.\r\n    designed by hamayan.\r\n" );
-//  Serial1.loopBack();
-
-  dly_tsk( 5 *1000UL );
-  /* configure exti. */
-  extiConfig( INTDP, EXTI_Trigger_Falling );
-  extiCallBack( 3, cbINTDP );
-//  extiConfig( EOLC1, EXTI_Trigger_Falling );
-//  extiConfig( EOLC2, EXTI_Trigger_Falling );
-
-//  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
-  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
-//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, (uint16_t)0xA5A5, &actled ); /* fixed */
-//  bd1804.dpRamWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
 
   /* configure 1411 board. */
 //  bd1411.begin( PF11, PF10, PF9, PF8 );
@@ -160,8 +158,18 @@ int main(void)
 *******************************************************************************/
 void stackMonitor( void )
 {
+  dly_tsk( 5 *1000UL );
+  /* configure exti. */
+  extiConfig( INTDP, EXTI_Trigger_Falling );
+  extiCallBack( 3, cbINTDP );
   while(1)
   {
+//  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
+//    bd1804.dpRamRandomWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
+//  bd1804.dpRamFixedWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, (uint16_t)0xA5A5, &actled ); /* fixed */
+//  bd1804.dpRamIncrementWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
+    bd1804.dpRamSineWrite( (void *)DPRAM_BASE_ADDRESS, 2000, 62UL, &actled );  /* sine pattern. */
+
     rot_rdq();
   }
 }
@@ -180,6 +188,40 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
 }
 
 
+/* ----------------------------------------
+    adc task.
+---------------------------------------- */
+void adcTask( void )
+{
+  uint8_t adc1UpdateBase,adc2UpdateBase;
+  adc1UpdateBase = adc1Update;
+  adc2UpdateBase = adc2Update;
+
+  /* configure filter clock. */
+  bd1804.fclk( 500 * 1000UL );
+  /* configure exti. */
+  extiConfig( EOLC1, EXTI_Trigger_Falling );
+  extiConfig( EOLC2, EXTI_Trigger_Falling );
+  extiCallBack( 5, cbINTEOLC1 );
+  extiCallBack( 4, cbINTEOLC2 );
+  /* initialize adc1,adc2. */
+  adc1.begin( (volatile uint16_t *)ADC1_BASE_ADDRESS );
+  adc2.begin( (volatile uint16_t *)ADC2_BASE_ADDRESS );
+  /* configure convert clock. */
+  bd1804.convert( 10 * 1000UL );
+
+  while( true )
+  {
+    while( adc1Update == adc1UpdateBase || adc2Update == adc2UpdateBase ) rot_rdq();
+    adc1UpdateBase = adc1Update;
+    adc2UpdateBase = adc2Update;
+    for( int i = 0; i < (int)(sizeof(adc1Buffer) / sizeof(adc1Buffer[0])); i++ )
+    {
+      adc1Buffer[i] = adc1.read();
+      adc2Buffer[i] = adc2.read();
+    }
+  }
+}
 
 /*******************************************************************************
 * Function Name  : RCC_Configuration
@@ -229,6 +271,19 @@ void NVIC_Configuration( void )
 //  NVIC_SetVectorTable(NVIC_VectTab_FLASH, (uint32_t)&_isr_vectorsflash_offs);
   //NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x08000000);
   NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0);
+}
+
+/* ----------------------------------------
+    interrupt call back routine.
+---------------------------------------- */
+void cbINTEOLC1( void )
+{
+  adc1Update++;
+}
+
+void cbINTEOLC2( void )
+{
+  adc2Update++;
 }
 
 extern "C"

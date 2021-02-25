@@ -128,10 +128,11 @@
 /* ----------------------------------------
   multi tasks defines.
 ---------------------------------------- */
-#define  MAX_TASK_NUMBER    1  //
+#define  MAX_TASK_NUMBER    2  //
 enum GR_SAKURA_TSK_ID
 {
   ID_stackMonitor,
+  ID_adcTask,
 };
 
 #define  MAX_MBX_NUMBER    1
