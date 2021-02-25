@@ -59,9 +59,10 @@ void tim1Interrupt( void );
 void tim8Interrupt( void );
 
 static uint16_t dpRamDividRead( volatile const uint16_t *ram );
-static void dpRamRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led );
-static void dpRamRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led );
-static void dpRamRead( volatile const uint16_t *ram, size_t size, LED *led );
+static void dpRamRandomRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led );
+static void dpRamFixedRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led );
+static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *led );
+static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led );
 
 void cbGANYMEDE_CALL( void );
 volatile uint8_t ganymedeUpdate;
@@ -143,10 +144,12 @@ int main(void)
 
   extiConfig( PF10, EXTI_Trigger_Falling );  // INT0:PC4 INT6:PF10
   extiCallBack( 10, cbGANYMEDE_CALL );  // INT0:4 INT6:10
-  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
-//  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
-//  dpRamRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+//  dpRamRandomRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
+//  dpRamFixedRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
+//  dpRamIncrementRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+  dpRamSineRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, 2000, &actLed );
 //  ramCheck( (void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+
 /*
   SRAM_8M sram( 0x00080000, 0x0200 );
   int ret = sram.sram8m();
@@ -280,9 +283,79 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
 }
 
 /* ----------------------------------------
+  sine pattern read and check.
+---------------------------------------- */
+#define  ADC_OFFSET  8192
+#define  SINE_BUFFER_ELEMENT_SIZE  1024
+#define  SINE_BUFFER_BLOCK_SIZE    64
+#define  SINE_BUFFER_CHANNELS      16
+
+uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+
+static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
+{
+//  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
+  /* It may be that the HEAP area is lacking. */
+
+  /* Generate sine waveform data.. */
+  for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
+  {
+    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
+    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    rot_rdq();
+  }
+
+  uint16_t loop = 0;
+  uint32_t baseTim = millis();
+  uint8_t ganymedeUpdateBase = ganymedeUpdate;
+
+  while( true )
+  {
+    int index = 0;
+    for( int k = 0; k < SINE_BUFFER_ELEMENT_SIZE / SINE_BUFFER_BLOCK_SIZE; k++ )
+    {
+      while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+      ganymedeUpdateBase = ganymedeUpdate;
+
+      uint16_t *ptr = (uint16_t *)ram;
+      for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
+      {
+        uint16_t snd = sineBuffer[ index ];
+        for( int i = 0; i < SINE_BUFFER_CHANNELS; )
+        {
+          rot_rdq();
+          uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
+          if( rcv != (snd + i) )
+          {
+            while( true )
+            {
+              dly_tsk( 50UL );
+              led->toggle();
+//              break;
+            }
+          }
+          ptr += 2;
+          i++;
+        }
+        index++;
+      }
+
+      *((volatile uint16_t *)DPRAM_INTR_ADDRESS) = loop++;
+      dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+      if( (millis() - baseTim) >= 500UL )
+      {
+        baseTim = millis();
+        led->toggle();
+      }
+    }
+  }
+//  delete [] sineBuffer;
+}
+
+/* ----------------------------------------
   random pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led )
+static void dpRamRandomRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led )
 {
   uint16_t loop = 0;
   uint32_t baseTim = millis();
@@ -342,7 +415,7 @@ static void dpRamRead( volatile const uint16_t *ram, size_t size, uint32_t seed,
 /* ----------------------------------------
   fixed pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led )
+static void dpRamFixedRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led )
 {
   uint16_t loop = 0;
   uint32_t baseTim = millis();
@@ -380,7 +453,7 @@ static void dpRamRead( volatile const uint16_t *ram, size_t size, uint16_t fixed
 /* ----------------------------------------
   increment pattern read and check.
 ---------------------------------------- */
-static void dpRamRead( volatile const uint16_t *ram, size_t size, LED *led )
+static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *led )
 {
   uint16_t loop = 1234;
   uint16_t data = 0;
@@ -451,8 +524,20 @@ static void dpRamRead( volatile const uint16_t *ram, size_t size, LED *led )
 /* ----------------------------------------
   dpram int call back routine.
 ---------------------------------------- */
+SYSTIM systimOld = 0UL;
+uint32_t cycleCounterOld = 0UL;
 void cbGANYMEDE_CALL( void )
 {
-  ganymedeUpdate++;
+  if( (systim - systimOld) >= 10UL )
+  {
+    ganymedeUpdate++;
+    systimOld = systim;
+  }
+  else
+  {
+    uint32_t cycleCounterNow = CYCLE_COUNTER();
+    uint32_t cycleCounterDiff = cycleCounterNow - cycleCounterOld;
+    cycleCounterOld = cycleCounterNow;
+  }
 }
 

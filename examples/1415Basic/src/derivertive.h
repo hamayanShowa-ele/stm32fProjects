@@ -30,6 +30,7 @@
 #define  GANYMEDE_MEM_ADR    (CBUS_MEM_ADR + 0x070000)
 #define  GANYMEDE_MEM_SIZE   (8192)  // 4k * 16bit
 #define  DPRAM_INTR_ADDRESS  (GANYMEDE_MEM_ADR + (0x0FFF * 2))
+#define  DPRAM_INTL_ADDRESS  (GANYMEDE_MEM_ADR + (0x0FFE * 2))
 
 /*
   time zone.

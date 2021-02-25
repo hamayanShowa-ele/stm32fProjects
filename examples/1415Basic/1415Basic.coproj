@@ -159,8 +159,8 @@
     <File name="stm_lib/src/stm32f10x_spi.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_spi.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_dac.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_dac.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_dac.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_dac.c" type="1"/>
-    <File name="board" path="" type="2"/>
     <File name="cppCommonLib/boardUtility.cpp" path="../../cppCommonLib/boardUtility.cpp" type="1"/>
+    <File name="board" path="" type="2"/>
     <File name="stm_lib/src/stm32f10x_fsmc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_fsmc.c" type="1"/>
     <File name="stm32f1xx_common_lib/stm32f_rtc.h" path="../../stm32f1xx_common_lib/stm32f_rtc.h" type="1"/>
     <File name="cppCommonLib/led.cpp" path="../../cppCommonLib/led.cpp" type="1"/>
