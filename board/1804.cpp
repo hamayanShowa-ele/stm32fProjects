@@ -300,7 +300,8 @@ void BOARD_1804::busPort()
   pinMode( PE1, ALTERNATE_PP );  //bhe
   pinAFConfig( PE1, GPIO_AF_FSMC );
 
-  pinMode( PD6, ALTERNATE_PP );  //wait
+//  pinMode( PD6, ALTERNATE_PP );  //wait
+  pinMode( PD6, INPUT_PULLUP );  //wait
   pinAFConfig( PD6, GPIO_AF_FSMC );
 }
 
@@ -315,7 +316,7 @@ void BOARD_1804::extBus()
   /* dpram (idt70v24s55) area,16bit */
   /* read cycle time = min 55ns and access time = max 55ns. */
   /* write cycle time = min 55ns and address setup time = min 15ns and data hold time = min 40ns. */
-  fsmc->sram( FSMC_Bank1_NORSRAM1,FSMC_MemoryDataWidth_16b, 1,11, 3,9, true );
+  fsmc->sram( FSMC_Bank1_NORSRAM1,FSMC_MemoryDataWidth_16b, 1,11, 3,9 );
   /* adc1 area,16bit */
   /* read cycle time = min 60ns and data access time = max 30ns. */
   /* write cycle time = min 60ns and data setup time = min 10ns and data hold time = min 20ns. */

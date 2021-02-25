@@ -247,7 +247,8 @@ void BOARD_1415::busPortInitialize()
   pinMode( EXT_BUS_NE4, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_BLE, ALTERNATE_PP, GPIO_SPEED_FAST );
   pinMode( EXT_BUS_BHE, ALTERNATE_PP, GPIO_SPEED_FAST );
-  pinMode( EXT_BUS_WAIT, ALTERNATE_PP, GPIO_SPEED_FAST );  // wait input ,if you need.
+//  pinMode( EXT_BUS_WAIT, ALTERNATE_PP, GPIO_SPEED_FAST );  // wait input ,if you need.
+  pinMode( EXT_BUS_WAIT, INPUT_PULLUP );  // wait input ,if you need.
 }
 
 void BOARD_1415::extBusInit()
@@ -259,8 +260,8 @@ void BOARD_1415::extBusInit()
   fsmc->sram( FSMC_Bank1_NORSRAM1,FSMC_MemoryDataWidth_16b, 1,4, 1,4 );  /* NE1 0x60000000 sram bank1 */
   fsmc->sram( FSMC_Bank1_NORSRAM2,FSMC_MemoryDataWidth_16b, 1,4, 1,4 );  /* NE2 0x64000000 w5300 */
   fsmc->sram( FSMC_Bank1_NORSRAM3,FSMC_MemoryDataWidth_16b, 1,2, 4,2 );  /* NE3 0x68000000 arcnet */
-  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 10,13, 10,15, true );  /* NE4 0x6C000000 c-bus */
-//  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 5,5, 5,5, true );  /* NE4 0x6C000000 c-bus */
+  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 10,13, 10,15 );  /* NE4 0x6C000000 c-bus */
+//  fsmc->sram( FSMC_Bank1_NORSRAM4,FSMC_MemoryDataWidth_16b, 5,5, 5,5 );  /* NE4 0x6C000000 c-bus */
   delete fsmc;
 #else
   /* FSMC clock enable */
