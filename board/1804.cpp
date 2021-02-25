@@ -33,6 +33,7 @@
 ---------------------------------------- */
 volatile static uint16_t v50Ack;
 volatile static uint16_t dummy;
+volatile static uint8_t intdpUpdate;
 
 /* ----------------------------------------
     constructor destructor
@@ -329,36 +330,16 @@ void BOARD_1804::extBus()
 }
 
 
-volatile uint8_t intdpUpdate;
-
-/* ----------------------------------------
-    interrupt call back routine.
----------------------------------------- */
-void cbINTDP( void )
-{
-  v50Ack = *((volatile uint16_t *)DPRAM_INTR_ADDRESS);
-  dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
-  intdpUpdate++;
-}
-
 /* ----------------------------------------
   V50 INT.
 ---------------------------------------- */
 void BOARD_1804::v50INT()
 {
   digitalWrite( PD11, HIGH );  /* active high, connect to a npn transistor. */
-//  dly_tsk( 2UL );
+#if 1
   dly2R5us();  // 6.8us
-#if 0
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
-  dly2R5us();
+#else
+  dly_tsk( 5UL );
 #endif
   digitalWrite( PD11, LOW );  /* active high, connect to a npn transistor. */
 }
@@ -393,19 +374,20 @@ uint16_t BOARD_1804::dpRamDividRead( const uint16_t *ram )
 /* ----------------------------------------
   dpram random write.
 ---------------------------------------- */
-void BOARD_1804::dpRamWrite( void *ram, size_t size, uint32_t seed, LED *led )
+void BOARD_1804::dpRamRandomWrite( void *ram, size_t size, uint32_t seed, LED *led )
 {
   led->Off();
   srand( seed );
   while( true )
   {
     volatile uint16_t *ptr = (volatile uint16_t *)ram;
-#if 0
+#if 1
     int sz = size / (sizeof(uint16_t) * 2);
     for( int i = 0; i < sz; )
     {
       uint16_t rnd = (uint16_t)rand();
 __retry001 :
+      rot_rdq();
       dpRamDividWrite( (uint16_t *)ptr, rnd );
       uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
       if( rnd != rcv )
@@ -423,6 +405,7 @@ __retry001 :
     {
       uint16_t rnd = (uint16_t)rand();
 __retry002 :
+      rot_rdq();
       *ptr = rnd;
       uint16_t ret = *ptr;
       if( rnd != ret )
@@ -446,7 +429,7 @@ __retry002 :
 /* ----------------------------------------
   dpram fixed write.
 ---------------------------------------- */
-void BOARD_1804::dpRamWrite( void *ram, size_t size, uint16_t fixed, LED *led )
+void BOARD_1804::dpRamFixedWrite( void *ram, size_t size, uint16_t fixed, LED *led )
 {
   led->On();
   size /= sizeof(uint16_t);
@@ -470,7 +453,7 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, uint16_t fixed, LED *led )
 /* ----------------------------------------
   dpram increment write.
 ---------------------------------------- */
-void BOARD_1804::dpRamWrite( void *ram, size_t size, LED *led )
+void BOARD_1804::dpRamIncrementWrite( void *ram, size_t size, LED *led )
 {
   led->Off();
   uint16_t data = 0;
@@ -527,6 +510,66 @@ void BOARD_1804::dpRamWrite( void *ram, size_t size, LED *led )
 }
 
 /* ----------------------------------------
+  dpram sine write.
+---------------------------------------- */
+#define  ADC_OFFSET  8192
+#define  SINE_BUFFER_ELEMENT_SIZE  1024
+#define  SINE_BUFFER_BLOCK_SIZE    64
+#define  SINE_BUFFER_CHANNELS      16
+
+uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+
+void BOARD_1804::dpRamSineWrite( void *ram, int scale, uint32_t ms, LED *led )
+{
+//  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
+  /* It may be that the HEAP area is lacking. */
+
+  /* Generate sine waveform data.. */
+  for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
+  {
+    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
+    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    rot_rdq();
+  }
+
+  while( true )
+  {
+    int index = 0;
+    for( int k = 0; k < SINE_BUFFER_ELEMENT_SIZE / SINE_BUFFER_BLOCK_SIZE; k++ )
+    {
+      uint32_t baseTim = millis();
+      uint16_t *ptr = (uint16_t *)ram;
+      for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
+      {
+        uint16_t snd = sineBuffer[ index ];
+        for( int i = 0; i < SINE_BUFFER_CHANNELS; )
+        {
+          rot_rdq();
+          dpRamDividWrite( ptr, snd + i );
+          uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
+          if( rcv != (snd + i) )
+          {
+            led->toggle();
+            dly_tsk( 50UL );
+            continue;
+          }
+          ptr += 2;
+          i++;
+        }
+        index++;
+      }
+      uint8_t intdpUpdateBase = intdpUpdate;
+      v50INT();
+      while( intdpUpdate == intdpUpdateBase ) rot_rdq();
+
+      while( (millis() - baseTim) < ms ) rot_rdq();
+    }
+  }
+//  delete [] sineBuffer;
+}
+
+
+/* ----------------------------------------
   dpram read and check.
 ---------------------------------------- */
 void BOARD_1804::dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led )
@@ -563,69 +606,76 @@ void BOARD_1804::dpRamRead( const void *ram, size_t size, uint32_t seed, LED *le
 
 
 /* ----------------------------------------
-    io reset.
----------------------------------------- */
-#if 0
-void BOARD_1804::ioReset()
-{
-  pinMode( IO_RST, OUTPUT );
-  digitalWrite( IO_RST, LOW );  // io reset goes LOW.
-  dly_tsk( 10UL );
-  digitalWrite( IO_RST, HIGH );  // io reset goes HIGH.
-  dly_tsk( 500UL );
-}
-#endif
-
-/* ----------------------------------------
-  usb on/off.
----------------------------------------- */
-#if 0
-void BOARD_1804::usbOn( bool onOff )
-{
-  if( onOff )
-  {
-    pinMode( USBON, OUTPUT );
-    digitalWrite( USBON, LOW );  // USBON is active low.
-  }
-  else
-  {
-    pinMode( USBON, INPUT );
-    digitalWrite( USBON, HIGH );  // USBON is active low.
-  }
-}
-#endif
-
-/* ----------------------------------------
   fclk.
     perhaps filter clock.
-    TIM3 ch3 PB0.
+    TIM4 ch2 PD13.
 ---------------------------------------- */
-#if 0
-void BOARD_1804::fclk( STM32F_TIMER *Timer, uint32_t freq )
+void BOARD_1804::fclk( uint32_t freq )
 {
+  /* gpio alternate for TIM4 ch2 output. */
+  pinMode( PD13, ALTERNATE_PP );
+  pinAFConfig( PD13, GPIO_AF_TIM4 );
+
+  /* TIM4 clock enable */
+  RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM4, ENABLE );
+
+  STM32F_TIMER *Timer = new STM32F_TIMER( TIM4 );
   Timer->frequency( freq );
   uint16_t arr = (uint16_t)Timer->getAutoReload();
-  Timer->pwm1( TIMx_CH3, PB0, arr / 2UL );
+  Timer->pwm1( TIMx_CH2, PD13, arr / 2UL );
   Timer->start();
+  delete Timer;
 }
-#endif
 
 
 /* ----------------------------------------
   convert.
     perhaps adc convert clock.
-    TIM2 ch2 PB3.
+    TIM3 ch3 PC8.
 ---------------------------------------- */
-#if 0
-void BOARD_1804::convert( STM32F_TIMER *Timer, uint32_t freq )
+void BOARD_1804::convert( uint32_t freq )
 {
+  /* gpio alternate for TIM3 ch3 output. */
+  pinMode( PC8, ALTERNATE_PP );
+  pinAFConfig( PC8, GPIO_AF_TIM3 );
+
+  /* TIM3 clock enable */
+  RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
+
+  STM32F_TIMER *Timer = new STM32F_TIMER( TIM3 );
   Timer->frequency( freq );
   uint16_t arr = (uint16_t)Timer->getAutoReload();
-  Timer->pwm1( TIMx_CH2, PB3, arr - (arr / 10UL) );
+  Timer->pwm1( TIMx_CH3, PC8, arr - (arr / 10UL) );
   Timer->start();
+  delete Timer;
 }
-#endif
 
+/* ----------------------------------------
+  adc initialize.
+---------------------------------------- */
+void ADC_1804::begin( volatile uint16_t *a, uint16_t mask )
+{
+  adcAddress = a;
+  *adcAddress = mask;
+}
+
+/* ----------------------------------------
+  adc read.
+---------------------------------------- */
+uint16_t ADC_1804::read()
+{
+  return *adcAddress & 0x3FFF;
+}
+
+/* ----------------------------------------
+    interrupt call back routine.
+---------------------------------------- */
+void cbINTDP( void )
+{
+  v50Ack = *((volatile uint16_t *)DPRAM_INTR_ADDRESS);
+  dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
+  intdpUpdate++;
+}
 
 extern "C"
 {

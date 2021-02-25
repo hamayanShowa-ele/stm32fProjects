@@ -29,6 +29,8 @@
 #include  <strutil.h>
 #include  <led.h>
 #include  <FSMC.h>
+#include  <Timer.h>
+#include  <math.h>
 
 extern "C"
 {
@@ -48,6 +50,7 @@ extern "C"
 #define  DPRAM_BASE_ADDRESS  (0x60000000UL)
 #define  DPRAM_SIZE          (8192)  // 4k * 16bit
 #define  DPRAM_INTR_ADDRESS  (DPRAM_BASE_ADDRESS + (0x0FFF * 2))
+#define  DPRAM_INTL_ADDRESS  (DPRAM_BASE_ADDRESS + (0x0FFE * 2))
 #define  GANYMEDE_DUMMY_ADDRESS  (0x6C000000UL)
 
 /* ----------------------------------------
@@ -67,15 +70,30 @@ public:
   void gpioInit();
   void extBus();
   void v50INT();
-  void dpRamWrite( void *ram, size_t size, uint32_t seed, LED *led );
-  void dpRamWrite( void *ram, size_t size, uint16_t fixed, LED *led );
-  void dpRamWrite( void *ram, size_t size, LED *led );
+  void dpRamRandomWrite( void *ram, size_t size, uint32_t seed, LED *led );  /* random */
+  void dpRamFixedWrite( void *ram, size_t size, uint16_t fixed, LED *led );  /* fixed */
+  void dpRamIncrementWrite( void *ram, size_t size, LED *led );  /* increment */
+  void dpRamSineWrite( void *ram, int scale, uint32_t ms, LED *led );  /* sine */
   void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led );
-//  void ioReset();
-//  void usbOn( bool onOff );
-//  void fclk( STM32F_TIMER *Timer, uint32_t freq );
-//  void convert( STM32F_TIMER *Timer, uint32_t freq );
+  void fclk( uint32_t freq );
+  void convert( uint32_t freq );
 };
+
+
+class ADC_1804
+{
+private:
+  volatile uint16_t *adcAddress;
+
+public:
+  ADC_1804() {}
+  ADC_1804( volatile uint16_t *a, uint16_t mask = 0x00FF ) { begin( a, mask ); }
+  ~ADC_1804() {}
+
+  void begin( volatile uint16_t *a, uint16_t mask = 0x00FF );
+  uint16_t read();
+};
+
 
 #endif  /* __BOARD_1804_H__ */
 
