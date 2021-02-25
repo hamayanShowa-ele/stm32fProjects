@@ -312,10 +312,13 @@ void GPIO::jtagEnable()
 ---------------------------------------- */
 void GPIO::exti( int pin, EXTITrigger_TypeDef trig, uint8_t pri, uint8_t sub )
 {
+  /* Enable clock for SYSCFG */
+  RCC_APB2PeriphClockCmd( RCC_APB2Periph_SYSCFG, ENABLE );
+
   uint8_t portSource = whatExtiPortSource( pin );
   uint8_t pinSource = whatExtiPinSource( pin );
   /* Configure EXTI line */
-  EXTI_DeInit();
+//  EXTI_DeInit();
   EXTI_InitTypeDef EXTI_InitStruct;
   EXTI_StructInit( &EXTI_InitStruct );
   SYSCFG_EXTILineConfig( portSource, pinSource );
