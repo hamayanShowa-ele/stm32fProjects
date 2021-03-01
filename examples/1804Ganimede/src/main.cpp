@@ -55,7 +55,7 @@ void RCC_Configuration( void );
 void NVIC_Configuration( void );
 static unsigned int RemainStack( void *stk, unsigned int sz );
 
-extern void cbINTDP( void );
+void cbINTDP( void );
 void cbINTEOLC1( void );
 void cbINTEOLC2( void );
 
@@ -73,7 +73,11 @@ BOARD_1411 bd1411;
 ADC_1804 adc1;
 ADC_1804 adc2;
 volatile uint16_t adc1Buffer[8],adc2Buffer[8];
-volatile uint8_t adc1Update,adc2Update;
+volatile int adc1Update,adc2Update;
+
+volatile uint8_t intdpUpdate;
+volatile static uint16_t v50Ack;
+volatile static uint16_t dummy;
 
 /* ----------------------------------------
   multi task.
@@ -100,7 +104,7 @@ void tsk_ini( void )
   reg_tsk( ID_adcTask,(void *)adcTask, tsk2_stk, sizeof(tsk2_stk), 0,0,0,0 );
 
   sta_tsk( ID_stackMonitor );
-  sta_tsk( ID_adcTask );
+//  sta_tsk( ID_adcTask );
 }
 
 /* ----------------------------------------
@@ -159,16 +163,15 @@ int main(void)
 void stackMonitor( void )
 {
   dly_tsk( 5 *1000UL );
-  /* configure exti. */
-  extiConfig( INTDP, EXTI_Trigger_Falling );
-  extiCallBack( 3, cbINTDP );
+  sta_tsk( ID_adcTask );
+
   while(1)
   {
 //  ramCheck( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );
-//    bd1804.dpRamRandomWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
+//  bd1804.dpRamRandomWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, 1234UL, &actled );  /* random */
 //  bd1804.dpRamFixedWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, (uint16_t)0xA5A5, &actled ); /* fixed */
 //  bd1804.dpRamIncrementWrite( (void *)DPRAM_BASE_ADDRESS, DPRAM_SIZE, &actled );  /* incrment */
-    bd1804.dpRamSineWrite( (void *)DPRAM_BASE_ADDRESS, 2000, 62UL, &actled );  /* sine pattern. */
+//  bd1804.dpRamSineWrite( (void *)DPRAM_BASE_ADDRESS, 2000, 10UL, &actled );  /* sine pattern. */
 
     rot_rdq();
   }
@@ -191,17 +194,33 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
 /* ----------------------------------------
     adc task.
 ---------------------------------------- */
+#define  ADC_OFFSET  8192
+#define  SINE_BUFFER_ELEMENT_SIZE  1024
+#define  SINE_BUFFER_BLOCK_SIZE    64
+#define  SINE_BUFFER_CHANNELS      16
+
+uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+
 void adcTask( void )
 {
-  uint8_t adc1UpdateBase,adc2UpdateBase;
-  adc1UpdateBase = adc1Update;
-  adc2UpdateBase = adc2Update;
+  //  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
+   /* It may be that the HEAP area is lacking. */
+  /* Generate sine waveform data.. */
+  const int scale = 2000;
+  for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
+  {
+    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
+    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    rot_rdq();
+  }
 
   /* configure filter clock. */
   bd1804.fclk( 500 * 1000UL );
   /* configure exti. */
+  extiConfig( INTDP, EXTI_Trigger_Falling );
   extiConfig( EOLC1, EXTI_Trigger_Falling );
   extiConfig( EOLC2, EXTI_Trigger_Falling );
+  extiCallBack( 3, cbINTDP );
   extiCallBack( 5, cbINTEOLC1 );
   extiCallBack( 4, cbINTEOLC2 );
   /* initialize adc1,adc2. */
@@ -212,15 +231,36 @@ void adcTask( void )
 
   while( true )
   {
-    while( adc1Update == adc1UpdateBase || adc2Update == adc2UpdateBase ) rot_rdq();
-    adc1UpdateBase = adc1Update;
-    adc2UpdateBase = adc2Update;
-    for( int i = 0; i < (int)(sizeof(adc1Buffer) / sizeof(adc1Buffer[0])); i++ )
+    int index = 0;
+    for( int k = 0; k < SINE_BUFFER_ELEMENT_SIZE / SINE_BUFFER_BLOCK_SIZE; k++ )
     {
-      adc1Buffer[i] = adc1.read();
-      adc2Buffer[i] = adc2.read();
+      uint16_t *ptr = (uint16_t *)DPRAM_BASE_ADDRESS;
+      for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
+      {
+        uint16_t snd = sineBuffer[ index ];
+        for( int i = 0; i < SINE_BUFFER_CHANNELS; )
+        {
+          rot_rdq();
+          bd1804.dpRamDividWrite( ptr, snd + i );
+          uint16_t rcv = bd1804.dpRamDividRead( (const uint16_t *)ptr );
+          if( rcv != (snd + i) )
+          {
+            actled.toggle();
+            dly_tsk( 50UL );
+            continue;
+          }
+          ptr += 2;
+          i++;
+        }
+        index++;
+      }
+      while( (adc1Update % 100) < 99 ) rot_rdq();
+      uint8_t intdpUpdateBase = intdpUpdate;
+      bd1804.v50INT();
+      while( intdpUpdate == intdpUpdateBase ) rot_rdq();
     }
   }
+  //  delete [] sineBuffer;
 }
 
 /*******************************************************************************
@@ -276,13 +316,28 @@ void NVIC_Configuration( void )
 /* ----------------------------------------
     interrupt call back routine.
 ---------------------------------------- */
+void cbINTDP( void )
+{
+  v50Ack = *((volatile uint16_t *)DPRAM_INTR_ADDRESS);
+  dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
+  intdpUpdate++;
+}
+
 void cbINTEOLC1( void )
 {
+  for( int i = 0; i < (int)(sizeof(adc1Buffer) / sizeof(adc1Buffer[0])); i++ )
+  {
+    adc1Buffer[i] = adc1.read();
+  }
   adc1Update++;
 }
 
 void cbINTEOLC2( void )
 {
+  for( int i = 0; i < (int)(sizeof(adc2Buffer) / sizeof(adc2Buffer[0])); i++ )
+  {
+    adc2Buffer[i] = adc2.read();
+  }
   adc2Update++;
 }
 
