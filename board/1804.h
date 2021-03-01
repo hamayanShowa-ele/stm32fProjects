@@ -60,8 +60,8 @@ class BOARD_1804 : public GPIO
 {
 private:
   void busPort();
-  void dpRamDividWrite( uint16_t *ram, uint16_t data );
-  uint16_t dpRamDividRead( const uint16_t *ram );
+//  void dpRamDividWrite( uint16_t *ram, uint16_t data );
+//  uint16_t dpRamDividRead( const uint16_t *ram );
 
 public:
   BOARD_1804(){}
@@ -73,10 +73,12 @@ public:
   void dpRamRandomWrite( void *ram, size_t size, uint32_t seed, LED *led );  /* random */
   void dpRamFixedWrite( void *ram, size_t size, uint16_t fixed, LED *led );  /* fixed */
   void dpRamIncrementWrite( void *ram, size_t size, LED *led );  /* increment */
-  void dpRamSineWrite( void *ram, int scale, uint32_t ms, LED *led );  /* sine */
   void dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led );
   void fclk( uint32_t freq );
   void convert( uint32_t freq );
+
+  void dpRamDividWrite( uint16_t *ram, uint16_t data );
+  uint16_t dpRamDividRead( const uint16_t *ram );
 };
 
 

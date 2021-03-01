@@ -31,9 +31,8 @@
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-volatile static uint16_t v50Ack;
+extern volatile uint8_t intdpUpdate;
 volatile static uint16_t dummy;
-volatile static uint8_t intdpUpdate;
 
 /* ----------------------------------------
     constructor destructor
@@ -337,11 +336,7 @@ void BOARD_1804::extBus()
 void BOARD_1804::v50INT()
 {
   digitalWrite( PD11, HIGH );  /* active high, connect to a npn transistor. */
-#if 1
-  dly2R5us();  // 6.8us
-#else
-  dly_tsk( 5UL );
-#endif
+  dly2R5us();
   digitalWrite( PD11, LOW );  /* active high, connect to a npn transistor. */
 }
 
@@ -511,66 +506,6 @@ void BOARD_1804::dpRamIncrementWrite( void *ram, size_t size, LED *led )
 }
 
 /* ----------------------------------------
-  dpram sine write.
----------------------------------------- */
-#define  ADC_OFFSET  8192
-#define  SINE_BUFFER_ELEMENT_SIZE  1024
-#define  SINE_BUFFER_BLOCK_SIZE    64
-#define  SINE_BUFFER_CHANNELS      16
-
-uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
-
-void BOARD_1804::dpRamSineWrite( void *ram, int scale, uint32_t ms, LED *led )
-{
-//  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
-  /* It may be that the HEAP area is lacking. */
-
-  /* Generate sine waveform data.. */
-  for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
-  {
-    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
-    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
-    rot_rdq();
-  }
-
-  while( true )
-  {
-    int index = 0;
-    for( int k = 0; k < SINE_BUFFER_ELEMENT_SIZE / SINE_BUFFER_BLOCK_SIZE; k++ )
-    {
-      uint32_t baseTim = millis();
-      uint16_t *ptr = (uint16_t *)ram;
-      for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
-      {
-        uint16_t snd = sineBuffer[ index ];
-        for( int i = 0; i < SINE_BUFFER_CHANNELS; )
-        {
-          rot_rdq();
-          dpRamDividWrite( ptr, snd + i );
-          uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
-          if( rcv != (snd + i) )
-          {
-            led->toggle();
-            dly_tsk( 50UL );
-            continue;
-          }
-          ptr += 2;
-          i++;
-        }
-        index++;
-      }
-      uint8_t intdpUpdateBase = intdpUpdate;
-      v50INT();
-      while( intdpUpdate == intdpUpdateBase ) rot_rdq();
-
-      while( (millis() - baseTim) < ms ) rot_rdq();
-    }
-  }
-//  delete [] sineBuffer;
-}
-
-
-/* ----------------------------------------
   dpram read and check.
 ---------------------------------------- */
 void BOARD_1804::dpRamRead( const void *ram, size_t size, uint32_t seed, LED *led )
@@ -668,15 +603,6 @@ uint16_t ADC_1804::read()
   return *adcAddress & 0x3FFF;
 }
 
-/* ----------------------------------------
-    interrupt call back routine.
----------------------------------------- */
-void cbINTDP( void )
-{
-  v50Ack = *((volatile uint16_t *)DPRAM_INTR_ADDRESS);
-  dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
-  intdpUpdate++;
-}
 
 extern "C"
 {
