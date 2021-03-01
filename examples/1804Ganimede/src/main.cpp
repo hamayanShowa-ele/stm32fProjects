@@ -199,7 +199,8 @@ static unsigned int RemainStack( void *stk, unsigned int sz )
 #define  SINE_BUFFER_BLOCK_SIZE    64
 #define  SINE_BUFFER_CHANNELS      16
 
-uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+//uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+int16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
 
 void adcTask( void )
 {
@@ -207,10 +208,12 @@ void adcTask( void )
    /* It may be that the HEAP area is lacking. */
   /* Generate sine waveform data.. */
   const int scale = 2000;
+  double phase = 2 * M_PI * 30.0 / 360.0;
   for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
   {
-    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
-    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    double d = scale * sin( (2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE) + phase );
+//    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    sineBuffer[ i ] = (int16_t)d;
     rot_rdq();
   }
 
@@ -234,13 +237,18 @@ void adcTask( void )
     int index = 0;
     for( int k = 0; k < SINE_BUFFER_ELEMENT_SIZE / SINE_BUFFER_BLOCK_SIZE; k++ )
     {
-      uint16_t *ptr = (uint16_t *)DPRAM_BASE_ADDRESS;
+      while( (adc1Update % 100) != 99 ) { rot_rdq(); }
+
+//      uint16_t *ptr = (uint16_t *)DPRAM_BASE_ADDRESS;
+      int16_t *ptr = (int16_t *)DPRAM_BASE_ADDRESS;
       for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
       {
-        uint16_t snd = sineBuffer[ index ];
+//        uint16_t snd = sineBuffer[ index ];
+        int16_t snd = sineBuffer[ index ];
         for( int i = 0; i < SINE_BUFFER_CHANNELS; )
         {
           rot_rdq();
+#if 0
           bd1804.dpRamDividWrite( ptr, snd + i );
           uint16_t rcv = bd1804.dpRamDividRead( (const uint16_t *)ptr );
           if( rcv != (snd + i) )
@@ -250,11 +258,24 @@ void adcTask( void )
             continue;
           }
           ptr += 2;
+#else
+          *ptr = snd + i;
+//          uint16_t rcv = *ptr;
+          int16_t rcv = *ptr;
+          if( rcv != (snd + i) )
+          {
+            actled.toggle();
+            dly_tsk( 50UL );
+            continue;
+          }
+          ptr++;
+#endif
           i++;
         }
         index++;
       }
-      while( (adc1Update % 100) < 99 ) rot_rdq();
+
+      dummy = *((volatile uint16_t *)GANYMEDE_DUMMY_ADDRESS);
       uint8_t intdpUpdateBase = intdpUpdate;
       bd1804.v50INT();
       while( intdpUpdate == intdpUpdateBase ) rot_rdq();

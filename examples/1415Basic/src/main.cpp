@@ -289,7 +289,8 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
 #define  SINE_BUFFER_BLOCK_SIZE    64
 #define  SINE_BUFFER_CHANNELS      16
 
-uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+//uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
+int16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
 
 static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
 {
@@ -297,10 +298,12 @@ static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
   /* It may be that the HEAP area is lacking. */
 
   /* Generate sine waveform data.. */
+  double phase = 2 * M_PI * 30.0 / 360.0;
   for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
   {
-    double d = scale * sin( 2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE );
-    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    double d = scale * sin( (2 * M_PI * i / SINE_BUFFER_ELEMENT_SIZE) + phase );
+//    sineBuffer[ i ] = (uint16_t)d + ADC_OFFSET;
+    sineBuffer[ i ] = (int16_t)d;
     rot_rdq();
   }
 
@@ -316,13 +319,16 @@ static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
       while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
       ganymedeUpdateBase = ganymedeUpdate;
 
-      uint16_t *ptr = (uint16_t *)ram;
+//      uint16_t *ptr = (uint16_t *)ram;
+      int16_t *ptr = (int16_t *)ram;
       for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
       {
-        uint16_t snd = sineBuffer[ index ];
+//        uint16_t snd = sineBuffer[ index ];
+        int16_t snd = sineBuffer[ index ];
         for( int i = 0; i < SINE_BUFFER_CHANNELS; )
         {
           rot_rdq();
+#if 0
           uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
           if( rcv != (snd + i) )
           {
@@ -334,6 +340,21 @@ static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
             }
           }
           ptr += 2;
+#else
+//          uint16_t rcv = *ptr;
+          int16_t rcv = *ptr;
+          dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+          if( rcv != (snd + i) )
+          {
+            while( true )
+            {
+              dly_tsk( 50UL );
+              led->toggle();
+//              break;
+            }
+          }
+          ptr++;
+#endif
           i++;
         }
         index++;

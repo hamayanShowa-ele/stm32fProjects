@@ -143,9 +143,9 @@
     <File name="stm_lib/src/stm32f10x_i2c.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_i2c.c" type="1"/>
     <File name="stm32f1xx_common_lib/nvic.c" path="../../stm32f1xx_common_lib/nvic.c" type="1"/>
     <File name="stm32f1xx_common_lib/dispatch.S" path="../../stm32f1xx_common_lib/dispatch.S" type="1"/>
+    <File name="cppCommonLib/boardUtility.h" path="../../cppCommonLib/boardUtility.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_rtc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_rtc.c" type="1"/>
     <File name="stm32f1xx_common_lib/peripheral.c" path="../../stm32f1xx_common_lib/peripheral.c" type="1"/>
-    <File name="cppCommonLib/boardUtility.h" path="../../cppCommonLib/boardUtility.h" type="1"/>
     <File name="board/2007.cpp" path="../../board/2007.cpp" type="1"/>
     <File name="board/1415.h" path="../../board/1415.h" type="1"/>
     <File name="stm32f1xx_common_lib/usart.h" path="../../stm32f1xx_common_lib/usart.h" type="1"/>
