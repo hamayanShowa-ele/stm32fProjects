@@ -104,6 +104,7 @@ void tsk_ini( void )
 ---------------------------------------- */
 int main(void)
 {
+  dwt_access_enable();  /* if is there in a debug mode. */
   RCC_Configuration();
   NVIC_PriorityGroupConfig( NVIC_PriorityGroup_4 );
   NVIC_Configuration();
@@ -121,8 +122,6 @@ int main(void)
   actLed.begin( ACTLED );
   cbus.cbusEnable( true );
   cbus.cbusReset();
-  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
-//  while( 1 ) rot_rdq();
 
   if( RTC_Init() != 0 )
   {
@@ -528,7 +527,7 @@ SYSTIM systimOld = 0UL;
 uint32_t cycleCounterOld = 0UL;
 void cbGANYMEDE_CALL( void )
 {
-  if( (systim - systimOld) >= 10UL )
+  if( (systim - systimOld) >= 3UL )
   {
     ganymedeUpdate++;
     systimOld = systim;
