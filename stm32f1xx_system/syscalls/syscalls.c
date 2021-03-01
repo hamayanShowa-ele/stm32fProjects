@@ -23,7 +23,6 @@ caddr_t _sbrk ( int incr )
         heap = (unsigned char *)&_end;
     }
     prev_heap = heap;
-
     heap += incr;
 
     return (caddr_t) prev_heap;
