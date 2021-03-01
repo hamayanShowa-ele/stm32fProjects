@@ -49,4 +49,30 @@ void dly100us( uint32_t dly_us );
 void dly1ms( uint32_t dly_ms );
 uint32_t millis( void );
 
+uint16_t getRevID( void );
+uint16_t getDevID( void );
+void getUniqueID( uint32_t id[] );
+uint16_t getFlashSize( void );
+
+void *dataSectionStart( void );
+void *dataSectionEnd( void );
+uint32_t dataSectionSize( void );
+
+void *bssSectionStart( void );
+void *bssSectionEnd( void );
+uint32_t bssSectionSize( void );
+
+void *stackStart( void );
+void *stackEnd( void );
+uint32_t stackSize( void );
+
+void *heapStart( void );
+void *heapEnd( void );
+uint32_t heapSize( void );
+uint32_t availableHeap( void *base );
+
+//#define  CYCLE_COUNTER()  (DWT->CYCCNT)
+#define  SYS_TICK()   (SysTick->VAL)
+#define  CPU_CLOCK()  (SystemCoreClock)
+
 #endif  /* __SYSTEM_H__ */
