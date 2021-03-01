@@ -73,6 +73,12 @@
 #define  ACT_RCC        RCC_AHB1Periph_GPIOG  //for virgo
 #define  ACT_LED        PG11
 
+/* PD11 :V50 INT */
+#define  V50_INT_PORT   GPIOD
+#define  V50_INT_PIN    GPIO_Pin_11
+#define  V50_INT_IS_0   V50_INT_PORT->BSRRH = (V50_INT_PIN << 0)
+#define  V50_INT_IS_1   V50_INT_PORT->BSRRL = (V50_INT_PIN << 0)
+
 /* PB6 :SCL1 */
 /* PB7 :SDA1 */
 #define  I2C1_PORT      GPIOB
