@@ -52,7 +52,28 @@ uint32_t millis( void );
 uint16_t getRevID( void );
 uint16_t getDevID( void );
 void getUniqueID( uint32_t id[] );
+uint16_t getFlashSize( void );
 
+void *dataSectionStart( void );
+void *dataSectionEnd( void );
+uint32_t dataSectionSize( void );
+
+void *bssSectionStart( void );
+void *bssSectionEnd( void );
+uint32_t bssSectionSize( void );
+
+void *stackStart( void );
+void *stackEnd( void );
+uint32_t stackSize( void );
+
+void *heapStart( void );
+void *heapEnd( void );
+uint32_t heapSize( void );
+uint32_t availableHeap( void *base );
+
+void dwt_access_enable( void );
+
+#define  SYS_TICK()       (SysTick->VAL)
 #define  CYCLE_COUNTER()  (DWT->CYCCNT)
 #define  CPU_CLOCK()      (SystemCoreClock)
 

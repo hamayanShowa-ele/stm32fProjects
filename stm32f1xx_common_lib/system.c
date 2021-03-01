@@ -23,167 +23,118 @@
 ---------------------------------------- */
 #include  "system.h"
 
-/*****************************************************/
-/* defines                                           */
-/*****************************************************/
+/* ----------------------------------------
+    defines
+---------------------------------------- */
 #define  false  0
 #define  true   (~false)
 #define  bool  int
 
-/*****************************************************/
-/* global variables                                  */
-/*****************************************************/
+/* ----------------------------------------
+    global variables
+---------------------------------------- */
 
 
-/*****************************************************/
-/* prototypes                                        */
-/*****************************************************/
+/* ----------------------------------------
+    prototypes
+---------------------------------------- */
 
 
-/*****************************************************/
-/* delay 140ns                                       */
-/*****************************************************/
+/* ----------------------------------------
+    enable DWT->LAR
+---------------------------------------- */
+
+void dwt_access_enable( void )
+{
+  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+//  volatile uint32_t cycle = CYCLE_COUNTER();
+}
+
+/* ----------------------------------------
+    delay 140ns
+---------------------------------------- */
 void wait140ns( void )
 {
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
-  __NOP();  /*1cpu clock時間は約14ns*/
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
+  __NOP();  /* 1cpu clock time is about 14ns. */
 }
 
-
-/*****************************************************/
-/* delay 1us                                        */
-/*****************************************************/
+/* ----------------------------------------
+    delay 1us
+---------------------------------------- */
 void dly1us( void )
 {
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
+  uint32_t limit = CPU_CLOCK() / 1000000UL;
+  uint32_t old = SYS_TICK();
+  uint32_t mod = CPU_CLOCK() / 1000UL;
+  while( ((old - SYS_TICK()) % mod) < limit ) {}
 }
 
-/*****************************************************/
-/* delay 2.5us                                        */
-/*****************************************************/
+/* ----------------------------------------
+    delay 2.5us
+---------------------------------------- */
 void dly2R5us( void )
 {
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-  wait140ns();
-
-  wait140ns();
-  wait140ns();
+  uint32_t limit = CPU_CLOCK() / (1000000UL * 10 / 25);
+  uint32_t old = SYS_TICK();
+  uint32_t mod = CPU_CLOCK() / 1000UL;
+  while( ((old - SYS_TICK()) % mod) < limit ) {}
 }
 
-/*****************************************************/
-/* delay 5us                                        */
-/*****************************************************/
+/* ----------------------------------------
+    delay 5us
+---------------------------------------- */
 void dly5us( void )
 {
-#if 0
-  uint32_t dly_us = SystemCoreClock / (1000000UL / 5UL);  /* 5us count. */
-  volatile uint32_t now = SysTick->VAL;
-  volatile uint32_t end = (now - dly_us) % (SystemCoreClock / 1000UL);  /* SysTick->VAL is down counter. */
-  if( now > end )
-  {
-    while( SysTick->VAL > end ) {}
-  }
-  else
-  {
-    while( SysTick->VAL <= end ) {}
-    while( SysTick->VAL > end ) {}
-  }
-#else
-  dly1us();
-  dly1us();
-  dly1us();
-  dly1us();
-  dly1us();
-#endif
+  uint32_t limit = CPU_CLOCK() / (1000000UL / 5);
+  uint32_t old = SYS_TICK();
+  uint32_t mod = CPU_CLOCK() / 1000UL;
+  while( ((old - SYS_TICK()) % mod) < limit ) {}
 }
 
-/*****************************************************/
-/* delay 10us                                        */
-/*****************************************************/
+/* ----------------------------------------
+    delay 10us
+---------------------------------------- */
 void dly10us( uint32_t dly_us )
 {
-  dly_us *= SystemCoreClock / (1000000UL / 10UL);  /* 10us count. */
-  volatile uint32_t now = SysTick->VAL;
-  volatile uint32_t end = (now - dly_us) % (SystemCoreClock / 1000UL);  /* SysTick->VAL is down counter. */
-  if( now > end )
-  {
-    while( SysTick->VAL > end ) {}
-  }
-  else
-  {
-    while( SysTick->VAL <= end ) {}
-    while( SysTick->VAL > end ) {}
-  }
+  if( dly_us == 0 ) return;
+  uint32_t limit = CPU_CLOCK() / (1000000UL / (10 * dly_us));
+  uint32_t old = SYS_TICK();
+  uint32_t mod = CPU_CLOCK() / 1000UL;
+  while( ((old - SYS_TICK()) % mod) < limit ) {}
 }
 
-
-/*****************************************************/
-/* delay 100us                                       */
-/*****************************************************/
+/* ----------------------------------------
+    delay 100us
+---------------------------------------- */
 void dly100us( uint32_t dly_us )
 {
-  dly_us *= SystemCoreClock / (1000000UL / 100UL);  /* 100us count. */
-  volatile uint32_t now = SysTick->VAL;
-  volatile uint32_t end = (now - dly_us) % (SystemCoreClock / 1000UL);  /* SysTick->VAL is down counter. */
-  if( now > end )
-  {
-    while( SysTick->VAL > end ) {}
-  }
-  else
-  {
-    while( SysTick->VAL <= end ) {}
-    while( SysTick->VAL > end ) {}
-  }
+  if( dly_us == 0 ) return;
+  else if( dly_us < 10UL ) dly10us( dly_us * 10UL );
+  else { for( ; dly_us > 0; dly_us-- ) dly10us( 10UL ); }
 }
 
-
-/*****************************************************/
-/* delay 1ms                                         */
-/*****************************************************/
+/* ----------------------------------------
+    delay 1ms
+---------------------------------------- */
 void dly1ms( uint32_t dly_ms )
 {
-#if 0
-  for( ; dly_ms > 0; dly_ms-- )
-  {
-    dly100us( 10UL );
-  }
-#else
-  dly_tsk( dly_ms );
-#endif
+  if( dly_ms == 0 ) return;
+  else if( dly_ms == 1UL ) dly100us( 10UL );
+  else dly_tsk( dly_ms );
 }
 
-/*****************************************************/
-/* millis                                            */
-/*****************************************************/
+/* ----------------------------------------
+    millis
+---------------------------------------- */
 extern SYSTIM systim;
 
 uint32_t millis( void )
@@ -191,27 +142,27 @@ uint32_t millis( void )
   return (uint32_t)systim;
 }
 
-/*****************************************************/
-/* get revision ID.  */
-/*****************************************************/
+/* ----------------------------------------
+    get revision ID.
+---------------------------------------- */
 uint16_t getRevID( void )
 {
   DBGMCU_TypeDef dbg = *((DBGMCU_TypeDef *)DBGMCU);
   return (uint16_t)(dbg.IDCODE >> 16);
 }
 
-/*****************************************************/
-/* get device ID.  */
-/*****************************************************/
+/* ----------------------------------------
+    get device ID.
+---------------------------------------- */
 uint16_t getDevID( void )
 {
   DBGMCU_TypeDef dbg = *((DBGMCU_TypeDef *)DBGMCU);
   return (uint16_t)(dbg.IDCODE & 0x0FFF);
 }
 
-/*****************************************************/
-/* get unique ID.  */
-/*****************************************************/
+/* ----------------------------------------
+    get unique ID.
+---------------------------------------- */
 void getUniqueID( uint32_t id[] )
 {
 #if  defined(STM32F10X_HD)
@@ -222,3 +173,105 @@ void getUniqueID( uint32_t id[] )
   id[2] |= *((uint32_t *)UNIQUE_ID_BASE_ADDRESS + 8);
 }
 
+/* ----------------------------------------
+    get flash size.
+    unit is k byte.
+---------------------------------------- */
+uint16_t getFlashSize( void )
+{
+#if  defined(STM32F10X_HD)
+  #define  FLASH_SIZE_BASE_ADDRESS  0x1FFFF7E0
+#endif  /* defined(STM32F10X_HD) */
+  return *((uint16_t *)FLASH_SIZE_BASE_ADDRESS);
+}
+
+/* ----------------------------------------
+    get data section start and end and size.
+---------------------------------------- */
+extern uint32_t __data_start__;
+extern uint32_t _edata;
+
+void *dataSectionStart( void )
+{
+  return &__data_start__;
+}
+
+void *dataSectionEnd( void )
+{
+  return &_edata;
+}
+
+uint32_t dataSectionSize( void )
+{
+  return (uint32_t)dataSectionEnd() - (uint32_t)dataSectionStart();
+}
+
+/* ----------------------------------------
+    get bss section start and end and size.
+---------------------------------------- */
+extern uint32_t __bss_start__;
+extern uint32_t _ebss;
+
+void *bssSectionStart( void )
+{
+  return &__bss_start__;
+}
+
+void *bssSectionEnd( void )
+{
+  return &_ebss;
+}
+
+uint32_t bssSectionSize( void )
+{
+  return (uint32_t)bssSectionEnd() - (uint32_t)bssSectionStart();
+}
+
+/* ----------------------------------------
+    get stack start and end and size.
+---------------------------------------- */
+extern uint32_t __StackTop;
+extern uint32_t __StackLimit;
+
+void *stackStart( void )
+{
+  return &__StackLimit;
+}
+
+void *stackEnd( void )
+{
+  return &__StackTop;
+}
+
+uint32_t stackSize( void )
+{
+  return (uint32_t)stackEnd() - (uint32_t)stackStart();
+}
+
+/* ----------------------------------------
+    get heap start and end and size.
+---------------------------------------- */
+extern uint32_t __HeapLimit;
+
+void *heapStart( void )
+{
+  return &__HeapLimit;
+}
+
+void *heapEnd( void )
+{
+  return &__StackLimit;
+}
+
+uint32_t heapSize( void )
+{
+  return (uint32_t)heapEnd() - (uint32_t)heapStart();
+}
+
+/* ----------------------------------------
+    get available heap size.
+---------------------------------------- */
+uint32_t availableHeap( void *base )
+{
+  return (uint32_t)heapEnd() - (uint32_t)base;
+}
