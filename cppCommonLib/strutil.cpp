@@ -25,6 +25,10 @@
 /* ----------------------------------------
     defines
 ---------------------------------------- */
+#if !defined( TIMEZONE_JST )
+#define  TIMEZONE_JST  (9 * 3600UL)
+#endif
+
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
@@ -748,16 +752,13 @@ void compileTime(int *hour, int *minute, int *second)
 }
 
 /* ----------------------------------------
-  dateTimeToUnixtime
-  convert to local date and time to unix time
-  Returns the local date and time string from unix time.
+  utcDateTimeToUnixtime
+  convert to utc date and time to unix time
+  Returns the seconds from unix time.
 ---------------------------------------- */
-time_t localDateTimeToUnixtime( uint16_t y, uint8_t mo, uint8_t d,
+time_t utcDateTimeToUnixtime( uint16_t y, uint8_t mo, uint8_t d,
   uint8_t h, uint8_t mi, uint8_t s )
 {
-#if !defined( TIMEZONE_JST )
-#define  TIMEZONE_JST  (9 * 3600UL)
-#endif
   struct tm localTime;
   localTime.tm_year = y - 1900;
   localTime.tm_mon = mo - 1;
@@ -766,40 +767,56 @@ time_t localDateTimeToUnixtime( uint16_t y, uint8_t mo, uint8_t d,
   localTime.tm_min = mi;
   localTime.tm_sec = s;
   time_t t = mktime( &localTime );
-  return t - TIMEZONE_JST;
+  return t;
 }
 
-
-
 /* ----------------------------------------
-  local date and time string
-  Returns the local date and time string from unix time.
+  localDateTimeToUnixtime
+  convert to local date and time to unix time
+  Returns the seconds from unix time.
 ---------------------------------------- */
-char *localDateTimeString( char *dst, time_t ut )
+time_t localDateTimeToUnixtime( uint16_t y, uint8_t mo, uint8_t d,
+  uint8_t h, uint8_t mi, uint8_t s )
 {
-#if !defined( TIMEZONE_JST )
-#define  TIMEZONE_JST  (9 * 3600UL)
-#endif
-  ut += TIMEZONE_JST;
-  struct tm *t = localtime( (const time_t *)&ut );
-  uint16_t year  = t->tm_year + 1900;
-  uint8_t  month = t->tm_mon + 1;
-  uint8_t  day   = t->tm_mday;
-  uint8_t  hour  = t->tm_hour;
-  uint8_t  minute = t->tm_min;
-  uint8_t  second = t->tm_sec;
-
-  sprintf( dst, "%d/%02d/%02d %02d:%02d:%02d",
-    year, month, day,
-    hour, minute, second );
-  return dst;
+  time_t ut = utcDateTimeToUnixtime( y, mo, d, h, mi, s );
+  return ut - TIMEZONE_JST;
 }
 
 /* ----------------------------------------
-  local date string
-  Returns the local date string from unix time.
+  utcDateTime
+  unix time(ut) converted to utc date and time strings.
+  no returns.
 ---------------------------------------- */
-char *localDateString( char *dst, time_t ut )
+void utcDateTime( time_t ut,
+  uint16_t *year, uint8_t *month, uint8_t *day,
+  uint8_t *hour, uint8_t *minute, uint8_t *second )
+{
+  struct tm *t = localtime( (const time_t *)&ut );
+  *year = t->tm_year + 1900;
+  *month = t->tm_mon + 1;
+  *day = t->tm_mday;
+  *hour = t->tm_hour;
+  *minute = t->tm_min;
+  *second = t->tm_sec;
+}
+
+/* ----------------------------------------
+  localDateTime
+  unix time(ut) converted to local date and time strings.
+  no returns.
+---------------------------------------- */
+void localDateTime( time_t ut,
+  uint16_t *year, uint8_t *month, uint8_t *day,
+  uint8_t *hour, uint8_t *minute, uint8_t *second )
+{
+  utcDateTime( ut + TIMEZONE_JST, year, month, day, hour, minute, second );
+}
+
+/* ----------------------------------------
+  utcDateString
+  Returns the utc date string from unix time.
+---------------------------------------- */
+char *utcDateString( char *dst, time_t ut )
 {
   struct tm *t = localtime( (const time_t *)&ut );
   uint16_t year  = t->tm_year + 1900;
@@ -812,10 +829,19 @@ char *localDateString( char *dst, time_t ut )
 }
 
 /* ----------------------------------------
-  local time string
-  Returns the local time string from unix time.
+  local date string
+  Returns the local date string from unix time.
 ---------------------------------------- */
-char *localTimeString( char *dst, time_t ut )
+char *localDateString( char *dst, time_t ut )
+{
+  return utcDateString( dst, ut + TIMEZONE_JST );
+}
+
+/* ----------------------------------------
+  utcTimeString
+  Returns the utc time string from unix time.
+---------------------------------------- */
+char *utcTimeString( char *dst, time_t ut )
 {
   struct tm *t = localtime( (const time_t *)&ut );
   uint8_t  hour  = t->tm_hour;
@@ -825,6 +851,63 @@ char *localTimeString( char *dst, time_t ut )
   sprintf( dst, "%02d:%02d:%02d",
     hour, minute, second );
   return dst;
+}
+
+/* ----------------------------------------
+  local time string
+  Returns the local time string from unix time.
+---------------------------------------- */
+char *localTimeString( char *dst, time_t ut )
+{
+  return utcTimeString( dst, ut + TIMEZONE_JST );
+}
+
+/* ----------------------------------------
+  utcDateTimeString
+  Returns the utc date and time string from unix time.
+---------------------------------------- */
+char *utcDateTimeString( char *dst, time_t ut )
+{
+  utcDateString( dst, ut );
+  strcat( dst, " " );
+  int len = strlen( dst );
+  utcTimeString( dst + len, ut );
+
+  return dst;
+}
+
+/* ----------------------------------------
+  local date and time string
+  Returns the local date and time string from unix time.
+---------------------------------------- */
+char *localDateTimeString( char *dst, time_t ut )
+{
+  localDateString( dst, ut );
+  strcat( dst, " " );
+  int len = strlen( dst );
+  localTimeString( dst + len, ut );
+
+  return dst;
+}
+
+/* ----------------------------------------
+  weekDay
+  Returns the local date and time string from unix time.
+---------------------------------------- */
+int weekDay( time_t ut )
+{
+  struct tm *t = localtime( (const time_t *)&ut );
+  return t->tm_wday;
+}
+
+/* ----------------------------------------
+  weekDayFromYMD
+  Returns the local date and time string from unix time.
+---------------------------------------- */
+int weekDayFromYMD( uint16_t y, uint8_t mo, uint8_t d )
+{
+  time_t ut = utcDateTimeToUnixtime( y, mo, d, 0, 0, 0 );
+  return weekDay( ut );
 }
 
 /* ----------------------------------------

@@ -39,6 +39,7 @@ extern "C"
 /* ----------------------------------------
     defines
 ---------------------------------------- */
+enum THE_WEEK_DAY {SUNDAY,MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY,SATURDAY};
 
 /* ----------------------------------------
     instances or global variables
@@ -62,6 +63,7 @@ int  isDigitString( const char *digit );
 char *small2large( char *str );
 
 char *fixed_little_number( char *dst, long num, int point );
+char *dtostrf(double number, signed char width, unsigned char prec, char *s);
 void int2byteBig( char *dst, int d );
 void int2byteLittle( char *dst, int d );
 void double2byteLittle( char *dst, double d );
@@ -71,12 +73,25 @@ unsigned short utf8to16( const unsigned char utf8[], int sz );
 
 void compileDate(int *year, int *month, int *day);
 void compileTime(int *hour, int *minute, int *second);
-char *dtostrf(double number, signed char width, unsigned char prec, char *s);
-char *localDateTimeString( char *dst, time_t ut );
+void utcDateTime( time_t ut,
+  uint16_t *year, uint8_t *month, uint8_t *day,
+  uint8_t *hour, uint8_t *minute, uint8_t *second );
+void localDateTime( time_t ut,
+  uint16_t *year, uint8_t *month, uint8_t *day,
+  uint8_t *hour, uint8_t *minute, uint8_t *second );
+char *utcDateString( char *dst, time_t ut );
 char *localDateString( char *dst, time_t ut );
+char *utcTimeString( char *dst, time_t ut );
 char *localTimeString( char *dst, time_t ut );
+char *utcDateTimeString( char *dst, time_t ut );
+char *localDateTimeString( char *dst, time_t ut );
+time_t utcDateTimeToUnixtime(
+  uint16_t y, uint8_t mo, uint8_t d, uint8_t h, uint8_t mi, uint8_t s );
 time_t localDateTimeToUnixtime(
   uint16_t y, uint8_t mo, uint8_t d, uint8_t h, uint8_t mi, uint8_t s );
+int weekDay( time_t ut );
+int weekDayFromYMD( uint16_t y, uint8_t mo, uint8_t d );
+
 time_t iso8601ToUnixtime( const char *iso8601 );
 
 int patternMatch( const char *compA, const char *compB );
