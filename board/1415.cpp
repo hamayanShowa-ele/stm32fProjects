@@ -105,7 +105,9 @@ void BOARD_1415::gpioInit()
   digitalWrite( PC3, HIGH );
   pinMode( PC3, OUTPUT );
   /*  PC4： INT0 (external interrupt). */
+  pinMode( PC4, INPUT_PULLUP );
   /*  PC5： INT1 (external interrupt). */
+  pinMode( PC5, INPUT_PULLUP );
   /*  PC6: usart3 ri. */
   /*  PC7: not connected. */
   /*  PC8: not connected. */
@@ -165,10 +167,15 @@ void BOARD_1415::gpioInit()
   /*  PF4： fsmc address bus bit 4(A4) */
   /*  PF5： fsmc address bus bit 5(A5) */
   /*  PF6： INT2 (external interrupt). */
+  pinMode( PF6, INPUT_PULLUP );
   /*  PF7： INT3 (external interrupt). */
+  pinMode( PF7, INPUT_PULLUP );
   /*  PF8： INT4 (external interrupt). */
+  pinMode( PF8, INPUT_PULLUP );
   /*  PF9： INT5 (external interrupt). */
+  pinMode( PF9, INPUT_PULLUP );
   /*  PF10： INT6 (external interrupt). */
+  pinMode( PF10, INPUT_PULLUP );
   /*  PF11： cbus enable(BUS_ENB). */
   digitalWrite( PF11, LOW );  // active high
   pinMode( PF11, OUTPUT );
