@@ -78,11 +78,12 @@ static int extiIRQn( int num )
     configure interrupt handler
 ---------------------------------------- */
 void extiConfig(
-  uint8_t pin, EXTITrigger_TypeDef trigger, uint8_t pri, uint8_t sub )
+  uint8_t pin, EXTITrigger_TypeDef trigger, int active,
+  uint8_t pri, uint8_t sub )
 {
   if( pin < PA0 || pin >= PORT_END ) return;
   GPIO gpio;
-  gpio.pinMode( pin, INPUT );
+  gpio.pinMode( pin, (active == LOW) ? INPUT_PULLUP : (active == HIGH) ? INPUT_PULLDOWN : INPUT );
   gpio.exti( pin, trigger, pri, sub );
 }
 
@@ -99,7 +100,7 @@ void extiCallBack( int num, void(*cb)(void) )
 void extiRejectCallBack( int name )
 {
   if( name >= EXTI_IRQ_NUMBERS ) return;
-  cbList[ name ] = nullptr;
+  cbList[ name ] = 0;
 }
 
 
