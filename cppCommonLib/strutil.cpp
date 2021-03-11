@@ -892,7 +892,7 @@ char *localDateTimeString( char *dst, time_t ut )
 
 /* ----------------------------------------
   weekDay
-  Returns the local date and time string from unix time.
+  Returns the week day from unix time.
 ---------------------------------------- */
 int weekDay( time_t ut )
 {
@@ -902,7 +902,7 @@ int weekDay( time_t ut )
 
 /* ----------------------------------------
   weekDayFromYMD
-  Returns the local date and time string from unix time.
+  Returns the week day from year,month and day.
 ---------------------------------------- */
 int weekDayFromYMD( uint16_t y, uint8_t mo, uint8_t d )
 {
