@@ -63,6 +63,7 @@ static void dpRamRandomRead( volatile const uint16_t *ram, size_t size, uint32_t
 static void dpRamFixedRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led );
 static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *led );
 static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led );
+static void dpHayashiCheck( volatile const uint16_t *ram, LED *led );
 
 void cbGANYMEDE_CALL( void );
 volatile uint8_t ganymedeUpdate;
@@ -146,8 +147,9 @@ int main(void)
 //  dpRamRandomRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
 //  dpRamFixedRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, (uint16_t)0xA5A5, &actLed );
 //  dpRamIncrementRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
-  dpRamSineRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, 2000, &actLed );
+//  dpRamSineRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, 8000, &actLed );
 //  ramCheck( (void *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, &actLed );
+  dpHayashiCheck( (volatile const uint16_t *)GANYMEDE_MEM_ADR, &actLed );
 
 /*
   SRAM_8M sram( 0x00080000, 0x0200 );
@@ -281,9 +283,22 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
   return (h << 8 | l);
 }
 
-/* ----------------------------------------
-  sine pattern read and check.
----------------------------------------- */
+static uint16_t dpRamDividRead2( volatile const uint16_t *ram )
+{
+  volatile uint16_t h,l;
+
+  l = *ram++;
+  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+  h = *ram;
+  dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+  h &= 0x00FF;
+  l &= 0x00FF;
+
+  return (h << 8 | l);
+}
+
+
+
 #define  ADC_OFFSET  8192
 #define  SINE_BUFFER_ELEMENT_SIZE  1024
 #define  SINE_BUFFER_BLOCK_SIZE    64
@@ -292,6 +307,73 @@ static uint16_t dpRamDividRead( volatile const uint16_t *ram )
 //uint16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
 int16_t sineBuffer[ SINE_BUFFER_ELEMENT_SIZE ];
 
+/* ----------------------------------------
+  hayashi check.
+---------------------------------------- */
+#define  HAYASHI_CHANNEL_NUMBER  8
+#define  HAYASHI_BLOCK_NUMBER    (2 * 100)
+
+typedef struct
+{
+  uint16_t Head;
+  uint16_t HandShake_L;
+  uint16_t HandShake_H;
+  uint16_t Data[ HAYASHI_CHANNEL_NUMBER ][ HAYASHI_BLOCK_NUMBER ];
+} CBUS_ST1;
+
+static void dpHayashiCheck( volatile const uint16_t *ram, LED *led )
+{
+  CBUS_ST1 *st1 = (CBUS_ST1 *)ram;
+  uint16_t loop = 0;
+  uint32_t baseTim = millis();
+  uint8_t ganymedeUpdateBase = ganymedeUpdate;
+
+  while( false )
+  {
+//    dly_tsk( 1 * 1000UL );
+    while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+    ganymedeUpdateBase = ganymedeUpdate;
+    *((volatile uint16_t *)DPRAM_INTR_ADDRESS) = loop++;
+    dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+    led->toggle();
+  }
+  while( true )
+  {
+    while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
+    ganymedeUpdateBase = ganymedeUpdate;
+    for( int ch = 0; ch < (HAYASHI_CHANNEL_NUMBER - 1); ch++ )
+    {
+      uint16_t *ptr = (uint16_t *)st1->Data[ch];
+      for( int i = 0; i < (HAYASHI_BLOCK_NUMBER / 2); )
+      {
+        int16_t rcv = (int16_t)dpRamDividRead2( (const uint16_t *)ptr );
+        if( rcv <= -10000 || rcv >= 10000 )
+        {
+          while( true )
+          {
+            memcpy( sineBuffer, st1->Data[ch], HAYASHI_BLOCK_NUMBER );
+//            dly_tsk( 50UL );
+            led->toggle();
+            break;
+          }
+        }
+        ptr += 2;
+        i++;
+      }
+    }
+    *((volatile uint16_t *)DPRAM_INTR_ADDRESS) = loop++;
+    dummy = *((volatile uint16_t *)CBUS_DUMMY_MEM_ADR);
+    if( (millis() - baseTim) >= 500UL )
+    {
+      baseTim = millis();
+      led->toggle();
+    }
+  }
+}
+
+/* ----------------------------------------
+  sine pattern read and check.
+---------------------------------------- */
 static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
 {
 //  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
@@ -319,16 +401,16 @@ static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led )
       while( ganymedeUpdate == ganymedeUpdateBase ) rot_rdq();
       ganymedeUpdateBase = ganymedeUpdate;
 
-//      uint16_t *ptr = (uint16_t *)ram;
-      int16_t *ptr = (int16_t *)ram;
+      uint16_t *ptr = (uint16_t *)ram;
+//      int16_t *ptr = (int16_t *)ram;
       for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
       {
-//        uint16_t snd = sineBuffer[ index ];
-        int16_t snd = sineBuffer[ index ];
+        uint16_t snd = sineBuffer[ index ];
+//        int16_t snd = sineBuffer[ index ];
         for( int i = 0; i < SINE_BUFFER_CHANNELS; )
         {
           rot_rdq();
-#if 0
+#if 1
           uint16_t rcv = dpRamDividRead( (const uint16_t *)ptr );
           if( rcv != (snd + i) )
           {
