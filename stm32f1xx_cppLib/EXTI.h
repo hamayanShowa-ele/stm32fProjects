@@ -40,7 +40,7 @@ extern "C"
     prototypes
 ---------------------------------------- */
 void extiConfig(
-  uint8_t pin, EXTITrigger_TypeDef trigger,
+  uint8_t pin, EXTITrigger_TypeDef trigger, int active = LOW,
   uint8_t pri = BASE_PRIORITY, uint8_t sub = BASE_SUB_PRIORITY );
 void extiCallBack( int num, void(*cb)(void) );
 
