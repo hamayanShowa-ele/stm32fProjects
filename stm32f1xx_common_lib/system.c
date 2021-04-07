@@ -165,7 +165,7 @@ uint16_t getDevID( void )
 ---------------------------------------- */
 void getUniqueID( uint32_t id[] )
 {
-#if  defined(STM32F10X_HD)
+#if  defined(STM32F10X_HD) || defined(STM32F10X_MD)
   #define  UNIQUE_ID_BASE_ADDRESS  0x1FFFF7E8
 #endif  /* defined(STM32F10X_HD) */
   id[0] =  *((uint32_t *)UNIQUE_ID_BASE_ADDRESS + 0);
@@ -179,7 +179,7 @@ void getUniqueID( uint32_t id[] )
 ---------------------------------------- */
 uint16_t getFlashSize( void )
 {
-#if  defined(STM32F10X_HD)
+#if  defined(STM32F10X_HD) || defined(STM32F10X_MD)
   #define  FLASH_SIZE_BASE_ADDRESS  0x1FFFF7E0
 #endif  /* defined(STM32F10X_HD) */
   return *((uint16_t *)FLASH_SIZE_BASE_ADDRESS);

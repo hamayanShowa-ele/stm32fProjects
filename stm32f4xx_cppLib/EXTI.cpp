@@ -83,7 +83,8 @@ void extiConfig(
 {
   if( pin < PA0 || pin >= PORT_END ) return;
   GPIO gpio;
-  gpio.pinMode( pin, (active == LOW) ? INPUT_PULLUP : (active == HIGH) ? INPUT_PULLDOWN : INPUT );
+//  gpio.pinMode( pin, (active == LOW) ? INPUT_PULLUP : (active == HIGH) ? INPUT_PULLDOWN : INPUT );
+  gpio.pinMode( pin, INPUT );
   gpio.exti( pin, trigger, pri, sub );
 }
 

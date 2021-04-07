@@ -34,7 +34,7 @@ extern "C"
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-static void (*cbList[ EXTI_IRQ_NUMBERS ])( void );
+static void (*cbList[ EXTI_IRQ_NUMBERS ])( int );
 
 
 /* ----------------------------------------
@@ -82,7 +82,8 @@ void extiConfig(
   if( pin < PA0 || pin >= PORT_END ) return;
 
   GPIO gpio;
-  gpio.pinMode( pin, (active == LOW) ? INPUT_PULLUP : (active == HIGH) ? INPUT_PULLDOWN : INPUT );
+//  gpio.pinMode( pin, (active == LOW) ? INPUT_PULLUP : (active == HIGH) ? INPUT_PULLDOWN : INPUT );
+  gpio.pinMode( pin, INPUT );
   GPIO_EXTILineConfig( gpio.whatPortSource(pin), gpio.whatPinSource(pin) );
   EXTI_InitTypeDef EXTI_InitStruct;
   EXTI_DeInit();
@@ -105,7 +106,7 @@ void extiConfig(
     register call back routine
     and unregister call back routine.
 ---------------------------------------- */
-void extiCallBack( int num, void(*cb)(void) )
+void extiCallBack( int num, void(*cb)(int extiNum) )
 {
   if( num >= EXTI_IRQ_NUMBERS ) return;
   cbList[ num ] = cb;
@@ -123,38 +124,38 @@ void extiRejectCallBack( int name )
 ---------------------------------------- */
 extern "C"
 {
-void EXTI0_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line0 ); if( cbList[0] != 0 ) (*cbList[0])(); }
-void EXTI1_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line1 ); if( cbList[1] != 0 ) (*cbList[1])(); }
-void EXTI2_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line2 ); if( cbList[2] != 0 ) (*cbList[2])(); }
-void EXTI3_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line3 ); if( cbList[3] != 0 ) (*cbList[3])(); }
-void EXTI4_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line4 ); if( cbList[4] != 0 ) (*cbList[4])(); }
+void EXTI0_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line0 ); if( cbList[0] != 0 ) (*cbList[0])(0); }
+void EXTI1_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line1 ); if( cbList[1] != 0 ) (*cbList[1])(1); }
+void EXTI2_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line2 ); if( cbList[2] != 0 ) (*cbList[2])(2); }
+void EXTI3_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line3 ); if( cbList[3] != 0 ) (*cbList[3])(3); }
+void EXTI4_IRQHandler( void ){ EXTI_ClearITPendingBit( EXTI_Line4 ); if( cbList[4] != 0 ) (*cbList[4])(4); }
 
 void EXTI9_5_IRQHandler( void )
 {
   if( EXTI_GetITStatus( EXTI_Line5 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line5 );  /* Release of interrupt request factors. */
-    if( cbList[5] != 0 ) (*cbList[5])();
+    if( cbList[5] != 0 ) (*cbList[5])(5);
   }
   if( EXTI_GetITStatus( EXTI_Line6 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line6 );  /* Release of interrupt request factors. */
-    if( cbList[6] != 0 ) (*cbList[6])();
+    if( cbList[6] != 0 ) (*cbList[6])(6);
   }
   if( EXTI_GetITStatus( EXTI_Line7 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line7 );  /* Release of interrupt request factors. */
-    if( cbList[7] != 0 ) (*cbList[7])();
+    if( cbList[7] != 0 ) (*cbList[7])(7);
   }
   if( EXTI_GetITStatus( EXTI_Line8 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line8 );  /* Release of interrupt request factors. */
-    if( cbList[8] != 0 ) (*cbList[8])();
+    if( cbList[8] != 0 ) (*cbList[8])(8);
   }
   if( EXTI_GetITStatus( EXTI_Line9 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line9 );  /* Release of interrupt request factors. */
-    if( cbList[9] != 0 ) (*cbList[9])();
+    if( cbList[9] != 0 ) (*cbList[9])(9);
   }
 }
 
@@ -163,32 +164,32 @@ void EXTI15_10_IRQHandler( void )
   if( EXTI_GetITStatus( EXTI_Line10 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line10 );  /* Release of interrupt request factors. */
-    if( cbList[10] != 0 ) (*cbList[10])();
+    if( cbList[10] != 0 ) (*cbList[10])(10);
   }
   if( EXTI_GetITStatus( EXTI_Line11 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line11 );  /* Release of interrupt request factors. */
-    if( cbList[11] != 0 ) (*cbList[11])();
+    if( cbList[11] != 0 ) (*cbList[11])(11);
   }
   if( EXTI_GetITStatus( EXTI_Line12 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line12 );  /* Release of interrupt request factors. */
-    if( cbList[12] != 0 ) (*cbList[12])();
+    if( cbList[12] != 0 ) (*cbList[12])(12);
   }
   if( EXTI_GetITStatus( EXTI_Line13 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line13 );  /* Release of interrupt request factors. */
-    if( cbList[13] != 0 ) (*cbList[13])();
+    if( cbList[13] != 0 ) (*cbList[13])(13);
   }
   if( EXTI_GetITStatus( EXTI_Line14 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line14 );  /* Release of interrupt request factors. */
-    if( cbList[14] != 0 ) (*cbList[14])();
+    if( cbList[14] != 0 ) (*cbList[14])(14);
   }
   if( EXTI_GetITStatus( EXTI_Line15 ) == SET )  /* XOVR */
   {
     EXTI_ClearITPendingBit( EXTI_Line15 );  /* Release of interrupt request factors. */
-    if( cbList[15] != 0 ) (*cbList[15])();
+    if( cbList[15] != 0 ) (*cbList[15])(15);
   }
 }
 
