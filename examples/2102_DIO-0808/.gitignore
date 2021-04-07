@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+2102_DIO-0808.cogui
+2102_DIO-0808.comarker
+2102_DIO-0808.comemgui
+
+# not need cppGraphic folder
+2102_DIO-0808/
+
+# not need logs folder
+logs/
+
+
