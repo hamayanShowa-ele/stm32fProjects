@@ -1,5 +1,5 @@
 /* ----------------------------------------
- board 1415 utilities.
+ board 1405 utilities.
   for STMicroelectronics SPL library
 
   Copyright (c) 2020 hamayan (hamayan@showa-ele.jp).
@@ -22,25 +22,28 @@
   Created 2020 by hamayan (hamayan@showa-ele.jp)
 ---------------------------------------- */
 
-#ifndef  __BOARD_1415_H__
-#define  __BOARD_1415_H__
+#ifndef  __BOARD_1405_H__
+#define  __BOARD_1405_H__
 
-#include  <gpio.h>
+#include  <led.h>
 #include  <derivertive.h>
-#include  <FSMC.h>
-#include  <boardUtility.h>
+#include  <EXTI.h>
+#if !defined( STM32F103RB )
+#include  <1415.h>
+#endif /* !defined( STM32F103RB ) */
 extern "C"
 {
-//  #include  <fsmc.h>
   #include  <system.h>
 }
 
-enum V50_INT_NUMBERS
-{
-  INT0_NUMBER = 4,INT1_NUMBER,INT2_NUMBER,INT3_NUMBER,
-  INT4_NUMBER,INT5_NUMBER,INT6_NUMBER,
-};
-#define EXTI_TO_INT_NUMBER(n)  (n - INT0_NUMBER)
+/* ----------------------------------------
+    defines
+---------------------------------------- */
+#define  ALVC7804_WORD_SIZE  (512 - 1)  /* 512 * 18bits. */
+
+#if !defined( STM32F103RB )
+  #define  IDSW  0
+#endif  /* !defined( IDSW ) */
 
 /* ----------------------------------------
     prototypes 
@@ -49,23 +52,33 @@ enum V50_INT_NUMBERS
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-
-class BOARD_1415 : public GPIO
+class BOARD_1405 : public LED
 {
-public:
-  BOARD_1415() {}
-  ~BOARD_1415() {}
-
-  void gpioInit();
-  void extBusInit();
-  void cbusEnable( bool onOff );
-  void cbusReset();
-  volatile uint16_t dummyRead();
-
 private:
-  void busPortInitialize();
+  volatile uint16_t *ioAddress;
+
+public:
+  BOARD_1405() {}
+  BOARD_1405( uint16_t *adr ) { begin( adr ); }
+  ~BOARD_1405() {}
+
+#if defined( STM32F103RB )
+  void gpioInit();
+  void fifoWrite( uint16_t data );
+  void fifoWrite( uint16_t *data, size_t size );
+  uint8_t idSW() { return (IDSW << 1); }
+  volatile uint16_t *ioAdr() { return ioAddress; }
+
+  void fifoIncrementWrite( LED *led );
+  void knock1415();
+#endif /* STM32F103RB */
+
+  void begin( volatile uint16_t *adr ) { ioAddress = adr; }
+  void fifoIncrementRead( int portNum, LED *led );
+  void fifoDummyRead( int size );
+
+  void knock1405();
 };
 
-
-#endif  /* __BOARD_1415_H__ */
+#endif  /* __BOARD_1405_H__ */
 
