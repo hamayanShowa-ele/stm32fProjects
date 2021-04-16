@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1405_IsolateAD.cogui
+1405_IsolateAD.comarker
+1405_IsolateAD.comemgui
+
+# not need cppGraphic folder
+1405_IsolateAD/
+
+# not need logs folder
+logs/
+
+
