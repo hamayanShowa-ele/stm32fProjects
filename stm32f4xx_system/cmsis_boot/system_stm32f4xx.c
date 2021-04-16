@@ -150,7 +150,11 @@
 #define PLL_N      336
 
 /* SYSCLK = PLL_VCO / PLL_P */
-#define PLL_P      2
+#if defined( STM32F401RB ) || defined( STM32F401RC ) || defined( STM32F401RE )
+#define PLL_P      4  // 84MHz
+#else
+#define PLL_P      2  // 168MHz
+#endif
 
 /* USB OTG FS, SDIO and RNG Clock =  PLL_VCO / PLLQ */
 #define PLL_Q      7
