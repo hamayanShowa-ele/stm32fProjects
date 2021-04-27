@@ -91,6 +91,13 @@
 #define  BUS_ENB_IS_0  BUS_ENB_PORT->BSRR = (BUS_ENB_PIN << 16)
 #define  BUS_ENB_IS_1  BUS_ENB_PORT->BSRR = (BUS_ENB_PIN << 0)
 
+/* ACT LED */
+//#define  ACTLED     PB9
+#define  ACTLED_PORT  GPIOB
+#define  ACTLED_PIN   GPIO_Pin_9
+#define  ACTLED_IS_0  ACTLED_PORT->BSRR = (ACTLED_PIN << 16)
+#define  ACTLED_IS_1  ACTLED_PORT->BSRR = (ACTLED_PIN << 0)
+
 /* I2C1,I2C2 */
 #define  SCL1       PB7
 #define  SDA1       PB6

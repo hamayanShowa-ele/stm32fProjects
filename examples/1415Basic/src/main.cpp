@@ -32,9 +32,10 @@
 #include  <EXTI.h>
 //#include  <FSMC.h>
 #include  <led.h>
+#include  <strutil.h>
 #include  <1415.h>
 #include  <2007.h>
-#include  <strutil.h>
+#include  <1405.h>
 
 extern "C"
 {
@@ -65,7 +66,7 @@ static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *
 static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led );
 static void dpHayashiCheck( volatile const uint16_t *ram, LED *led );
 
-void cbGANYMEDE_CALL( void );
+void cbGANYMEDE_CALL( int num );
 volatile uint8_t ganymedeUpdate;
 
 /* ----------------------------------------
@@ -79,6 +80,7 @@ volatile time_t unixTime;
 GPIO gpio;
 Serial Serial1;  /* hardware serial 1 */
 BOARD_1415 cbus;
+BOARD_1405 bd1405;
 LED actLed;
 
 volatile static uint16_t dummy;
@@ -141,6 +143,11 @@ int main(void)
   Serial1.printf( "    1415 ARM CBUS LONG\r\n" );
   Serial1.printf( "    designed by hamayan.\r\n" );
 //  serialLoopBack( &Serial1 );
+
+#define  BD1405_01_IO_ADR  (CBUS_IO_ADR + 0x0200)
+  bd1405.begin( (volatile uint16_t *)BD1405_01_IO_ADR );
+//  bd1405.fifoDummyRead( ALVC7804_WORD_SIZE );
+  bd1405.fifoIncrementRead( PF10, &actLed );
 
   extiConfig( PF10, EXTI_Trigger_Falling );  // INT0:PC4 INT6:PF10
   extiCallBack( 10, cbGANYMEDE_CALL );  // INT0:4 INT6:10
@@ -628,7 +635,7 @@ static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *
 ---------------------------------------- */
 SYSTIM systimOld = 0UL;
 uint32_t cycleCounterOld = 0UL;
-void cbGANYMEDE_CALL( void )
+void cbGANYMEDE_CALL( int num )
 {
   if( (systim - systimOld) >= 3UL )
   {
