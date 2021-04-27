@@ -207,7 +207,7 @@ void adcTask( void )
   //  uint16_t *sineBuffer = new uint16_t[ SINE_BUFFER_ELEMENT_SIZE ];
    /* It may be that the HEAP area is lacking. */
   /* Generate sine waveform data.. */
-  const int scale = 2000;
+  const int scale = 8000;
   double phase = 2 * M_PI * 30.0 / 360.0;
   for( int i = 0; i < SINE_BUFFER_ELEMENT_SIZE; i++ )
   {
@@ -239,16 +239,16 @@ void adcTask( void )
     {
       while( (adc1Update % 100) != 99 ) { rot_rdq(); }
 
-//      uint16_t *ptr = (uint16_t *)DPRAM_BASE_ADDRESS;
-      int16_t *ptr = (int16_t *)DPRAM_BASE_ADDRESS;
+      uint16_t *ptr = (uint16_t *)DPRAM_BASE_ADDRESS;
+//      int16_t *ptr = (int16_t *)DPRAM_BASE_ADDRESS;
       for( int j = 0; j < SINE_BUFFER_BLOCK_SIZE; j++ )
       {
-//        uint16_t snd = sineBuffer[ index ];
-        int16_t snd = sineBuffer[ index ];
+        uint16_t snd = sineBuffer[ index ];
+//        int16_t snd = sineBuffer[ index ];
         for( int i = 0; i < SINE_BUFFER_CHANNELS; )
         {
           rot_rdq();
-#if 0
+#if 1
           bd1804.dpRamDividWrite( ptr, snd + i );
           uint16_t rcv = bd1804.dpRamDividRead( (const uint16_t *)ptr );
           if( rcv != (snd + i) )
