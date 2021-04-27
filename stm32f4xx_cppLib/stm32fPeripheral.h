@@ -122,6 +122,115 @@ enum STM32F_ADC_PIN
 /* ----------------------------------------
     RCC defines.
 ---------------------------------------- */
+enum RCC_PERIPHERALS
+{
+  /* ahb1 */
+  RCC_GPIOA = 0,  // #define RCC_AHB1Periph_GPIOA ((uint32_t)0x00000001)
+  RCC_GPIOB,  // #define RCC_AHB1Periph_GPIOB     ((uint32_t)0x00000002)
+  RCC_GPIOC,  // #define RCC_AHB1Periph_GPIOC     ((uint32_t)0x00000004)
+  RCC_GPIOD,  // #define RCC_AHB1Periph_GPIOD     ((uint32_t)0x00000008)
+  RCC_GPIOE,  // #define RCC_AHB1Periph_GPIOE ((uint32_t)0x00000010)
+  RCC_GPIOF,  // #define RCC_AHB1Periph_GPIOF ((uint32_t)0x00000020)
+  RCC_GPIOG,  // #define RCC_AHB1Periph_GPIOG ((uint32_t)0x00000040)
+  RCC_GPIOH,  // #define RCC_AHB1Periph_GPIOH ((uint32_t)0x00000080)
+  RCC_GPIOI,  // #define RCC_AHB1Periph_GPIOI ((uint32_t)0x00000100)
+  RCC_RESERVE01, /*                           ((uint32_t)0x00000200) */
+  RCC_RESERVE02, /*                           ((uint32_t)0x00000400) */
+  RCC_RESERVE03, /*                           ((uint32_t)0x00000800) */
+  RCC_CRC,  // #define RCC_AHB1Periph_CRC     ((uint32_t)0x00001000)
+  RCC_RESERVE04, /*                           ((uint32_t)0x00002000) */
+  RCC_RESERVE05, /*                           ((uint32_t)0x00004000) */
+  RCC_FLITF,  // #define RCC_AHB1Periph_FLITF ((uint32_t)0x00008000)
+  RCC_SRAM1,  // #define RCC_AHB1Periph_SRAM1     ((uint32_t)0x00010000)
+  RCC_SRAM2,  // #define RCC_AHB1Periph_SRAM2     ((uint32_t)0x00020000)
+  RCC_BKPSRAM,  // #define RCC_AHB1Periph_BKPSRAM ((uint32_t)0x00040000)
+  RCC_RESERVE06, /*                               ((uint32_t)0x00080000) */
+  RCC_CCMDATARAMEN,  // #define RCC_AHB1Periph_CCMDATARAMEN ((uint32_t)0x00100000)
+  RCC_DMA1,  // #define RCC_AHB1Periph_DMA1                 ((uint32_t)0x00200000)
+  RCC_DMA2,  // #define RCC_AHB1Periph_DMA2                 ((uint32_t)0x00400000)
+  RCC_RESERVE07, /*                                         ((uint32_t)0x00800000) */
+  RCC_RESERVE08, /*                                     ((uint32_t)0x01000000) */
+  RCC_ETH_MAC,  // #define RCC_AHB1Periph_ETH_MAC       ((uint32_t)0x02000000)
+  RCC_ETH_MAC_Tx,  // #define RCC_AHB1Periph_ETH_MAC_Tx ((uint32_t)0x04000000)
+  RCC_ETH_MAC_Rx,  // #define RCC_AHB1Periph_ETH_MAC_Rx ((uint32_t)0x08000000)
+  RCC_ETH_MAC_PTP,  // #define RCC_AHB1Periph_ETH_MAC_PTP ((uint32_t)0x10000000)
+  RCC_OTG_HS,  // #define RCC_AHB1Periph_OTG_HS           ((uint32_t)0x20000000)
+  RCC_OTG_HS_ULPI,  // #define RCC_AHB1Periph_OTG_HS_ULPI ((uint32_t)0x40000000)
+  RCC_RESERVE09, /*                                       ((uint32_t)0x80000000) */
+
+  /* ahb2 */
+  RCC_DCMI = 32,  // #define RCC_AHB2Periph_DCMI ((uint32_t)0x00000001)
+  RCC_RESERVE10, /*                              ((uint32_t)0x00000002) */
+  RCC_RESERVE11, /*                              ((uint32_t)0x00000004) */
+  RCC_RESERVE12, /*                              ((uint32_t)0x00000008) */
+  RCC_CRYP,  // #define RCC_AHB2Periph_CRYP     ((uint32_t)0x00000010)
+  RCC_HASH,  // #define RCC_AHB2Periph_HASH     ((uint32_t)0x00000020)
+  RCC_RNG,  // #define RCC_AHB2Periph_RNG       ((uint32_t)0x00000040)
+  RCC_OTG_FS,  // #define RCC_AHB2Periph_OTG_FS ((uint32_t)0x00000080)
+
+  /* ahb3 */
+  RCC_FSMC = 64,  // #define RCC_AHB3Periph_FSMC ((uint32_t)0x00000001)
+  RCC_RESERVE13, /*                              ((uint32_t)0x00000002) */
+  RCC_RESERVE14, /*                              ((uint32_t)0x00000004) */
+  RCC_RESERVE15, /*                              ((uint32_t)0x00000008) */
+
+  /* apb1 */
+  RCC_TIM2 = 96,  // #define RCC_APB1Periph_TIM2 ((uint32_t)0x00000001)
+  RCC_TIM3,  // #define RCC_APB1Periph_TIM3     ((uint32_t)0x00000002)
+  RCC_TIM4,  // #define RCC_APB1Periph_TIM4     ((uint32_t)0x00000004)
+  RCC_TIM5,  // #define RCC_APB1Periph_TIM5     ((uint32_t)0x00000008)
+  RCC_TIM6,  // #define RCC_APB1Periph_TIM6   ((uint32_t)0x00000010)
+  RCC_TIM7,  // #define RCC_APB1Periph_TIM7   ((uint32_t)0x00000020)
+  RCC_TIM12,  // #define RCC_APB1Periph_TIM12 ((uint32_t)0x00000040)
+  RCC_TIM13,  // #define RCC_APB1Periph_TIM13 ((uint32_t)0x00000080)
+  RCC_TIM14,  // #define RCC_APB1Periph_TIM14 ((uint32_t)0x00000100)
+  RCC_RESERVE16, /*                           ((uint32_t)0x00000200) */
+  RCC_RESERVE17, /*                           ((uint32_t)0x00000400) */
+  RCC_WWDG,  // #define RCC_APB1Periph_WWDG   ((uint32_t)0x00000800)
+  RCC_RESERVE18, /*                         ((uint32_t)0x00001000) */
+  RCC_RESERVE19, /*                         ((uint32_t)0x00002000) */
+  RCC_SPI2,  // #define RCC_APB1Periph_SPI2 ((uint32_t)0x00004000)
+  RCC_SPI3,  // #define RCC_APB1Periph_SPI3 ((uint32_t)0x00008000)
+  RCC_RESERVE20, /*                             ((uint32_t)0x00010000) */
+  RCC_USART2,  // #define RCC_APB1Periph_USART2 ((uint32_t)0x00020000)
+  RCC_USART3,  // #define RCC_APB1Periph_USART3 ((uint32_t)0x00040000)
+  RCC_UART4,  // #define RCC_APB1Periph_UART4   ((uint32_t)0x00080000)
+  RCC_UART5,  // #define RCC_APB1Periph_UART5 ((uint32_t)0x00100000)
+  RCC_I2C1,  // #define RCC_APB1Periph_I2C1   ((uint32_t)0x00200000)
+  RCC_I2C2,  // #define RCC_APB1Periph_I2C2   ((uint32_t)0x00400000)
+  RCC_I2C3,  // #define RCC_APB1Periph_I2C3   ((uint32_t)0x00800000)
+  RCC_RESERVE21, /*                         ((uint32_t)0x01000000) */
+  RCC_CAN1,  // #define RCC_APB1Periph_CAN1 ((uint32_t)0x02000000)
+  RCC_CAN2,  // #define RCC_APB1Periph_CAN2 ((uint32_t)0x04000000)
+  RCC_RESERVE22, /*                         ((uint32_t)0x08000000) */
+  RCC_PWR,  // #define RCC_APB1Periph_PWR ((uint32_t)0x10000000)
+  RCC_DAC,  // #define RCC_APB1Periph_DAC ((uint32_t)0x20000000)
+  RCC_RESERVE23, /*                       ((uint32_t)0x40000000) */
+  RCC_RESERVE24, /*                       ((uint32_t)0x80000000) */
+
+  /* apb2 */
+  RCC_TIM1 = 128,  // #define RCC_APB2Periph_TIM1 ((uint32_t)0x00000001)
+  RCC_TIM8,  // #define RCC_APB2Periph_TIM8       ((uint32_t)0x00000002)
+  RCC_RESERVE25, /*                               ((uint32_t)0x00000004) */
+  RCC_RESERVE26, /*                               ((uint32_t)0x00000008) */
+  RCC_USART1,  // #define RCC_APB2Periph_USART1 ((uint32_t)0x00000010)
+  RCC_USART6,  // #define RCC_APB2Periph_USART6 ((uint32_t)0x00000020)
+  RCC_RESERVE27, /*                             ((uint32_t)0x00000040) */
+  RCC_RESERVE28, /*                             ((uint32_t)0x00000080) */
+//  RCC_ADC,  // #define RCC_APB2Periph_ADC   ((uint32_t)0x00000100)
+  RCC_ADC1,  // #define RCC_APB2Periph_ADC1 ((uint32_t)0x00000100)
+  RCC_ADC2,  // #define RCC_APB2Periph_ADC2 ((uint32_t)0x00000200)
+  RCC_ADC3,  // #define RCC_APB2Periph_ADC3 ((uint32_t)0x00000400)
+  RCC_SDIO,  // #define RCC_APB2Periph_SDIO ((uint32_t)0x00000800)
+  RCC_SPI1,  // #define RCC_APB2Periph_SPI1     ((uint32_t)0x00001000)
+  RCC_RESERVE29, /*                             ((uint32_t)0x00002000) */
+  RCC_SYSCFG,  // #define RCC_APB2Periph_SYSCFG ((uint32_t)0x00004000)
+  RCC_RESERVE30, /*                             ((uint32_t)0x00008000) */
+  RCC_TIM9,  // #define RCC_APB2Periph_TIM9   ((uint32_t)0x00010000)
+  RCC_TIM10,  // #define RCC_APB2Periph_TIM10 ((uint32_t)0x00020000)
+  RCC_TIM11,  // #define RCC_APB2Periph_TIM11 ((uint32_t)0x00040000)
+  RCC_RESERVE31, /*                           ((uint32_t)0x00080000) */
+};
 
 /* ----------------------------------------
     instances or global variables

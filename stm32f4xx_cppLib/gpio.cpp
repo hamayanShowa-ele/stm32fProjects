@@ -339,3 +339,80 @@ void GPIO::exti( int pin, EXTITrigger_TypeDef trig, uint8_t pri, uint8_t sub )
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init( &NVIC_InitStructure );
 }
+
+/* ----------------------------------------
+    RCC clock enable and disable
+---------------------------------------- */
+void GPIO::rccClockEnable( int rcc )
+{
+  uint32_t shift;
+  if( rcc < 32 )  /* RCC_AHB1Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB1PeriphClockCmd( shift, ENABLE );
+    RCC_AHB1PeriphResetCmd( shift, DISABLE );
+  }
+  else if( rcc < 64 )  /* RCC_AHB2Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB2PeriphClockCmd( shift, ENABLE );
+    RCC_AHB2PeriphResetCmd( shift, DISABLE );
+  }
+  else if( rcc < 96 )  /* RCC_AHB3Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB3PeriphClockCmd( shift, ENABLE );
+    RCC_AHB3PeriphResetCmd( shift, DISABLE );
+  }
+  else if( rcc < 128 )  /* RCC_APB1Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB1PeriphClockCmd( shift, ENABLE );
+    RCC_APB1PeriphResetCmd( shift, DISABLE );
+  }
+  else if( rcc < 160 )  /* RCC_APB2Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB2PeriphClockCmd( shift, ENABLE );
+    RCC_APB2PeriphResetCmd( shift, DISABLE );
+  }
+  else {}
+}
+
+void GPIO::rccClockDisable( int rcc )
+{
+  uint32_t shift;
+  if( rcc < 32 )  /* RCC_AHB1Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB1PeriphClockCmd( shift, DISABLE );
+    RCC_AHB1PeriphResetCmd( shift, ENABLE );
+  }
+  else if( rcc < 64 )  /* RCC_AHB2Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB2PeriphClockCmd( shift, DISABLE );
+    RCC_AHB2PeriphResetCmd( shift, ENABLE );
+  }
+  else if( rcc < 96 )  /* RCC_AHB3Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_AHB3PeriphClockCmd( shift, DISABLE );
+    RCC_AHB3PeriphResetCmd( shift, ENABLE );
+  }
+  else if( rcc < 128 )  /* RCC_APB1Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB1PeriphClockCmd( shift, DISABLE );
+    RCC_APB1PeriphResetCmd( shift, ENABLE );
+  }
+  else if( rcc < 160 )  /* RCC_APB2Periph */
+  {
+    shift = 0x00000001 << (rcc % 32);
+    RCC_APB2PeriphClockCmd( shift, DISABLE );
+    RCC_APB2PeriphResetCmd( shift, ENABLE );
+  }
+  else {}
+}
+
+

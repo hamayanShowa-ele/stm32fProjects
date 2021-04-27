@@ -86,6 +86,9 @@ private:
   void allPullupPulldown( int type = INPUT_PULLDOWN );
 
 public:
+  void rccClockEnable( int rcc );
+  void rccClockDisable( int rcc );
+
   GPIO_TypeDef* whatGPIOType( int pin )
   {
     if( pin >= PA0 && pin <= PA15 ) return GPIOA;
