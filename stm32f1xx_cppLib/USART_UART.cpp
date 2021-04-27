@@ -160,6 +160,7 @@ int USART_UART::begin(
     rccClockEnable( RCC_USART3 );
     irq = USART3_IRQn;
   }
+#if  defined(STM32F10X_HD)
   else if( USARTx == UART4 )  /* PC10 : tx, PC11 : rx */
   {
     if( tx == PC10 && rx == PC11 )  // not need remap.
@@ -196,6 +197,7 @@ int USART_UART::begin(
     rccClockEnable( RCC_UART5 );
     irq = UART5_IRQn;
   }
+#endif  /* defined(STM32F10X_HD) */
   else { return USART_IF_ERROR; }
 
   /* buffer and error counter clear. */
