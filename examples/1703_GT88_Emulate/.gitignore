@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1703_GT88_Emulate.cogui
+1703_GT88_Emulate.comarker
+1703_GT88_Emulate.comemgui
+
+# not need cppGraphic folder
+1703_GT88_Emulate/
+
+# not need logs folder
+logs/
+
+

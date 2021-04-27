@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G - 1.7.8" name="1703_GT88_Emulate">
+  <Target name="1703_GT88_Emulate" isCurrent="1">
+    <Device manufacturerId="9" manufacturerName="ST" chipId="313" chipName="STM32F103RE" boardId="" boardName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="0"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="SupportCPlusplus" value="1"/>
+        <Includepaths>
+          <Includepath path="."/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="USE_STDPERIPH_DRIVER"/>
+          <Define name="__ASSEMBLY__"/>
+          <Define name="SUPPORT_CPLUSPLUS"/>
+          <Define name="STM32F103RE"/>
+          <Define name="STM32F10X_HD"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="1"/>
+        <Option name="nostartfiles" value="0"/>
+        <Option name="LTO" value="0"/>
+        <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Use base C Library"/>
+        <Option name="UserEditLinker" value="-lstdc++; "/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00080000" startValue="0x08000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00010000" startValue="0x20000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="c:/coocox/coide/configuration/programdata/1703_GT88_Emulate/link.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="1703_GT88_Emulate"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="ST-Link"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="SWD"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="2M"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="STM32F10x_HD_512.elf"/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./">
+    <Component id="30" name="C Library" path="" type="2"/>
+    <Component id="33" name="Semihosting" path="" type="2"/>
+    <Component id="50" name="CMSIS core" path="" type="2"/>
+    <Component id="440" name="RCC" path="" type="2"/>
+    <Component id="442" name="PWR" path="" type="2"/>
+    <Component id="443" name="BKP" path="" type="2"/>
+    <Component id="444" name="GPIO" path="" type="2"/>
+    <Component id="445" name="EXTI" path="" type="2"/>
+    <Component id="446" name="DMA" path="" type="2"/>
+    <Component id="447" name="DAC" path="" type="2"/>
+    <Component id="448" name="RTC" path="" type="2"/>
+    <Component id="451" name="FSMC" path="" type="2"/>
+    <Component id="452" name="SPI" path="" type="2"/>
+    <Component id="453" name="I2C" path="" type="2"/>
+    <Component id="454" name="DBGMCU" path="" type="2"/>
+    <Component id="455" name="FLASH" path="" type="2"/>
+    <Component id="456" name="TIM" path="" type="2"/>
+    <Component id="457" name="ADC" path="" type="2"/>
+    <Component id="458" name="USART" path="" type="2"/>
+    <Component id="460" name="CMSIS Boot" path="" type="2"/>
+    <Component id="467" name="MISC" path="" type="2"/>
+  </Components>
+  <Files>
+    <File name="myOs/mul_tsk.c" path="../../myOs/mul_tsk.c" type="1"/>
+    <File name="src/main.cpp" path="src/main.cpp" type="1"/>
+    <File name="wiznet/cppInternet/NTP/ntp.h" path="../../../wiznet/cppInternet/NTP/ntp.h" type="1"/>
+    <File name="wiznet/Internet/byteOrder.h" path="../../../wiznet/Internet/byteOrder.h" type="1"/>
+    <File name="stm32f1xx_cppLib/Dma.cpp" path="../../stm32f1xx_cppLib/Dma.cpp" type="1"/>
+    <File name="stm_lib/src/stm32f10x_dbgmcu.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_dbgmcu.c" type="1"/>
+    <File name="stm32f1xx_common_lib" path="" type="2"/>
+    <File name="src/stm32f10x_it.c" path="src/stm32f10x_it.c" type="1"/>
+    <File name="src" path="" type="2"/>
+    <File name="stm_lib/inc/stm32f10x_fsmc.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_fsmc.h" type="1"/>
+    <File name="wiznet/Ethernet/W5500/w5500.c" path="../../../wiznet/Ethernet/W5500/w5500.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_pwr.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_pwr.h" type="1"/>
+    <File name="cmsis/core_cmFunc.h" path="../../stm32f1xx_system/cmsis/core_cmFunc.h" type="1"/>
+    <File name="stm_lib/src/misc.c" path="../../stm32f1xx_system/stm_lib/src/misc.c" type="1"/>
+    <File name="cmsis_boot/stm32f10x.h" path="../../stm32f1xx_system/cmsis_boot/stm32f10x.h" type="1"/>
+    <File name="wiznet/Ethernet/socket.c" path="../../../wiznet/Ethernet/socket.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_dbgmcu.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_dbgmcu.h" type="1"/>
+    <File name="cmsis_boot/stm32f10x_conf.h" path="../../stm32f1xx_system/cmsis_boot/stm32f10x_conf.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_flash.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_flash.h" type="1"/>
+    <File name="board/1702.cpp" path="../../board/1702.cpp" type="1"/>
+    <File name="wiznet/Internet/byteOrder.c" path="../../../wiznet/Internet/byteOrder.c" type="1"/>
+    <File name="syscalls/syscalls.c" path="../../stm32f1xx_system/syscalls/syscalls.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_spi.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_spi.h" type="1"/>
+    <File name="stm32f1xx_cppLib/gpio.cpp" path="../../stm32f1xx_cppLib/gpio.cpp" type="1"/>
+    <File name="stm32f1xx_cppLib/gpio.h" path="../../stm32f1xx_cppLib/gpio.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_adc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_adc.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_dma.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_dma.h" type="1"/>
+    <File name="cppCommonLib/gnss.cpp" path="../../cppCommonLib/gnss.cpp" type="1"/>
+    <File name="stm32f1xx_cppLib/USART_UART.cpp" path="../../stm32f1xx_cppLib/USART_UART.cpp" type="1"/>
+    <File name="stm32f1xx_cppLib/SPI.cpp" path="../../stm32f1xx_cppLib/SPI.cpp" type="1"/>
+    <File name="stm32f1xx_common_lib/system.c" path="../../stm32f1xx_common_lib/system.c" type="1"/>
+    <File name="stm_lib/src/stm32f10x_bkp.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_bkp.c" type="1"/>
+    <File name="stm_lib/src/stm32f10x_gpio.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_gpio.c" type="1"/>
+    <File name="wiznet/Ethernet/W5500/w5500.h" path="../../../wiznet/Ethernet/W5500/w5500.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_usart.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_usart.h" type="1"/>
+    <File name="cppCommonLib/gnss.h" path="../../cppCommonLib/gnss.h" type="1"/>
+    <File name="stm32f1xx_cppLib/stm32fPeripheral.h" path="../../stm32f1xx_cppLib/stm32fPeripheral.h" type="1"/>
+    <File name="cmsis_boot/system_stm32f10x.c" path="../../stm32f1xx_system/cmsis_boot/system_stm32f10x.c" type="1"/>
+    <File name="stm32f1xx_common_lib/stm32f_rtc.c" path="../../stm32f1xx_common_lib/stm32f_rtc.c" type="1"/>
+    <File name="stm_lib/inc/misc.h" path="../../stm32f1xx_system/stm_lib/inc/misc.h" type="1"/>
+    <File name="stm32f1xx_cppLib/USART_UART.h" path="../../stm32f1xx_cppLib/USART_UART.h" type="1"/>
+    <File name="cmsis/core_cmInstr.h" path="../../stm32f1xx_system/cmsis/core_cmInstr.h" type="1"/>
+    <File name="cppCommonLib/pca8574.h" path="../../cppCommonLib/pca8574.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_rcc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_rcc.c" type="1"/>
+    <File name="cppCommonLib/rom24aa025.h" path="../../cppCommonLib/rom24aa025.h" type="1"/>
+    <File name="stm32f1xx_cppLib" path="" type="2"/>
+    <File name="myOs" path="" type="2"/>
+    <File name="cppCommonLib/strutil.h" path="../../cppCommonLib/strutil.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_bkp.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_bkp.h" type="1"/>
+    <File name="stm32f1xx_common_lib/nvic.h" path="../../stm32f1xx_common_lib/nvic.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_dma.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_dma.c" type="1"/>
+    <File name="stm_lib/src" path="" type="2"/>
+    <File name="cmsis" path="" type="2"/>
+    <File name="stm_lib" path="" type="2"/>
+    <File name="stm_lib/inc/stm32f10x_exti.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_exti.h" type="1"/>
+    <File name="wiznet/Ethernet/socket.h" path="../../../wiznet/Ethernet/socket.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_adc.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_adc.h" type="1"/>
+    <File name="cmsis_boot/system_stm32f10x.h" path="../../stm32f1xx_system/cmsis_boot/system_stm32f10x.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_i2c.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_i2c.c" type="1"/>
+    <File name="board/1703.cpp" path="../../board/1703.cpp" type="1"/>
+    <File name="stm32f1xx_common_lib/nvic.c" path="../../stm32f1xx_common_lib/nvic.c" type="1"/>
+    <File name="stm32f1xx_common_lib/dispatch.S" path="../../stm32f1xx_common_lib/dispatch.S" type="1"/>
+    <File name="cppCommonLib/wiznet.h" path="../../cppCommonLib/wiznet.h" type="1"/>
+    <File name="cppCommonLib/boardUtility.h" path="../../cppCommonLib/boardUtility.h" type="1"/>
+    <File name="stm32f1xx_common_lib/peripheral.c" path="../../stm32f1xx_common_lib/peripheral.c" type="1"/>
+    <File name="stm_lib/src/stm32f10x_rtc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_rtc.c" type="1"/>
+    <File name="cppCommonLib/wiznet.cpp" path="../../cppCommonLib/wiznet.cpp" type="1"/>
+    <File name="cppCommonLib/rom24aa025.cpp" path="../../cppCommonLib/rom24aa025.cpp" type="1"/>
+    <File name="wiznet" path="" type="2"/>
+    <File name="stm32f1xx_cppLib/I2C.cpp" path="../../stm32f1xx_cppLib/I2C.cpp" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_tim.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_tim.h" type="1"/>
+    <File name="cmsis_boot" path="" type="2"/>
+    <File name="wiznet/Ethernet/wizchip_conf.h" path="../../../wiznet/Ethernet/wizchip_conf.h" type="1"/>
+    <File name="cppCommonLib/pca8574.cpp" path="../../cppCommonLib/pca8574.cpp" type="1"/>
+    <File name="semihosting/sh_cmd.s" path="../../stm32f1xx_system/semihosting/sh_cmd.s" type="1"/>
+    <File name="stm_lib/src/stm32f10x_tim.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_tim.c" type="1"/>
+    <File name="cmsis_boot/startup" path="" type="2"/>
+    <File name="semihosting/semihosting.c" path="../../stm32f1xx_system/semihosting/semihosting.c" type="1"/>
+    <File name="cmsis_boot/startup/startup_stm32f10x_hd.c" path="../../stm32f1xx_system/cmsis_boot/startup/startup_stm32f10x_hd.c" type="1"/>
+    <File name="board/1703.h" path="../../board/1703.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_spi.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_spi.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_dac.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_dac.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_dac.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_dac.c" type="1"/>
+    <File name="board" path="" type="2"/>
+    <File name="cppCommonLib/boardUtility.cpp" path="../../cppCommonLib/boardUtility.cpp" type="1"/>
+    <File name="stm_lib/src/stm32f10x_fsmc.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_fsmc.c" type="1"/>
+    <File name="stm32f1xx_cppLib/I2C.h" path="../../stm32f1xx_cppLib/I2C.h" type="1"/>
+    <File name="stm32f1xx_common_lib/stm32f_rtc.h" path="../../stm32f1xx_common_lib/stm32f_rtc.h" type="1"/>
+    <File name="cppCommonLib/led.cpp" path="../../cppCommonLib/led.cpp" type="1"/>
+    <File name="stm32f1xx_common_lib/peripheral.h" path="../../stm32f1xx_common_lib/peripheral.h" type="1"/>
+    <File name="stm32f1xx_cppLib/Dma.h" path="../../stm32f1xx_cppLib/Dma.h" type="1"/>
+    <File name="stm32f1xx_cppLib/Timer.h" path="../../stm32f1xx_cppLib/Timer.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_usart.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_usart.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_rtc.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_rtc.h" type="1"/>
+    <File name="wiznet/Ethernet/wizchip_conf.c" path="../../../wiznet/Ethernet/wizchip_conf.c" type="1"/>
+    <File name="stm_lib/src/stm32f10x_pwr.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_pwr.c" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_gpio.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_gpio.h" type="1"/>
+    <File name="wiznet/cppInternet/NTP" path="" type="2"/>
+    <File name="src/derivertive.h" path="src/derivertive.h" type="1"/>
+    <File name="wiznet/cppInternet" path="" type="2"/>
+    <File name="myOs/mul_tsk.h" path="../../myOs/mul_tsk.h" type="1"/>
+    <File name="wiznet/Ethernet" path="" type="2"/>
+    <File name="cmsis/core_cm3.h" path="../../stm32f1xx_system/cmsis/core_cm3.h" type="1"/>
+    <File name="stm_lib/src/stm32f10x_exti.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_exti.c" type="1"/>
+    <File name="semihosting" path="" type="2"/>
+    <File name="src/stm32f10x_it.h" path="src/stm32f10x_it.h" type="1"/>
+    <File name="stm32f1xx_common_lib/system.h" path="../../stm32f1xx_common_lib/system.h" type="1"/>
+    <File name="stm32f1xx_cppLib/Timer.cpp" path="../../stm32f1xx_cppLib/Timer.cpp" type="1"/>
+    <File name="stm_lib/src/stm32f10x_flash.c" path="../../stm32f1xx_system/stm_lib/src/stm32f10x_flash.c" type="1"/>
+    <File name="wiznet/Ethernet/W5500" path="" type="2"/>
+    <File name="board/1702.h" path="../../board/1702.h" type="1"/>
+    <File name="wiznet/cppInternet/NTP/ntp.cpp" path="../../../wiznet/cppInternet/NTP/ntp.cpp" type="1"/>
+    <File name="cppCommonLib/strutil.cpp" path="../../cppCommonLib/strutil.cpp" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_rcc.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_rcc.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_i2c.h" path="../../stm32f1xx_system/stm_lib/inc/stm32f10x_i2c.h" type="1"/>
+    <File name="syscalls" path="" type="2"/>
+    <File name="cppCommonLib/led.h" path="../../cppCommonLib/led.h" type="1"/>
+    <File name="wiznet/Internet" path="" type="2"/>
+    <File name="stm32f1xx_cppLib/SPI.h" path="../../stm32f1xx_cppLib/SPI.h" type="1"/>
+    <File name="semihosting/semihosting.h" path="../../stm32f1xx_system/semihosting/semihosting.h" type="1"/>
+    <File name="cppCommonLib" path="" type="2"/>
+    <File name="stm_lib/inc" path="" type="2"/>
+  </Files>
+</Project>
