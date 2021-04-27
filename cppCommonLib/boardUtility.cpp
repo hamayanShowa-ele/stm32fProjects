@@ -275,7 +275,7 @@ void ramCheck( void *ram, size_t size, LED *led )
 {
   uint32_t baseTim = millis();
   uint16_t dataOffset = 0x0000;
-  uint16_t dataFixed = 0x0000;
+  uint16_t dataFixed = 0x0000; (void)dataFixed; // UNUSED( dataFixed );
   uint32_t seed = 1234;
 
   while( 1 )
