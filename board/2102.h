@@ -65,8 +65,8 @@ extern "C"
 #define  SW3   DIO2
 #define  SW4   DIO3
 
-#define  REDLED     PB3   /* output */
-#define  LCD_RES    PB5   /* LCD reset output. */
+#define  REDLED   PB3   /* output */
+#define  LCD_RES  PB5   /* LCD reset output. */
 
 /* ----------------------------------------
     prototypes 

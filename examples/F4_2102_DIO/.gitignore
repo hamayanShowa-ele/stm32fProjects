@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+F4_2102_DIO.cogui
+F4_2102_DIO.comarker
+F4_2102_DIO.comemgui
+
+# not need F4_2102_DIO folder
+F4_2102_DIO/
+
+# not need logs folder
+logs/
+
+

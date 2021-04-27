@@ -46,7 +46,7 @@
 void BOARD_2102::gpioInit()
 {
   swdEnable();
-  allPulldownOnSWD();
+//  allPulldownOnSWD();
 
   GPIOA->ODR = 0x0000;
   /*  PA0： pulse input 4 */
@@ -80,7 +80,6 @@ void BOARD_2102::gpioInit()
   /*  PB10: not connection. */
   /*  PB11: not connection. */
   /*  PB12: W5500 Slave select output */
-  pinMode( PB12, OUTPUT ); set( PA8 );
   /*  PB13:SPI2_SCK output Alternate function*/
   /*  PB14:SPI2_MISO input Alternate function*/
   /*  PB15:SPI2_MOSI output Alternate function*/
@@ -93,9 +92,7 @@ void BOARD_2102::gpioInit()
   /*  PC4： pulse output 4 */
   /*  PC5： pulse output 5 */
   /*  PC6: W5500 interrupt input. */
-  pinMode( PC6, INPUT_PULLUP );
   /*  PC7: W5500 reset. output */
-  pinMode( PC7, OUTPUT ); reset( PC7 );
   /*  PC8: not connection. */
   /*  PC9: not connection. */
   /*  PC10: UART4 TXD：Alternate function */
@@ -122,6 +119,10 @@ void BOARD_2102::gpioInit()
   /*  PD13： not used. */
   /*  PD14： not used. */
   /*  PD15： not used. */
+
+  pinMode( W5500_CS, OUTPUT ); set( W5500_CS );
+  pinMode( W5500_INT, INPUT_PULLUP );
+  pinMode( W5500_RESET, OUTPUT ); reset( W5500_RESET );
 
   pinMode( IN00, INPUT_PULLUP );
   pinMode( IN01, INPUT_PULLUP );

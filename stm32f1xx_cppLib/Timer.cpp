@@ -417,13 +417,14 @@ uint16_t STM32F_TIMER::encoderRead()
 uint8_t STM32F_TIMER::updateInterruptChannel()
 {
   if( TIMx == TIM1 ) return TIM1_UP_IRQn;
-  else if( TIMx == TIM8 ) return TIM8_UP_IRQn;
   else if( TIMx == TIM2 ) return TIM2_IRQn;
   else if( TIMx == TIM3 ) return TIM3_IRQn;
   else if( TIMx == TIM4 ) return TIM4_IRQn;
+#if  defined(STM32F10X_HD)
   else if( TIMx == TIM5 ) return TIM5_IRQn;
   else if( TIMx == TIM6 ) return TIM6_IRQn;
   else if( TIMx == TIM7 ) return TIM7_IRQn;
+  else if( TIMx == TIM8 ) return TIM8_UP_IRQn;
 //  else if( TIMx == TIM9 ) return TIM9_UP_IRQn;
 //  else if( TIMx == TIM10 ) return TIM10_UP_IRQn;
 //  else if( TIMx == TIM11 ) return TIM11_UP_IRQn;
@@ -433,6 +434,7 @@ uint8_t STM32F_TIMER::updateInterruptChannel()
  //  else if( TIMx == TIM12 ) return TIM12_UP_IRQn;
  //  else if( TIMx == TIM13 ) return TIM13_UP_IRQn;
  //  else if( TIMx == TIM14 ) return TIM14_UP_IRQn;
+#endif  /* defined(STM32F10X_HD) */
 
   return 255;
 }
@@ -440,11 +442,13 @@ uint8_t STM32F_TIMER::updateInterruptChannel()
 uint8_t STM32F_TIMER::ccInterruptChannel()
 {
   if( TIMx == TIM1 ) return TIM1_CC_IRQn;
-  else if( TIMx == TIM8 ) return TIM8_CC_IRQn;
   else if( TIMx == TIM2 ) return TIM2_IRQn;
   else if( TIMx == TIM3 ) return TIM3_IRQn;
   else if( TIMx == TIM4 ) return TIM4_IRQn;
+#if  defined(STM32F10X_HD)
   else if( TIMx == TIM5 ) return TIM5_IRQn;
+  else if( TIMx == TIM8 ) return TIM8_CC_IRQn;
+#endif  /* defined(STM32F10X_HD) */
 
   return 255;
 }
