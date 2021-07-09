@@ -28,9 +28,10 @@
 #include  <led.h>
 #include  <derivertive.h>
 #include  <EXTI.h>
-#if !defined( STM32F103RB )
+#if defined( ARM_CBUS_LONG )
 #include  <1415.h>
-#endif /* !defined( STM32F103RB ) */
+#include  <HardwareSerial.h>
+#endif  /* defined( ARM_CBUS_LONG ) */
 extern "C"
 {
   #include  <system.h>
@@ -41,9 +42,16 @@ extern "C"
 ---------------------------------------- */
 #define  ALVC7804_WORD_SIZE  (512 - 1)  /* 512 * 18bits. */
 
-#if !defined( STM32F103RB )
+#if defined( ARM_CBUS_LONG )
   #define  IDSW  0
-#endif  /* !defined( IDSW ) */
+  #define  BD1405_01_IO_ADR  (CBUS_IO_ADR + 0x0200)
+  #define  BD1405_02_IO_ADR  (CBUS_IO_ADR + 0x0202)
+  #define  BD1405_03_IO_ADR  (CBUS_IO_ADR + 0x0204)
+  #define  BD1405_04_IO_ADR  (CBUS_IO_ADR + 0x0206)
+  #define  BD1405_05_IO_ADR  (CBUS_IO_ADR + 0x0208)
+  #define  BD1405_06_IO_ADR  (CBUS_IO_ADR + 0x020A)
+  #define  BD1405_07_IO_ADR  (CBUS_IO_ADR + 0x020C)
+#endif  /* defined( ARM_CBUS_LONG ) */
 
 /* ----------------------------------------
     prototypes 
@@ -75,6 +83,7 @@ public:
 
   void begin( volatile uint16_t *adr ) { ioAddress = adr; }
   void fifoIncrementRead( int portNum, LED *led );
+  uint16_t fifoIncrementRead( uint16_t count, int size );
   void fifoDummyRead( int size );
 
   void knock1405();

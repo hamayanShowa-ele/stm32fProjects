@@ -27,16 +27,29 @@
 /* ----------------------------------------
     prototypes 
 ---------------------------------------- */
-void cb1405_int6_CALL( int num );
-void cb1415_CALL( int num );
+#if defined( ARM_CBUS_LONG )
+  static void cb1405_int6_CALL( int num );
+  static void cb1405_CALL( int num );
+#endif /* defined( ARM_CBUS_LONG ) */
+#if defined( ISOLATE_AD_10CH )
+  static void cb1415_CALL( int num );
+#endif /* defined( ISOLATE_AD_10CH ) */
 
 /* ----------------------------------------
     instances or global variables
 ---------------------------------------- */
-static uint8_t V50INT_update[6];
-static uint8_t convert_int_update;
 extern volatile SYSTIM systim;
-SYSTIM int6_preTime = 0UL;
+extern Serial Serial1;  /* hardware serial 1 */
+
+#if defined( ARM_CBUS_LONG )
+  static uint8_t V50INT_update[6];
+  SYSTIM int6_preTime = 0UL;
+  volatile uint16_t *dummy_io = (uint16_t *)CBUS_DUMMY_IO_ADR;
+#endif /* defined( ARM_CBUS_LONG ) */
+#if defined( ISOLATE_AD_10CH )
+  static uint8_t convert_int_update;
+#endif /* defined( ISOLATE_AD_10CH ) */
+
 
 /* ----------------------------------------
     constructor destructor
@@ -46,7 +59,7 @@ SYSTIM int6_preTime = 0UL;
     begin and end
 ---------------------------------------- */
 
-#if defined( STM32F103RB )
+#if defined( ISOLATE_AD_10CH )
 /* ----------------------------------------
     gpio initialize
 ---------------------------------------- */
@@ -201,9 +214,8 @@ void BOARD_1405::knock1415()
 void BOARD_1405::fifoIncrementWrite( LED *led )
 {
   uint16_t count = 0;
-  extiCallBack( 11, cb1415_CALL );  // CONVERT:PC11
+  extiCallBack( PC11 % 16, cb1415_CALL );  // CONVERT:PC11
   extiConfig( PC11, EXTI_Trigger_Rising );  // CONVERT:PC11 EXTI_Trigger_Falling
-//  fifoWrite( 0xA5A5 );  // dummy write
   uint8_t convert_int_update_Base = convert_int_update;
   SYSTIM ledBlinkTim = systim;
   while( true )
@@ -238,7 +250,7 @@ void BOARD_1405::fifoIncrementWrite( LED *led )
 /* ----------------------------------------
   1405 exti interrupt from 1415 call back routine.
 ---------------------------------------- */
-void cb1415_CALL( int num )
+static void cb1415_CALL( int num )
 {
   if( (systim - int6_preTime) >= 3UL )
   {
@@ -257,9 +269,10 @@ void cb1415_CALL( int num )
   }
 }
 
-#endif /* STM32F103RB */
+#endif /* ISOLATE_AD_10CH */
 
 
+#if defined( ARM_CBUS_LONG )
 /* ----------------------------------------
     dummy read from fifo.
 ---------------------------------------- */
@@ -268,12 +281,30 @@ void BOARD_1405::fifoDummyRead( int size )
   for(int i = 0; i < size; i++ )
   {
     uint16_t tempUS = *ioAddress;
+    (void)tempUS;
   }
 }
 
 /* ----------------------------------------
     increment pattern data read from fifo.
 ---------------------------------------- */
+uint16_t BOARD_1405::fifoIncrementRead( uint16_t count, int size )  //
+{
+  uint16_t success = 0;
+  for( int i = 0; i < size; i++ )
+  {
+    uint16_t tempUS = *ioAddress;
+    if( count == tempUS ) success++;
+//    tempUS = *dummy_io;  // dummy read. if you need.
+    count++;
+    rot_rdq();
+  }
+  dly_tsk( 2UL );
+  knock1405();
+
+  return success;
+}
+
 void BOARD_1405::fifoIncrementRead( int portNum, LED *led )
 {
   uint16_t count = 0;
@@ -321,9 +352,52 @@ void BOARD_1405::knock1405()
 }
 
 /* ----------------------------------------
+  check 1405 task.
+---------------------------------------- */
+extern volatile uint32_t actLedPeriod;
+
+void check1405( void )
+{
+  VP_INT exinf[4];
+  get_par( exinf, sizeof(exinf) / sizeof(exinf[0]) );
+  uint16_t *ioadr = (uint16_t *)exinf[0];
+  int pin = (int)exinf[1];
+
+  BOARD_1405 bd1405( ioadr );
+
+  uint16_t count = 0;
+  int intNum = EXTI_TO_INT_NUMBER( pin % 16 );
+  uint8_t updateBase = V50INT_update[ intNum ];
+  extiCallBack( pin % 16, cb1405_CALL );  // INT0:4 INT6:10
+  extiConfig( pin, EXTI_Trigger_Falling );  // INT0:PC4 INT6:PF10
+  SYSTIM baseTim = systim;
+  while( 1 )
+  {
+    while( V50INT_update[ intNum ] == updateBase ) rot_rdq();
+    updateBase = V50INT_update[ intNum ];
+    uint16_t ret = bd1405.fifoIncrementRead( count, ALVC7804_WORD_SIZE );
+    if( ret != ALVC7804_WORD_SIZE )
+    {
+      actLedPeriod = 50UL;
+    }
+    else count += ret;
+    if( (systim - baseTim) >= 3 * 1000UL )
+    {
+      baseTim = systim;
+      Serial1.printf( "  IO ADDRESS 0x%08X running.\r\n", ioadr );
+    }
+  }
+}
+
+/* ----------------------------------------
   1415 exti interrupt from 1405 call back routine.
 ---------------------------------------- */
-void cb1405_int6_CALL( int num )
+static void cb1405_CALL( int num )
+{
+  V50INT_update[ EXTI_TO_INT_NUMBER(num) ]++;
+}
+
+static void cb1405_int6_CALL( int num )
 {
   if( (systim - int6_preTime) >= 3UL )
   {
@@ -341,6 +415,8 @@ void cb1405_int6_CALL( int num )
     }
   }
 }
+
+#endif /* ARM_CBUS_LONG */
 
 
 extern "C"
