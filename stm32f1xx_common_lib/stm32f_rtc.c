@@ -147,6 +147,7 @@ static int RTC_LSE_Clock_Start( void )
   /* Clear reset flags */
   RCC_ClearFlag();
 
+  (void)BKP_WUP_Type_Status;
   return reStartRTC;
 }
 
