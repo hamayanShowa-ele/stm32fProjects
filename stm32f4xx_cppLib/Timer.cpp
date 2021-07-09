@@ -408,8 +408,8 @@ int STM32F_TIMER::pwm1( int ch, int pin, uint32_t pulse )
   /* gpio initialize (alternate function). */
   if( pin >= PA0 && pin < PORT_END )
   {
-    pinMode( pin, ALTERNATE_PP );
-    if( altFunc( pin ) < 0 ) return (-1);
+//    pinMode( pin, ALTERNATE_PP );
+//    if( altFunc( pin ) < 0 ) return (-1);
   }
   else return (-1);
 
