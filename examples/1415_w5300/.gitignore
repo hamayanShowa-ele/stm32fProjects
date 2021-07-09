@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+1415_w5300.cogui
+1415_w5300.comarker
+1415_w5300.comemgui
+
+# not need cppGraphic folder
+1415_w5300/
+
+# not need logs folder
+logs/
+
+
