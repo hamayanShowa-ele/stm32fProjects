@@ -1,0 +1,16 @@
+# git ignore file
+# designed by hamayan.
+
+# not need a.out
+a.out
+stm32f401.cogui
+stm32f401.comarker
+stm32f401.comemgui
+
+# not need stm32f401 folder
+stm32f401/
+
+# not need logs folder
+logs/
+
+
