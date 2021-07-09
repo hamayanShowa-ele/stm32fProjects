@@ -86,7 +86,7 @@ void extiConfig(
   gpio.pinMode( pin, INPUT );
   GPIO_EXTILineConfig( gpio.whatPortSource(pin), gpio.whatPinSource(pin) );
   EXTI_InitTypeDef EXTI_InitStruct;
-  EXTI_DeInit();
+//  EXTI_DeInit();
   EXTI_StructInit( &EXTI_InitStruct );
   EXTI_InitStruct.EXTI_Line = gpio.whatPinLine(pin);
   EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
