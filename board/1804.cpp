@@ -98,6 +98,8 @@ void BOARD_1804::gpioInit()
 /*  PC6: not used */
 /*  PC7: not used */
 /*  PC8: CONVERT : output. analog sampling clock. */
+  digitalWrite( PC8, HIGH );
+  pinMode( PC8, OUTPUT );
 /*  PC9: not used */
 /*  PC10: UART4 TXD */
 //  pinMode( PC10, ALTERNATE_PP );
@@ -548,10 +550,6 @@ void BOARD_1804::dpRamRead( const void *ram, size_t size, uint32_t seed, LED *le
 ---------------------------------------- */
 void BOARD_1804::fclk( uint32_t freq )
 {
-  /* gpio alternate for TIM4 ch2 output. */
-  pinMode( PD13, ALTERNATE_PP );
-  pinAFConfig( PD13, GPIO_AF_TIM4 );
-
   /* TIM4 clock enable */
   RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM4, ENABLE );
 
@@ -559,6 +557,11 @@ void BOARD_1804::fclk( uint32_t freq )
   Timer->frequency( freq );
   uint16_t arr = (uint16_t)Timer->getAutoReload();
   Timer->pwm1( TIMx_CH2, PD13, arr / 2UL );
+
+  /* gpio alternate for TIM4 ch2 output. */
+  pinAFConfig( PD13, GPIO_AF_TIM4 );
+  pinMode( PD13, ALTERNATE_PP );
+
   Timer->start();
   delete Timer;
 }
@@ -571,10 +574,6 @@ void BOARD_1804::fclk( uint32_t freq )
 ---------------------------------------- */
 void BOARD_1804::convert( uint32_t freq )
 {
-  /* gpio alternate for TIM3 ch3 output. */
-  pinMode( PC8, ALTERNATE_PP );
-  pinAFConfig( PC8, GPIO_AF_TIM3 );
-
   /* TIM3 clock enable */
   RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
 
@@ -582,6 +581,11 @@ void BOARD_1804::convert( uint32_t freq )
   Timer->frequency( freq );
   uint16_t arr = (uint16_t)Timer->getAutoReload();
   Timer->pwm1( TIMx_CH3, PC8, arr - (arr / 10UL) );
+
+  /* gpio alternate for TIM3 ch3 output. */
+  pinAFConfig( PC8, GPIO_AF_TIM3 );
+  pinMode( PC8, ALTERNATE_PP );
+
   Timer->start();
   delete Timer;
 }
