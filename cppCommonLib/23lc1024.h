@@ -1,5 +1,5 @@
 /* ----------------------------------------
-  ERIAL SRAM 23LC1024 or 23LC512 utilities
+  SERIAL SRAM 23LC1024 or 23LC512 utilities
   for STMicroelectronics SPL library
 
   THE SOURCE CODE OF THE FOLLOWING url WAS MODIFIED FOR STM32F.
