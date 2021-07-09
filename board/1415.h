@@ -40,7 +40,14 @@ enum V50_INT_NUMBERS
   INT0_NUMBER = 4,INT1_NUMBER,INT2_NUMBER,INT3_NUMBER,
   INT4_NUMBER,INT5_NUMBER,INT6_NUMBER,
 };
-#define EXTI_TO_INT_NUMBER(n)  (n - INT0_NUMBER)
+#define  EXTI_TO_INT_NUMBER(n)  (n - INT0_NUMBER)
+#define  INT0_PIN  PC4
+#define  INT1_PIN  PC5
+#define  INT2_PIN  PF6
+#define  INT3_PIN  PF7
+#define  INT4_PIN  PF8
+#define  INT5_PIN  PF9
+#define  INT6_PIN  PF10
 
 /* ----------------------------------------
     prototypes 
@@ -61,6 +68,7 @@ public:
   void cbusEnable( bool onOff );
   void cbusReset();
   volatile uint16_t dummyRead();
+  void etherGpioInit();
 
 private:
   void busPortInitialize();

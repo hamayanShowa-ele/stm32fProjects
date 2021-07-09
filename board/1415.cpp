@@ -394,10 +394,10 @@ void BOARD_1415::cbusEnable( bool onOff )
 ---------------------------------------- */
 void BOARD_1415::cbusReset()
 {
-  pinMode( PD3, OUTPUT );
-  digitalWrite( PD3, LOW );
+  pinMode( C_RST, OUTPUT );
+  digitalWrite( C_RST, LOW );
   dly_tsk( 10UL );
-  digitalWrite( PD3, HIGH );
+  digitalWrite( C_RST, HIGH );
   dly_tsk( 100UL );
 }
 
@@ -412,6 +412,17 @@ volatile uint16_t BOARD_1415::dummyRead()
 }
 
 
+/* ----------------------------------------
+    w5300 gpio initialize.
+---------------------------------------- */
+void BOARD_1415::etherGpioInit()
+{
+  pinMode( ETN_RST, OUTPUT );
+  digitalWrite( ETN_RST, LOW );
+  dly_tsk( 10UL );
+  digitalWrite( ETN_RST, HIGH );
+  dly_tsk( 100UL );
+}
 
 extern "C"
 {
