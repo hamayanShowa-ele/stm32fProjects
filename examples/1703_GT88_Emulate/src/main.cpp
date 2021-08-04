@@ -199,6 +199,8 @@ int main(void)
     usart1.printf( "  Mac address read from eeprom, but failed.\r\n" );
     xMAC[0] = 0xDE; xMAC[1] = 0xAD; xMAC[2] = 0xBE; xMAC[3] = 0xEF; xMAC[4] = 0x00; xMAC[5] = 100;
   }
+  usart1.printf( "  Mac address was set next. " );
+  usart1.printf( "%02X:%02X:%02X:%02X:%02X:%02X:\r\n", xMAC[0],xMAC[1],xMAC[2],xMAC[3],xMAC[4],xMAC[5] );
 
   /* initialize w5500. */
   chronos.etherGpioInit();
