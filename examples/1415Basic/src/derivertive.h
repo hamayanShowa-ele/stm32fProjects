@@ -10,7 +10,7 @@
 /*
   defines for interrupt
 */
-#define  BASE_PRIORITY      2
+#define  BASE_PRIORITY      15  // The priorities range from 0 to 15, with 0 being the highest priority.
 #define  BASE_SUB_PRIORITY  0
 
 /*
@@ -26,6 +26,7 @@
 //#define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x074000)
 #define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x080000)
 //#define  CBUS_DUMMY_MEM_ADR  (CBUS_MEM_ADR + 0x072000)  // semaphore address
+#define  CBUS_DUMMY_IO_ADR   (CBUS_IO_ADR + 0x000000)
 
 #define  GANYMEDE_MEM_ADR    (CBUS_MEM_ADR + 0x070000)
 #define  GANYMEDE_MEM_SIZE   (8192)  // 4k * 16bit
@@ -219,10 +220,15 @@ void cris_ex( void );  // start he interrupt.
 /*
  configures for multi tasks.
 */
-#define  MAX_TASK_NUMBER  1
+#define  MAX_TASK_NUMBER  6
 enum GR_SAKURA_TSK_ID
 {
   ID_stackMonitor,
+  ID_check1405_01,
+  ID_check1405_02,
+  ID_check1405_03,
+  ID_check1405_04,
+  ID_check1405_05,
 };
 
 #define  MAX_MBX_NUMBER    1

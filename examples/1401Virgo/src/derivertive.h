@@ -69,12 +69,6 @@
 #define  ACT_RCC        RCC_AHB1Periph_GPIOG  //for virgo
 #define  ACT_LED        PG11
 
-/*  PA1: 1PPS,GPS 1PPS input*/
-#define  PPS            PA1
-#define  PPS_PORT       GPIOA
-#define  PPS_PIN        GPIO_Pin_1
-#define  PPS_IS         (PPS_PORT->ODR & PPS_PIN)
-
 /*  PB8: SCL1 */
 /*  PB9: SDA1 */
 #define  SCL1           PB8
@@ -96,36 +90,46 @@
 #define  USBON_IS_0     USBON_PORT->BSRRH = (USBON_PIN << 0)
 #define  USBON_IS_1     USBON_PORT->BSRRL = (USBON_PIN << 0)
 
+/*  PA1: 1PPS,GPS 1PPS input*/
+#define  PPS            PA1
+#define  PPS_PORT       GPIOA
+#define  PPS_PIN        GPIO_Pin_1
+#define  PPS_IS         (PPS_PORT->ODR & PPS_PIN)
+#define  PPS_INT_NUM    1
+
+/*  PG8: EXT_INT0, external interrupt input 0. */
+#define  EXT_INT0       PG8
+#define  EXT_INT0_PORT   GPIOG
+#define  EXT_INT0_PIN    GPIO_Pin_8
+#define  EXT_INT0_IS     (EXT_INT0_PORT->ODR & EXT_INT0_PIN)
+#define  EXT_INT0_NUM   8
+
 /*  PC9: EXT_INT1, external interrupt input 1. */
 #define  EXT_INT1       PC9
 #define  EXT_INT1_PORT  GPIOC
 #define  EXT_INT1_PIN   GPIO_Pin_9
 #define  EXT_INT1_IS    (EXT_INT1_PORT->ODR & EXT_INT1_PIN)
-
-/*  PC12: UART4 M/S, output for rs485 driver control. */
-#define  UART4_MS       PC12
-#define  UART4_MS_PORT  GPIOC
-#define  UART4_MS_PIN   GPIO_Pin_12
-#define  UART4_MS_IS_0  UART4_MS_PORT->BSRRH = (UART4_MS_PIN << 0)
-#define  UART4_MS_IS_1  UART4_MS_PORT->BSRRL = (UART4_MS_PIN << 0)
-
-/*  PC13: TAMPER, input. */
-#define  TAMPER         PC13
-#define  TAMPER_PORT    GPIOC
-#define  TAMPER_PIN     GPIO_Pin_13
-#define  TAMPER_IS      (TAMPER_PORT->ODR & TAMPER_PIN)
-
-/*  PD2: TRIGGER2, external trigger input 2. */
-#define  TRIGGER2       PD2
-#define  TRIGGER2_PORT  GPIOD
-#define  TRIGGER2_PIN   GPIO_Pin_2
-#define  TRIGGER2_IS    (TRIGGER2_PORT->ODR & TRIGGER2_PIN)
+#define  EXT_INT1_NUM   9
 
 /*  PD3: TRIGGER1, external trigger input 1. */
 #define  TRIGGER1       PD3
 #define  TRIGGER1_PORT  GPIOD
 #define  TRIGGER1_PIN   GPIO_Pin_3
 #define  TRIGGER1_IS    (TRIGGER1_PORT->ODR & TRIGGER1_PIN)
+#define  TRIGGER1_INT_NUM  3
+
+/*  PD2: TRIGGER2, external trigger input 2. */
+#define  TRIGGER2       PD2
+#define  TRIGGER2_PORT  GPIOD
+#define  TRIGGER2_PIN   GPIO_Pin_2
+#define  TRIGGER2_IS    (TRIGGER2_PORT->ODR & TRIGGER2_PIN)
+#define  TRIGGER2_INT_NUM  2
+
+/*  PC13: TAMPER, input. */
+#define  TAMPER         PC13
+#define  TAMPER_PORT    GPIOC
+#define  TAMPER_PIN     GPIO_Pin_13
+#define  TAMPER_IS      (TAMPER_PORT->ODR & TAMPER_PIN)
 
 /*  PF8: LED RED, output */
 #define  LED_RED        PF8
@@ -158,11 +162,6 @@
 #define  ARC_INT_PIN     GPIO_Pin_7
 #define  ARC_INT_IS      (ARC_INT_PORT->ODR & ARC_INT_PIN)
 
-/*  PG8: EXT_INT0, external interrupt input 0. */
-#define  EXT_INT0_PORT   GPIOG
-#define  EXT_INT0_PIN    GPIO_Pin_8
-#define  EXT_INT0_IS     (EXT_INT0_PORT->ODR & EXT_INT0_PIN)
-
 /*  PG13: IO_RST, external bus reset output. */
 #define  IO_RST        PG13
 #define  IO_RST_PORT   GPIOG
@@ -184,6 +183,13 @@
 #define  USART1_RXD_PIN  GPIO_Pin_10
 #define  USART1_TXD_SOURCE  GPIO_PinSource9
 #define  USART1_RXD_SOURCE  GPIO_PinSource10
+#define  TXD1_PIN  PA9
+#define  RXD1_PIN  PA10
+
+/*  PA2: TXD2 */
+/*  PA3: RXD2 */
+#define  TXD2_PIN  PA2
+#define  RXD2_PIN  PA3
 
 /*  PB10: TXD3 */
 /*  PB11: RXD3 */
@@ -202,6 +208,13 @@
 #define  UART4_RXD_PIN  GPIO_Pin_11
 #define  UART4_TXD_SOURCE  GPIO_PinSource10
 #define  UART4_RXD_SOURCE  GPIO_PinSource11
+
+/*  PC12: UART4 M/S, output for rs485 driver control. */
+#define  UART4_MS       PC12
+#define  UART4_MS_PORT  GPIOC
+#define  UART4_MS_PIN   GPIO_Pin_12
+#define  UART4_MS_IS_0  UART4_MS_PORT->BSRRH = (UART4_MS_PIN << 0)
+#define  UART4_MS_IS_1  UART4_MS_PORT->BSRRL = (UART4_MS_PIN << 0)
 
 /*  PC12: TXD5 */
 /*  PD2: RXD5 */

@@ -17,7 +17,7 @@
 /*
   defines for interrupt
 */
-#define  BASE_PRIORITY      2
+#define  BASE_PRIORITY      15  // The priorities range from 0 to 15, with 0 being the highest priority.
 #define  BASE_SUB_PRIORITY  0
 
 /*
@@ -87,10 +87,17 @@
 #define  SPI2_SCK_PIN   GPIO_Pin_13
 #define  SPI2_MISO_PIN  GPIO_Pin_14
 #define  SPI2_MOSI_PIN  GPIO_Pin_15
+#define  SCK2_PIN       PB13
+#define  MOSI2_PIN      PB15
+#define  MISO2_PIN      PB14
+
 #define  SPI3_PORT      GPIOB
 #define  SPI3_SCK_PIN   GPIO_Pin_3
 #define  SPI3_MISO_PIN  GPIO_Pin_4
 #define  SPI3_MOSI_PIN  GPIO_Pin_5
+#define  SCK3_PIN       PB3
+#define  MOSI3_PIN      PB5
+#define  MISO3_PIN      PB4
 
 /* PULSE IN */
 #define  PULSE_IN_PORT  GPIOD
