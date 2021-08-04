@@ -136,7 +136,6 @@ int main(void)
 //  usart1.echo();  /* echo back is on. */
 
   dly_tsk( 5 * 1000UL );
-  bd1405.fifoIncrementWrite( &actLed );
 
   /* initialize tasks and start dispatch. */
   tsk_ini();  //
