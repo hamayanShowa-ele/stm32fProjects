@@ -57,6 +57,22 @@
 #define  MRAM_SIZE          524288UL
 
 /* ----------------------------------------
+ defines for usart and uart.
+---------------------------------------- */
+#define  SCI_1_SND_BUFFER_SIZE  256
+#define  SCI_1_RCV_BUFFER_SIZE  256
+#define  SCI_2_SND_BUFFER_SIZE  256
+#define  SCI_2_RCV_BUFFER_SIZE  256
+#define  SCI_3_SND_BUFFER_SIZE  0
+#define  SCI_3_RCV_BUFFER_SIZE  0
+#define  SCI_4_SND_BUFFER_SIZE  0
+#define  SCI_4_RCV_BUFFER_SIZE  0
+#define  SCI_5_SND_BUFFER_SIZE  0
+#define  SCI_5_RCV_BUFFER_SIZE  0
+#define  SCI_6_SND_BUFFER_SIZE  0
+#define  SCI_6_RCV_BUFFER_SIZE  0
+
+/* ----------------------------------------
   gpio port defines.
 ---------------------------------------- */
 /* PG11 :ACT LED */
