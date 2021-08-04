@@ -103,8 +103,8 @@ void tsk_ini( void )
   reg_tsk( ID_stackMonitor,(void *)stackMonitor, tsk1_stk, sizeof(tsk1_stk), 0,0,0,0 );
   reg_tsk( ID_adcTask,(void *)adcTask, tsk2_stk, sizeof(tsk2_stk), 0,0,0,0 );
 
-  sta_tsk( ID_stackMonitor );
-//  sta_tsk( ID_adcTask );
+//  sta_tsk( ID_stackMonitor );
+  sta_tsk( ID_adcTask );
 }
 
 /* ----------------------------------------
@@ -146,7 +146,8 @@ int main(void)
 //  bd1411.begin( PF11, PF10, PF9, PF8 );
 
   tsk_ini();  /* initialize tasks. */
-  sta_rdq( ID_stackMonitor );
+//  sta_rdq( ID_stackMonitor );
+  sta_rdq( ID_adcTask );
 
   while(1){}
 
