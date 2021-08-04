@@ -67,8 +67,10 @@ volatile time_t unixTime;
 volatile time_t sumTotalTime;  /* Total time since startup */
 
 Serial Serial1;  /* hardware serial 1 */
-BOARD  board;
+BOARD_1303  bd1303;
 BD1426 bd1426;
+
+STM32F_TIMER tim3;
 
 /* ----------------------------------------
     tasks
@@ -85,7 +87,7 @@ uint8_t tsk1_stk[256 * 6];  // stack for task1
 uint8_t tsk2_stk[256 * 2];  // stack for task2
 uint8_t tsk3_stk[256 * 2];  // stack for task3
 uint8_t tsk4_stk[256 * 2];  // stack for task4
-uint8_t tsk5_stk[256 * 2];  // stack for task5
+uint8_t tsk5_stk[256 * 6];  // stack for task5
 uint8_t tsk6_stk[256 * 4];  // stack for task6
 uint8_t tsk7_stk[256 * 6];  // stack for task7
 
@@ -106,9 +108,9 @@ void tsk_ini( void )
 //  sta_tsk( ID_segmentLED );
 //  sta_tsk( ID_relays );
 //  sta_tsk( ID_digitalSwitches );
-//  sta_tsk( ID_panelSwitches );
+  sta_tsk( ID_panelSwitches );
 //  sta_tsk( ID_encoder );
-  sta_tsk( ID_phaseTest );
+//  sta_tsk( ID_phaseTest );
 }
 
 
@@ -137,7 +139,7 @@ int main(void)
   }
 
   /* initialize gpio */
-  board.gpioInit();
+  bd1303.gpioInit();
   bd1426.gpioInit();
 
   /* initialize serial */
@@ -146,10 +148,20 @@ int main(void)
   Serial1.printf( "    designed by hamayan.\r\n" );
 //  serialLoopBack( &Serial1 );
 
+#if 0
+  /* Provide FCLK to match the phase delay of the filter. */
+  GPIO_PinRemapConfig( GPIO_FullRemap_TIM3, ENABLE );
+  tim3.begin( TIM3 );
+  tim3.frequency( 50 * 1000UL );
+  tim3.pwm1( TIMx_CH1, PC6, tim3.getAutoReload() / 2 );
+  tim3.start();
+#endif
+
   /* initialize tasks and start dispatch. */
   tsk_ini();  //
 //  sta_rdq( ID_stackMonitor );  // start round robin
-  sta_rdq( ID_phaseTest );
+//  sta_rdq( ID_phaseTest );
+  sta_rdq( ID_panelSwitches );
 
   while(1) {}
 }
@@ -346,6 +358,7 @@ void panelSwitches( void )
     uint16_t zero = panel.analogRead( ZERO_PIN );
     uint16_t oneEighty = panel.analogRead( ONE_EIGHTY_PIN );
     uint16_t variable = panel.analogRead( VARIABLE_PIN );
+    Serial1.printf( "MODE:%d ZERO:%d 180:%d VARI:%d\r\n", mode,zero,oneEighty,variable );
     dly_tsk( 1 * 1000UL );
   }
 }
@@ -408,7 +421,8 @@ void phaseTest( void )
   STM32F_TIMER adcTrigger( TIM1 );
   adcTrigger.frequency( 50 * 20 );  /* 50Hz 20th over sampling. */
 //  #define  PHASE_OFFSET  1400  // MAX7405 (0.7degree)
-  #define  PHASE_OFFSET  2800  // MAX7404 (1.4degree)
+//  #define  PHASE_OFFSET  2800  // MAX7404 (1.4degree)
+#define  PHASE_OFFSET  0  // MAX7404 (0.0degree for FCLK input at 2005. )
   adcTrigger.adcTrigger( TIMx_CH1, ADC1_IN10_PIN, 18000 );
   adcTrigger.adcTrigger( TIMx_CH3, ADC3_IN11_PIN, 18000 - PHASE_OFFSET );
 
@@ -423,8 +437,9 @@ void phaseTest( void )
     int diff = phase.compare(
       (const uint16_t *)VABuffer, (const uint16_t *)VBBuffer,
       sizeof(VABuffer) / sizeof(VBBuffer[0]) );
-    char buffer[64];
-    sprintf( buffer, "phase difference = %f\r\n", diff / 10.0 );
+    char buffer[64],little[16];
+    dtostrf( (double)diff / 10.0, 7, 2, little );
+    sprintf( buffer, "phase difference = %s\r\n", little );
 //    SH_SendString( (const char *)buffer );
     Serial1.printf( buffer );
 
