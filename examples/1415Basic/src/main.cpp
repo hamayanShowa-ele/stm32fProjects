@@ -58,13 +58,14 @@ void NVIC_Configuration( void );
 
 void tim1Interrupt( void );
 void tim8Interrupt( void );
-
+#if 0
 static uint16_t dpRamDividRead( volatile const uint16_t *ram );
 static void dpRamRandomRead( volatile const uint16_t *ram, size_t size, uint32_t seed, LED *led );
 static void dpRamFixedRead( volatile const uint16_t *ram, size_t size, uint16_t fixed, LED *led );
 static void dpRamIncrementRead( volatile const uint16_t *ram, size_t size, LED *led );
 static void dpRamSineRead( volatile const uint16_t *ram, int scale, LED *led );
 static void dpHayashiCheck( volatile const uint16_t *ram, LED *led );
+#endif
 
 void cbGANYMEDE_CALL( int num );
 volatile uint8_t ganymedeUpdate;
@@ -80,17 +81,25 @@ volatile time_t unixTime;
 GPIO gpio;
 Serial Serial1;  /* hardware serial 1 */
 BOARD_1415 cbus;
-BOARD_1405 bd1405;
+//BOARD_1405 bd1405;
 LED actLed;
 
 volatile static uint16_t dummy;
+
+volatile uint32_t actLedPeriod;
 
 /* ----------------------------------------
     tasks
 ---------------------------------------- */
 void stackMonitor( void );
+void check1405( void );
 
 uint8_t tsk1_stk[256 * 6];  // stack for task1
+uint8_t tsk2_stk[256 * 6];  // stack for task2
+uint8_t tsk3_stk[256 * 6];  // stack for task3
+uint8_t tsk4_stk[256 * 6];  // stack for task4
+uint8_t tsk5_stk[256 * 6];  // stack for task5
+uint8_t tsk6_stk[256 * 6];  // stack for task6
 
 /* ----------------------------------------
     task initialize
@@ -98,8 +107,18 @@ uint8_t tsk1_stk[256 * 6];  // stack for task1
 void tsk_ini( void )
 {
   reg_tsk( ID_stackMonitor,(void *)stackMonitor, tsk1_stk, sizeof(tsk1_stk), 0,0,0,0 );
+  reg_tsk( ID_check1405_01,(void *)check1405, tsk2_stk, sizeof(tsk2_stk), BD1405_01_IO_ADR,INT6_PIN,0,0 );
+  reg_tsk( ID_check1405_02,(void *)check1405, tsk3_stk, sizeof(tsk3_stk), BD1405_02_IO_ADR,INT5_PIN,0,0 );
+  reg_tsk( ID_check1405_03,(void *)check1405, tsk4_stk, sizeof(tsk4_stk), BD1405_03_IO_ADR,INT4_PIN,0,0 );
+  reg_tsk( ID_check1405_04,(void *)check1405, tsk5_stk, sizeof(tsk5_stk), BD1405_04_IO_ADR,INT3_PIN,0,0 );
+  reg_tsk( ID_check1405_05,(void *)check1405, tsk6_stk, sizeof(tsk6_stk), BD1405_05_IO_ADR,INT2_PIN,0,0 );
 
   sta_tsk( ID_stackMonitor );
+  sta_tsk( ID_check1405_01 );
+//  sta_tsk( ID_check1405_02 );
+//  sta_tsk( ID_check1405_03 );
+//  sta_tsk( ID_check1405_04 );
+//  sta_tsk( ID_check1405_05 );
 }
 
 /* ----------------------------------------
@@ -144,11 +163,7 @@ int main(void)
   Serial1.printf( "    designed by hamayan.\r\n" );
 //  serialLoopBack( &Serial1 );
 
-#define  BD1405_01_IO_ADR  (CBUS_IO_ADR + 0x0200)
-  bd1405.begin( (volatile uint16_t *)BD1405_01_IO_ADR );
-//  bd1405.fifoDummyRead( ALVC7804_WORD_SIZE );
-  bd1405.fifoIncrementRead( PF10, &actLed );
-
+#if 0
   extiConfig( PF10, EXTI_Trigger_Falling );  // INT0:PC4 INT6:PF10
   extiCallBack( 10, cbGANYMEDE_CALL );  // INT0:4 INT6:10
 //  dpRamRandomRead( (volatile const uint16_t *)GANYMEDE_MEM_ADR, GANYMEDE_MEM_SIZE, 1234UL, &actLed );
@@ -164,6 +179,7 @@ int main(void)
   if( ret == 0 ) { while( 1 ) {dly_tsk( 5000UL ); actLed.toggle();} }
   else { while( 1 ) {dly_tsk( 250UL ); actLed.toggle();} }
 */
+#endif
 
   /* initialize tasks and start dispatch. */
   tsk_ini();  //
@@ -180,7 +196,9 @@ static unsigned int RemainStack( void *stk, unsigned int sz );
 
 void stackMonitor( void )
 {
+  actLedPeriod = 500UL;
   SYSTIM baseTim = systim;
+  SYSTIM actLedTim = systim;
   while( 1 )
   {
     /*stack report.*/
@@ -188,10 +206,22 @@ void stackMonitor( void )
     {
       baseTim = systim;
       Serial1.printf( "  TASK1:%d/%d\r\n", RemainStack( tsk1_stk, sizeof(tsk1_stk) ), sizeof(tsk1_stk) );
+      Serial1.printf( "  TASK2:%d/%d\r\n", RemainStack( tsk2_stk, sizeof(tsk2_stk) ), sizeof(tsk2_stk) );
+      Serial1.printf( "  TASK3:%d/%d\r\n", RemainStack( tsk3_stk, sizeof(tsk3_stk) ), sizeof(tsk3_stk) );
+      Serial1.printf( "  TASK4:%d/%d\r\n", RemainStack( tsk4_stk, sizeof(tsk4_stk) ), sizeof(tsk4_stk) );
+      Serial1.printf( "  TASK5:%d/%d\r\n", RemainStack( tsk5_stk, sizeof(tsk5_stk) ), sizeof(tsk5_stk) );
+//      Serial1.printf( "  TASK6:%d/%d\r\n", RemainStack( tsk6_stk, sizeof(tsk6_stk) ), sizeof(tsk6_stk) );
       char buffer[32];
-      Serial1.printf( "    %s\r\n", localDateTimeString( buffer, unixTime ) );
+      Serial1.printf( "    %s period:%dms\r\n", localDateTimeString( buffer, unixTime ), actLedPeriod );
+    }
+
+    /* blink act led. */
+    if( (systim - actLedTim) >= actLedPeriod )
+    {
+      actLedTim = systim;
       actLed.toggle();
     }
+
     rot_rdq();
   }
 }
@@ -270,6 +300,7 @@ void NVIC_Configuration( void )
 }
 
 
+#if 0
 /* ----------------------------------------
   dpram read and check.
 ---------------------------------------- */
@@ -646,7 +677,9 @@ void cbGANYMEDE_CALL( int num )
   {
     uint32_t cycleCounterNow = CYCLE_COUNTER();
     uint32_t cycleCounterDiff = cycleCounterNow - cycleCounterOld;
+    (void)cycleCounterDiff;
     cycleCounterOld = cycleCounterNow;
   }
 }
 
+#endif
