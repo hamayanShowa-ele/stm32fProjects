@@ -49,6 +49,8 @@
 #define  USART1_RXD_PORT      GPIOA
 #define  USART1_TXD_PIN       GPIO_Pin_9
 #define  USART1_RXD_PIN       GPIO_Pin_10
+#define  TXD1_PIN             PA9
+#define  RXD1_PIN             PA10
 
 /* USART2 TXD RXD */
 #define  USART2_TXD_PORT      GPIOA

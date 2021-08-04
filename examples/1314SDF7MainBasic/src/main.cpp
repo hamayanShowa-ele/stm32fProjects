@@ -33,7 +33,7 @@
 #include  <led.h>
 #include  <1314.h>
 #include  <boardUtility.h>
-#include  <eep24aa025.h>
+#include  <rom24aa025.h>
 #include  <wiznet.h>
 #include  <sntp.h>
 #include  <23lc1024.h>
@@ -117,13 +117,26 @@ int main(void)
     while (1);
   }
 
+  time_t ut = utcDateTimeToUnixtime( 1970, 1, 1, 0, 0, 0 );
+  time_t lt = localDateTimeToUnixtime( 1970, 1, 1, 9, 0, 0 );
+  uint16_t year;
+  uint8_t month,day,hour,minute,second;
+  utcDateTime( 0, &year, &month, &day, &hour, &minute, &second );
+  localDateTime( 0, &year, &month, &day, &hour, &minute, &second );
+  char timeBuffer[32];
+  utcDateTimeString( timeBuffer, 0 );
+  localDateTimeString( timeBuffer, 0 );
+  int weekDay = weekDayFromYMD( 2021, 3, 7 );
+
+  while( 1 ){}
+
   /* initialize GPIO and external CPU bus. */
   board.gpioInit();
   /* initialize act led */
   LED actled( ACTLED );
 
   /* initialize serial */
-  Serial1.begin( USART1, 115200UL );
+  Serial1.begin( USART1, 115200UL, TXD1_PIN, RXD1_PIN );
   Serial1.print( "    1314 SDF7 Main\r\n" );
   Serial1.print( "    designed by hamayan.\r\n" );
 
@@ -156,7 +169,7 @@ int main(void)
   board.etherGpioInit();
 
   /* initialize SPI2 */
-  spi2.begin( SPI2, SEMID_SPI2, false );  /* SPI?,SEMAPHORE,REMAP */
+  spi2.begin( SPI2, SEMID_SPI2, SCK2_PIN, MOSI2_PIN, MISO2_PIN );  /* SPI?,SEMAPHORE,,sck,mosi,miso */
 
   /* initialize 23LCV1024 */
   sSRAM.begin( &spi2, RAM_CS );
@@ -248,7 +261,7 @@ int main(void)
   blinkLED( &actled, 500UL );
 
   /* initialize SPI3 */
-  spi3.begin( SPI3, SEMID_SPI3, false );  /* SPI?,SEMAPHORE,REMAP */
+  spi3.begin( SPI3, SEMID_SPI3, SCK3_PIN, MOSI3_PIN, MISO3_PIN );  /* SPI?,SEMAPHORE,sck,mosi,miso */
 
   /* initialize wiznet w5500 */
   wizchip1.clearNetworkInfo();
