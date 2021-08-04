@@ -11,21 +11,26 @@
 <editorArea activeWorkbook="DefaultEditorWorkbook">
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
 </folder>
 </info>
 </editorArea>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" partName="main.cpp" path="D:/Dropbox/projects/ARM/stm32fProjects/examples/1401Virgo/src/main.cpp" title="main.cpp" tooltip="D:/Dropbox/projects/ARM/stm32fProjects/examples/1401Virgo/src/main.cpp" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/1401Virgo/src/main.cpp"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3690" selectionTopPixel="2329"/>
+</editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
 <viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
 <expanded>
 <element path="/1401Virgo"/>
-<element path="/1401Virgo/board"/>
-<element path="/1401Virgo/stm32f4xx_cppLib"/>
+<element path="/1401Virgo/src"/>
 </expanded>
 <selection>
-<element path="/1401Virgo/board/1401.h"/>
+<element path="/1401Virgo/src/main.cpp"/>
 </selection>
 </viewState>
 </view>
@@ -65,7 +70,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.ui.console.ConsoleView" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.component.ui.actionSet"/>
@@ -211,58 +216,42 @@
 <view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view"/>
 <fastViewBars/>
 <viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
-<layout>
-<mainWindow>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1db3058">
-<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
-<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@1db3058">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.7496318" ratioLeft="1018" ratioRight="340" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1db3058">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.7496318" ratioLeft="1018" ratioRight="340" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1db3058">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1875737" ratio="0.58669573" ratioLeft="538" ratioRight="379" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1db3058">
-<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1875737" ratio="0.58669573" ratioLeft="538" ratioRight="379" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1db3058">&#x0A;<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="Breakpoints"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@22aeea" ratio="0.41225773" ratioLeft="787" ratioRight="1122" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1875737">
-<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">
-<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@22aeea" ratio="0.41225773" ratioLeft="787" ratioRight="1122" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1875737">&#x0A;<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
 <page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="Memory Browser"/>
 <page content="org.eclipse.debug.ui.RegisterView:PIN_CLONE_VIEW_1" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser:PIN_CLONE_VIEW_1" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@10f9c40" ratio="0.6987323" ratioLeft="937" ratioRight="404" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1db3058">
-<folder activePageID="org.eclipse.debug.ui.RegisterView" appearance="2" expanded="2">
-<page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@10f9c40" ratio="0.6987323" ratioLeft="937" ratioRight="404" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1db3058">&#x0A;<folder activePageID="org.eclipse.debug.ui.RegisterView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
 <page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
 <page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 </presentation>
 </folder>
@@ -273,54 +262,68 @@
 </perspective>
 </perspectives>
 <workingSets/>
-<navigationHistory/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/1401Virgo/board/1401.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/1401Virgo/src/main.cpp"/>
+</editors>
+<item historyLabel="1401.h" index="0">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item active="true" historyLabel="main.cpp" index="1">
+<position info="not_deleted" x="5720" y="73"/>
+</item>
+</navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
 </page>
 <workbenchWindowAdvisor/>
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx.h" tooltip="1401Virgo/cmsis_boot/stm32f4xx.h">
-<persistable path="/1401Virgo/cmsis_boot/stm32f4xx.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1415.cpp" tooltip="1415Basic/board/1415.cpp">
+<persistable path="/1415Basic/board/1415.cpp"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.cpp" tooltip="1401Virgo/src/main.cpp">
+<persistable path="/1401Virgo/src/main.cpp"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1401.h" tooltip="1401Virgo/board/1401.h">
 <persistable path="/1401Virgo/board/1401.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1401.cpp" tooltip="1401Virgo/board/1401.cpp">
-<persistable path="/1401Virgo/board/1401.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1804.h" tooltip="1804Ganimede/board/1804.h">
+<persistable path="/1804Ganimede/board/1804.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.cpp" tooltip="1401Virgo/stm32f4xx_cppLib/gpio.cpp">
-<persistable path="/1401Virgo/stm32f4xx_cppLib/gpio.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1804.cpp" tooltip="1804Ganimede/board/1804.cpp">
+<persistable path="/1804Ganimede/board/1804.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="gpio.h" tooltip="1401Virgo/stm32f4xx_cppLib/gpio.h">
-<persistable path="/1401Virgo/stm32f4xx_cppLib/gpio.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1411.cpp" tooltip="1804Ganimede/board/1411.cpp">
+<persistable path="/1804Ganimede/board/1411.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_gpio.h" tooltip="1401Virgo/cmsis_lib/include/stm32f4xx_gpio.h">
-<persistable path="/1401Virgo/cmsis_lib/include/stm32f4xx_gpio.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="FSMC.h" tooltip="1804Ganimede/stm32f4xx_cppLib/FSMC.h">
+<persistable path="/1804Ganimede/stm32f4xx_cppLib/FSMC.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="I2C.cpp" tooltip="1401Virgo/stm32f4xx_cppLib/I2C.cpp">
-<persistable path="/1401Virgo/stm32f4xx_cppLib/I2C.cpp"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="FSMC.h" tooltip="1415Basic/stm32f1xx_cppLib/FSMC.h">
+<persistable path="/1415Basic/stm32f1xx_cppLib/FSMC.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_tim.c" tooltip="1401Virgo/cmsis_lib/source/stm32f4xx_tim.c">
-<persistable path="/1401Virgo/cmsis_lib/source/stm32f4xx_tim.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="1415.h" tooltip="1415Basic/board/1415.h">
+<persistable path="/1415Basic/board/1415.h"/>
 </file>
-<file factoryID="org.eclipse.cdt.ui.ExternalEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="limits.h" tooltip="C:\Program Files (x86)\GNU Tools ARM Embedded\7 2017-q4-major\arm-none-eabi\include\limits.h">
-<persistable path="C:\Program Files (x86)\GNU Tools ARM Embedded\7 2017-q4-major\arm-none-eabi\include\limits.h" project="1401Virgo"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="EXTI.h" tooltip="1415Basic/stm32f1xx_cppLib/EXTI.h">
+<persistable path="/1415Basic/stm32f1xx_cppLib/EXTI.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="startup_stm32f4xx.c" tooltip="1401Virgo/cmsis_boot/startup/startup_stm32f4xx.c">
-<persistable path="/1401Virgo/cmsis_boot/startup/startup_stm32f4xx.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="EXTI.cpp" tooltip="1415Basic/stm32f1xx_cppLib/EXTI.cpp">
+<persistable path="/1415Basic/stm32f1xx_cppLib/EXTI.cpp"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_tim.h" tooltip="1401Virgo/cmsis_lib/include/stm32f4xx_tim.h">
-<persistable path="/1401Virgo/cmsis_lib/include/stm32f4xx_tim.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32fPeripheral.h" tooltip="1415Basic/stm32f1xx_cppLib/stm32fPeripheral.h">
+<persistable path="/1415Basic/stm32f1xx_cppLib/stm32fPeripheral.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_rcc.h" tooltip="1401Virgo/cmsis_lib/include/stm32f4xx_rcc.h">
-<persistable path="/1401Virgo/cmsis_lib/include/stm32f4xx_rcc.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_fsmc.h" tooltip="1415Basic/stm_lib/inc/stm32f10x_fsmc.h">
+<persistable path="/1415Basic/stm_lib/inc/stm32f10x_fsmc.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Timer.cpp" tooltip="1401Virgo/stm32f4xx_cppLib/Timer.cpp">
-<persistable path="/1401Virgo/stm32f4xx_cppLib/Timer.cpp"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Timer.h" tooltip="1401Virgo/stm32f4xx_cppLib/Timer.h">
-<persistable path="/1401Virgo/stm32f4xx_cppLib/Timer.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="FSMC.cpp" tooltip="1415Basic/stm32f1xx_cppLib/FSMC.cpp">
+<persistable path="/1415Basic/stm32f1xx_cppLib/FSMC.cpp"/>
 </file>
 </mruList>
 </workbench>
