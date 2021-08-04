@@ -325,17 +325,18 @@ int USART_UART::read()
 
 int USART_UART::read( uint8_t *dst, int size, TMO tmout )
 {
+  int count;
   SYSTIM baseTim = systim;
-  for( int i = 0; i < size; )
+  for( count = 0; count < size; )
   {
-    if( (systim - baseTim) > tmout ) return (-1);
+    if( (systim - baseTim) > tmout ) return count;
     int c = read();
     if( c < 0 ){ dly_tsk( 2UL ); continue; }
     baseTim = systim;
     *dst++ = (uint8_t)c;
-    i++;
+    count++;
   }
-  return 0;
+  return count;
 }
 
 /* ----------------------------------------
