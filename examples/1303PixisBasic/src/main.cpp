@@ -61,7 +61,7 @@ volatile time_t unixTime;
 volatile time_t sumTotalTime;  /* Total time since startup */
 
 Serial Serial1;  /* hardware serial 1 */
-BOARD  board;
+BOARD_1303  bd1303;
 
 /* ----------------------------------------
     tasks
@@ -98,7 +98,7 @@ int main(void)
   }
 
   /* initialize GPIO and external CPU bus. */
-  board.gpioInit();
+  bd1303.gpioInit();
 
   if( RTC_Init() != 0 )
   {
